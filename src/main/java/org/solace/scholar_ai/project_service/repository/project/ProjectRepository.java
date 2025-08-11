@@ -1,6 +1,5 @@
 package org.solace.scholar_ai.project_service.repository.project;
 
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,6 +23,4 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
 
     @Query("SELECT COUNT(p) FROM Project p WHERE p.userId = :userId AND p.status = :status")
     long countByUserIdAndStatus(@Param("userId") UUID userId, @Param("status") Project.Status status);
-
 }
-

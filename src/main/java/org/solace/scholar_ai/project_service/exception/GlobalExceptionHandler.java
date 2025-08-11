@@ -143,13 +143,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         }
 
         private ResponseEntity<Object> buildErrorResponse(
-                        Exception exception, String message, HttpStatus httpStatus, ErrorCode errorCode,
+                        Throwable exception, String message, HttpStatus httpStatus, ErrorCode errorCode,
                         WebRequest request) {
                 return buildErrorResponse(exception, message, httpStatus, errorCode, request, new ArrayList<>());
         }
 
         private ResponseEntity<Object> buildErrorResponse(
-                        Exception exception,
+                        Throwable exception,
                         String message,
                         HttpStatus httpStatus,
                         ErrorCode errorCode,
