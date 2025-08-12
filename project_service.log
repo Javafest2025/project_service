@@ -1,0 +1,106 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------< org.solace.scholar_ai:project_service >----------------
+[INFO] Building project_service 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.5.4:run (default-cli) > test-compile @ project_service >>>
+[INFO] 
+[INFO] --- git-commit-id:9.0.2:revision (default) @ project_service ---
+[INFO] dotGitDirectory 'D:\Javafest2025\ScholarAI\Microservices\project_service\.git'
+[INFO] Collected git.branch with value master
+[INFO] Collected git.commit.id.abbrev with value c40fece
+[INFO] Collected git.commit.user.name with value Tasriad Ahmed Tias
+[INFO] Collected git.commit.message.full with value project management added.
+[INFO] including property 'git.commit.user.name' in results
+[INFO] including property 'git.commit.id.abbrev' in results
+[INFO] including property 'git.branch' in results
+[INFO] including property 'git.commit.message.full' in results
+[INFO] Reading existing properties file [D:\Javafest2025\ScholarAI\Microservices\project_service\target\classes\git.properties] (for project project_service)...
+[INFO] Properties file [D:\Javafest2025\ScholarAI\Microservices\project_service\target\classes\git.properties] is up-to-date (for module project_service)...
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ project_service ---
+[INFO] Copying 4 resources from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.8.1:compile (default-compile) @ project_service ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 19 source files to D:\Javafest2025\ScholarAI\Microservices\project_service\target\classes
+[INFO] 
+[INFO] --- spotless:2.43.0:check (default) @ project_service ---
+[INFO] Spotless.Java is keeping 20 files clean - 8 needs changes to be clean, 0 were already clean, 12 were skipped because caching determined they were already clean
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  13.811 s
+[INFO] Finished at: 2025-08-12T16:09:53+06:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal com.diffplug.spotless:spotless-maven-plugin:2.43.0:check (default) on project project_service: The following files had format violations:
+[ERROR]     src\main\java\org\solace\scholar_ai\project_service\controller\project\ProjectController.java
+[ERROR]         @@ -1,6 +1,8 @@
+[ERROR]          package·org.solace.scholar_ai.project_service.controller.project;
+[ERROR]          
+[ERROR]          import·jakarta.validation.Valid;
+[ERROR]         +import·java.util.List;
+[ERROR]         +import·java.util.UUID;
+[ERROR]          import·lombok.RequiredArgsConstructor;
+[ERROR]          import·lombok.extern.slf4j.Slf4j;
+[ERROR]          import·org.solace.scholar_ai.project_service.dto.project.CreateProjectDto;
+[ERROR]         @@ -13,9 +15,6 @@
+[ERROR]          import·org.springframework.http.ResponseEntity;
+[ERROR]          import·org.springframework.web.bind.annotation.*;
+[ERROR]          
+[ERROR]         -import·java.util.List;
+[ERROR]         -import·java.util.UUID;
+[ERROR]         -
+[ERROR]          @Slf4j
+[ERROR]          @RestController
+[ERROR]          @RequestMapping("api/v1/projects")
+[ERROR]         @@ -163,8 +162,8 @@
+[ERROR]          ········try·{
+[ERROR]          ············log.info("Update·project·{}·endpoint·hit·for·user:·{}",·projectId,·updateProjectDto.userId());
+[ERROR]          
+[ERROR]         -············ProjectDto·updatedProject·=·projectService.updateProject(projectId,·updateProjectDto,
+[ERROR]         -····················updateProjectDto.userId());
+[ERROR]         +············ProjectDto·updatedProject·=
+[ERROR]         +····················projectService.updateProject(projectId,·updateProjectDto,·updateProjectDto.userId());
+[ERROR]          
+[ERROR]          ············return·ResponseEntity.ok(
+[ERROR]          ····················APIResponse.success(HttpStatus.OK.value(),·"Project·updated·successfully",·updatedProject));
+[ERROR]         @@ -184,8 +183,7 @@
+[ERROR]          ·····*·Delete·a·project
+[ERROR]          ·····*/
+[ERROR]          ····@DeleteMapping("/{projectId}")
+[ERROR]         -····public·ResponseEntity<APIResponse<String>>·deleteProject(
+[ERROR]         -············@PathVariable·UUID·projectId,·@RequestParam·UUID·userId)·{
+[ERROR]         +····public·ResponseEntity<APIResponse<String>>·deleteProject(@PathVariable·UUID·projectId,·@RequestParam·UUID·userId)·{
+[ERROR]          ········try·{
+[ERROR]          ············log.info("Delete·project·{}·endpoint·hit·for·user:·{}",·projectId,·userId);
+[ERROR]          
+[ERROR]         @@ -300,9 +298,8 @@
+[ERROR]          
+[ERROR]          ············projectService.updateProjectActiveTasksCount(projectId,·activeTasks);
+[ERROR]          
+[ERROR]         -············return·ResponseEntity.ok(
+[ERROR]         -····················APIResponse.success(HttpStatus.OK.value(),·"Project·active·tasks·count·updated·successfully",
+[ERROR]         -····························null));
+[ERROR]         +············return·ResponseEntity.ok(APIResponse.success(
+[ERROR]         +····················HttpStatus.OK.value(),·"Project·active·tasks·count·updated·successfully",·null));
+[ERROR]     ... (13 more lines that didn't fit)
+[ERROR] Violations also present in:
+[ERROR]     src\main\java\org\solace\scholar_ai\project_service\dto\project\CreateProjectDto.java
+[ERROR]     src\main\java\org\solace\scholar_ai\project_service\dto\project\UpdateProjectDto.java
+[ERROR]     src\main\java\org\solace\scholar_ai\project_service\exception\GlobalExceptionHandler.java
+[ERROR]     src\main\java\org\solace\scholar_ai\project_service\mapping\project\ProjectMapper.java
+[ERROR]     src\main\java\org\solace\scholar_ai\project_service\service\project\ProjectService.java
+[ERROR]     src\main\java\org\solace\scholar_ai\project_service\util\response\ResponseUtil.java
+[ERROR]     src\main\java\org\solace\scholar_ai\project_service\util\response\ResponseWrapper.java
+[ERROR] Run 'mvn spotless:apply' to fix these violations.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
