@@ -50,4 +50,3 @@ public class ResponseUtil {
                 .body(ResponseWrapper.error(createErrorResponse(status, errorCode, message)));
     }
 }
-

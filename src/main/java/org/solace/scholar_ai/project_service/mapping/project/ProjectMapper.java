@@ -1,6 +1,8 @@
 package org.solace.scholar_ai.project_service.mapping.project;
 
-
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -9,10 +11,6 @@ import org.solace.scholar_ai.project_service.dto.project.CreateProjectDto;
 import org.solace.scholar_ai.project_service.dto.project.ProjectDto;
 import org.solace.scholar_ai.project_service.dto.project.UpdateProjectDto;
 import org.solace.scholar_ai.project_service.model.project.Project;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
 
 @Mapper(componentModel = "spring")
 public interface ProjectMapper {
@@ -107,4 +105,3 @@ public interface ProjectMapper {
     @Mapping(target = "tags", source = "tags", qualifiedByName = "listToString")
     Project fromUpdateDto(UpdateProjectDto dto);
 }
-
