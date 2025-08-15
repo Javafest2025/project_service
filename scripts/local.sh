@@ -19,6 +19,7 @@ JAR_NAME="project_service-0.0.1-SNAPSHOT.jar"
 DEFAULT_PORT=8083
 PID_FILE="project_service.pid"
 LOG_FILE="project_service.log"
+MAVEN_CMD="mvn"
 
 # Function to print colored output
 print_status() {
@@ -55,12 +56,19 @@ check_java() {
 
 # Function to check if Maven is installed
 check_maven() {
-    if ! command -v mvn &> /dev/null; then
-        print_error "Maven is not installed or not in PATH"
+    # First try to use mvn command
+    if command -v mvn &> /dev/null; then
+        MAVEN_CMD="mvn"
+        print_success "Using system Maven: $(mvn -version | head -n 1)"
+    # Fallback to Maven wrapper if available
+    elif test -f ./mvnw; then
+        MAVEN_CMD="./mvnw"
+        print_success "Using Maven wrapper: $($MAVEN_CMD -version | head -n 1)"
+    else
+        print_error "Neither Maven (mvn) nor Maven wrapper (./mvnw) is available"
+        print_error "Please install Maven or ensure ./mvnw exists in the project"
         exit 1
     fi
-    
-    print_success "Maven version: $(mvn -version | head -n 1)"
 }
 
 # Function to format code
@@ -68,10 +76,10 @@ format() {
     print_status "Formatting code..."
     
     # Check if spotless is available
-    if mvn help:evaluate -Dexpression=plugin.artifactId -q -DforceStdout | grep -q "spotless-maven-plugin"; then
-        if ! mvn spotless:check; then
+    if $MAVEN_CMD help:evaluate -Dexpression=plugin.artifactId -q -DforceStdout | grep -q "spotless-maven-plugin"; then
+        if ! $MAVEN_CMD spotless:check; then
             print_status "Applying code format..."
-            mvn spotless:apply || {
+            $MAVEN_CMD spotless:apply || {
                 print_error "Formatting failed."
                 exit 1
             }
@@ -91,13 +99,13 @@ build() {
     format
     
     # Clean and compile
-    mvn clean compile
+    $MAVEN_CMD clean compile
     
     # Run tests
-    mvn test
+    $MAVEN_CMD test
     
     # Package the application
-    mvn package -DskipTests
+    $MAVEN_CMD package -DskipTests
     
     print_success "Build completed successfully!"
 }
@@ -105,7 +113,7 @@ build() {
 # Function to run tests
 test() {
     print_status "Running tests..."
-    mvn test
+    $MAVEN_CMD test
     print_success "Tests completed!"
 }
 
@@ -128,7 +136,7 @@ run() {
     fi
     
     # Start the application
-    nohup mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Dserver.port=$port" > "$LOG_FILE" 2>&1 &
+    nohup $MAVEN_CMD spring-boot:run -Dspring-boot.run.jvmArguments="-Dserver.port=$port" > "$LOG_FILE" 2>&1 &
     local pid=$!
     echo $pid > "$PID_FILE"
     
@@ -206,7 +214,7 @@ logs() {
 clean() {
     print_status "Cleaning up..."
     stop
-    mvn clean
+    $MAVEN_CMD clean
     rm -f "$LOG_FILE"
     print_success "Cleanup completed!"
 }
