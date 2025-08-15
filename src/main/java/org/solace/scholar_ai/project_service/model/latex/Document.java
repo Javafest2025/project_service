@@ -38,6 +38,21 @@ public class Document {
     @Column(name = "file_path")
     private String filePath;
 
+    @Column(name = "file_extension", length = 10)
+    private String fileExtension = "tex";
+
+    @Column(name = "file_size")
+    private Long fileSize;
+
+    @Column(name = "last_accessed")
+    private Instant lastAccessed;
+
+    @Column(name = "version", nullable = false)
+    private Integer version = 1;
+
+    @Column(name = "is_auto_saved", nullable = false)
+    private Boolean isAutoSaved = false;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

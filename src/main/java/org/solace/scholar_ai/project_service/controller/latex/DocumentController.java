@@ -121,4 +121,101 @@ public class DocumentController {
 
         return latexCompilationService.generatePDF(latexContent, filename);
     }
+
+    @PostMapping("/create-with-name")
+    public ResponseEntity<APIResponse<DocumentResponseDTO>> createDocumentWithName(
+            @RequestParam UUID projectId, @RequestParam String fileName) {
+        try {
+            DocumentResponseDTO document = documentService.createDocumentWithName(projectId, fileName);
+            APIResponse<DocumentResponseDTO> response = APIResponse.<DocumentResponseDTO>builder()
+                    .status(HttpStatus.CREATED.value())
+                    .message("Document created successfully")
+                    .data(document)
+                    .build();
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception e) {
+            APIResponse<DocumentResponseDTO> response = APIResponse.<DocumentResponseDTO>builder()
+                    .status(HttpStatus.BAD_REQUEST.value())
+                    .message("Failed to create document: " + e.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @PostMapping("/{documentId}/auto-save")
+    public ResponseEntity<APIResponse<DocumentResponseDTO>> autoSaveDocument(
+            @PathVariable UUID documentId, @RequestBody String content) {
+        try {
+            DocumentResponseDTO document = documentService.autoSaveDocument(documentId, content);
+            APIResponse<DocumentResponseDTO> response = APIResponse.<DocumentResponseDTO>builder()
+                    .status(HttpStatus.OK.value())
+                    .message("Document auto-saved successfully")
+                    .data(document)
+                    .build();
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            APIResponse<DocumentResponseDTO> response = APIResponse.<DocumentResponseDTO>builder()
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .message("Failed to auto-save document: " + e.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @PostMapping("/{documentId}/access")
+    public ResponseEntity<APIResponse<String>> updateLastAccessed(@PathVariable UUID documentId) {
+        try {
+            documentService.updateLastAccessed(documentId);
+            APIResponse<String> response = APIResponse.<String>builder()
+                    .status(HttpStatus.OK.value())
+                    .message("Last accessed updated successfully")
+                    .build();
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            APIResponse<String> response = APIResponse.<String>builder()
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .message("Failed to update last accessed: " + e.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<APIResponse<List<DocumentResponseDTO>>> searchDocuments(
+            @RequestParam UUID projectId, @RequestParam String query) {
+        try {
+            List<DocumentResponseDTO> documents = documentService.searchDocuments(projectId, query);
+            APIResponse<List<DocumentResponseDTO>> response = APIResponse.<List<DocumentResponseDTO>>builder()
+                    .status(HttpStatus.OK.value())
+                    .message("Documents found successfully")
+                    .data(documents)
+                    .build();
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            APIResponse<List<DocumentResponseDTO>> response = APIResponse.<List<DocumentResponseDTO>>builder()
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .message("Failed to search documents: " + e.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<APIResponse<Long>> getDocumentCount(@RequestParam UUID projectId) {
+        try {
+            long count = documentService.getDocumentCount(projectId);
+            APIResponse<Long> response = APIResponse.<Long>builder()
+                    .status(HttpStatus.OK.value())
+                    .message("Document count retrieved successfully")
+                    .data(count)
+                    .build();
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            APIResponse<Long> response = APIResponse.<Long>builder()
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .message("Failed to get document count: " + e.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
 }

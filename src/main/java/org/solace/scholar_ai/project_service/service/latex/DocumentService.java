@@ -1,6 +1,7 @@
 package org.solace.scholar_ai.project_service.service.latex;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.solace.scholar_ai.project_service.dto.latex.CreateDocumentRequestDTO;
@@ -50,10 +51,74 @@ public class DocumentService {
         }
         if (request.getContent() != null) {
             document.setContent(request.getContent());
+            // Calculate file size based on content length
+            document.setFileSize((long) request.getContent().length());
+            // Increment version on content change
+            document.setVersion(document.getVersion() + 1);
         }
 
         Document savedDocument = documentRepository.save(document);
         return documentMapper.toResponseDTO(savedDocument);
+    }
+
+    @Transactional
+    public DocumentResponseDTO autoSaveDocument(UUID documentId, String content) {
+        Document document = documentRepository
+                .findById(documentId)
+                .orElseThrow(() -> new RuntimeException("Document not found with id: " + documentId));
+
+        document.setContent(content);
+        document.setFileSize((long) content.length());
+        document.setIsAutoSaved(true);
+        // Update last accessed time
+        document.setLastAccessed(java.time.Instant.now());
+
+        Document savedDocument = documentRepository.save(document);
+        return documentMapper.toResponseDTO(savedDocument);
+    }
+
+    @Transactional
+    public void updateLastAccessed(UUID documentId) {
+        documentRepository.updateLastAccessed(documentId, java.time.Instant.now());
+    }
+
+    public DocumentResponseDTO createDocumentWithName(UUID projectId, String fileName) {
+        // Ensure file has .tex extension
+        if (!fileName.endsWith(".tex")) {
+            fileName = fileName + ".tex";
+        }
+
+        // Check if document with same name already exists
+        Optional<Document> existingDoc = documentRepository.findByProjectIdAndTitle(projectId, fileName);
+        if (existingDoc.isPresent()) {
+            throw new RuntimeException("Document with name '" + fileName + "' already exists in this project");
+        }
+
+        Document document = Document.builder()
+                .projectId(projectId)
+                .title(fileName)
+                .content(
+                        "% " + fileName
+                                + "\n\\documentclass{article}\n\\begin{document}\n\n% Start writing your LaTeX document here...\n\n\\end{document}")
+                .documentType(org.solace.scholar_ai.project_service.model.latex.DocumentType.LATEX)
+                .fileExtension("tex")
+                .fileSize(0L)
+                .version(1)
+                .isAutoSaved(false)
+                .build();
+
+        Document savedDocument = documentRepository.save(document);
+        return documentMapper.toResponseDTO(savedDocument);
+    }
+
+    public List<DocumentResponseDTO> searchDocuments(UUID projectId, String query) {
+        List<Document> documents =
+                documentRepository.findByProjectIdAndTitleContainingIgnoreCaseOrderByUpdatedAtDesc(projectId, query);
+        return documentMapper.toResponseDTOList(documents);
+    }
+
+    public long getDocumentCount(UUID projectId) {
+        return documentRepository.countByProjectId(projectId);
     }
 
     @Transactional
