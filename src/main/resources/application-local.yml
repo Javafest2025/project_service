@@ -95,6 +95,17 @@ springdoc:
     # Enable try it out by default
     tryItOutEnabled: true
 
+scholarai:
+  fastapi:
+    base-url: http://localhost:8001
+  rabbitmq:
+    exchange: scholarai.exchange
+    web-search:
+      queue: scholarai.websearch.queue
+      routing-key: scholarai.websearch
+      completed-queue: scholarai.websearch.completed.queue
+      completed-routing-key: scholarai.websearch.completed
+
 
 cors:
   allowed-origins: "https://localhost:3000,https://example.com"
@@ -107,9 +118,11 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     org.springframework.security: DEBUG
 
-    # quiet only Eureka-related logs
-    com.netflix.discovery: WARN
-    com.netflix.eureka: WARN
-    org.springframework.cloud.netflix.eureka: WARN
-    org.springframework.cloud.client.discovery: INFO
+    # Completely silence Eureka-related logs
+    com.netflix.discovery: ERROR
+    com.netflix.eureka: ERROR
+    org.springframework.cloud.netflix.eureka: ERROR
+    org.springframework.cloud.client.discovery: ERROR
+    com.netflix.discovery.shared.transport: ERROR
+    com.netflix.discovery.InstanceInfoReplicator: ERROR
 
