@@ -3,7 +3,6 @@ package org.solace.scholar_ai.project_service.util.response;
 import lombok.Getter;
 import org.solace.scholar_ai.project_service.dto.response.APIErrorResponse;
 
-
 /**
  * Wrapper class for API responses that can handle both success and error cases.
  */

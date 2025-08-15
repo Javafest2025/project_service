@@ -1,6 +1,8 @@
 package org.solace.scholar_ai.project_service.controller.project;
 
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solace.scholar_ai.project_service.dto.project.CreateProjectDto;
@@ -12,9 +14,6 @@ import org.solace.scholar_ai.project_service.service.project.ProjectService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -163,8 +162,8 @@ public class ProjectController {
         try {
             log.info("Update project {} endpoint hit for user: {}", projectId, updateProjectDto.userId());
 
-            ProjectDto updatedProject = projectService.updateProject(projectId, updateProjectDto,
-                    updateProjectDto.userId());
+            ProjectDto updatedProject =
+                    projectService.updateProject(projectId, updateProjectDto, updateProjectDto.userId());
 
             return ResponseEntity.ok(
                     APIResponse.success(HttpStatus.OK.value(), "Project updated successfully", updatedProject));
@@ -184,8 +183,7 @@ public class ProjectController {
      * Delete a project
      */
     @DeleteMapping("/{projectId}")
-    public ResponseEntity<APIResponse<String>> deleteProject(
-            @PathVariable UUID projectId, @RequestParam UUID userId) {
+    public ResponseEntity<APIResponse<String>> deleteProject(@PathVariable UUID projectId, @RequestParam UUID userId) {
         try {
             log.info("Delete project {} endpoint hit for user: {}", projectId, userId);
 
@@ -300,9 +298,8 @@ public class ProjectController {
 
             projectService.updateProjectActiveTasksCount(projectId, activeTasks);
 
-            return ResponseEntity.ok(
-                    APIResponse.success(HttpStatus.OK.value(), "Project active tasks count updated successfully",
-                            null));
+            return ResponseEntity.ok(APIResponse.success(
+                    HttpStatus.OK.value(), "Project active tasks count updated successfully", null));
         } catch (RuntimeException e) {
             log.error("Error updating active tasks count for project {}: {}", projectId, e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -311,7 +308,8 @@ public class ProjectController {
             log.error("Unexpected error updating active tasks count for project {}: {}", projectId, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(APIResponse.error(
-                            HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to update project active tasks count",
+                            HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                            "Failed to update project active tasks count",
                             null));
         }
     }

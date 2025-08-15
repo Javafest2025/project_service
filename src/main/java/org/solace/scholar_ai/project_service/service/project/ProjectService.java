@@ -1,5 +1,8 @@
 package org.solace.scholar_ai.project_service.service.project;
 
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solace.scholar_ai.project_service.dto.project.CreateProjectDto;
@@ -10,10 +13,6 @@ import org.solace.scholar_ai.project_service.model.project.Project;
 import org.solace.scholar_ai.project_service.repository.project.ProjectRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -44,7 +43,8 @@ public class ProjectService {
     public ProjectDto getProjectById(UUID projectId, UUID userId) {
         log.info("Fetching project with ID: {} for user: {}", projectId, userId);
 
-        Project project = projectRepository.findByIdAndUserId(projectId, userId)
+        Project project = projectRepository
+                .findByIdAndUserId(projectId, userId)
                 .orElseThrow(() -> new RuntimeException("Project not found or access denied"));
 
         return projectMapper.toDto(project);
@@ -58,9 +58,7 @@ public class ProjectService {
         log.info("Fetching all projects for user: {}", userId);
 
         List<Project> projects = projectRepository.findByUserId(userId);
-        return projects.stream()
-                .map(projectMapper::toDto)
-                .collect(Collectors.toList());
+        return projects.stream().map(projectMapper::toDto).collect(Collectors.toList());
     }
 
     /**
@@ -91,7 +89,8 @@ public class ProjectService {
     public ProjectDto updateProject(UUID projectId, UpdateProjectDto updateProjectDto, UUID userId) {
         log.info("Updating project with ID: {} for user: {}", projectId, userId);
 
-        Project existingProject = projectRepository.findByIdAndUserId(projectId, userId)
+        Project existingProject = projectRepository
+                .findByIdAndUserId(projectId, userId)
                 .orElseThrow(() -> new RuntimeException("Project not found or access denied"));
 
         // Update fields from DTO
@@ -151,8 +150,8 @@ public class ProjectService {
     public void updateProjectPaperCount(UUID projectId, int totalPapers) {
         log.info("Updating paper count for project: {} to: {}", projectId, totalPapers);
 
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+        Project project =
+                projectRepository.findById(projectId).orElseThrow(() -> new RuntimeException("Project not found"));
 
         project.setTotalPapers(totalPapers);
         projectRepository.save(project);
@@ -164,8 +163,8 @@ public class ProjectService {
     public void updateProjectActiveTasksCount(UUID projectId, int activeTasks) {
         log.info("Updating active tasks count for project: {} to: {}", projectId, activeTasks);
 
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+        Project project =
+                projectRepository.findById(projectId).orElseThrow(() -> new RuntimeException("Project not found"));
 
         project.setActiveTasks(activeTasks);
         projectRepository.save(project);
@@ -185,7 +184,8 @@ public class ProjectService {
     public ProjectDto toggleProjectStar(UUID projectId, UUID userId) {
         log.info("Toggling star status for project: {} and user: {}", projectId, userId);
 
-        Project project = projectRepository.findByIdAndUserId(projectId, userId)
+        Project project = projectRepository
+                .findByIdAndUserId(projectId, userId)
                 .orElseThrow(() -> new RuntimeException("Project not found or access denied"));
 
         project.setIsStarred(!project.getIsStarred());
