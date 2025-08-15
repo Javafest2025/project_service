@@ -10,20 +10,15 @@
 [INFO] --- git-commit-id:9.0.2:revision (default) @ project_service ---
 [INFO] dotGitDirectory 'C:\Code\JavaFestMain\microservices\project_service\.git'
 [INFO] Collected git.branch with value main
-[INFO] Collected git.commit.id.abbrev with value b6726c9
+[INFO] Collected git.commit.id.abbrev with value 64110cd
 [INFO] Collected git.commit.user.name with value Legend-2727
-[INFO] Collected git.commit.message.full with value Enhanced Maven detection: fallback from mvn to ./mvnw
-
-- Updated check_maven() to first try system mvn, then fallback to ./mvnw
-- Added MAVEN_CMD variable to track which Maven command to use
-- Updated all Maven command calls to use detected Maven command
-- Improved error messages and feedback for Maven detection
+[INFO] Collected git.commit.message.full with value Complete LaTeX integration: Add all LaTeX controllers, services, DTOs, models, repositories, and Jackson configuration for LocalDateTime support
 [INFO] including property 'git.commit.user.name' in results
 [INFO] including property 'git.commit.id.abbrev' in results
 [INFO] including property 'git.branch' in results
 [INFO] including property 'git.commit.message.full' in results
 [INFO] Reading existing properties file [C:\Code\JavaFestMain\microservices\project_service\target\classes\git.properties] (for project project_service)...
-[INFO] Properties file [C:\Code\JavaFestMain\microservices\project_service\target\classes\git.properties] is up-to-date (for module project_service)...
+[INFO] Writing properties file [C:\Code\JavaFestMain\microservices\project_service\target\classes\git.properties] (for project project_service)...
 [INFO] 
 [INFO] --- resources:3.3.1:resources (default-resources) @ project_service ---
 [INFO] Copying 4 resources from src\main\resources to target\classes
@@ -31,13 +26,13 @@
 [INFO] 
 [INFO] --- compiler:3.8.1:compile (default-compile) @ project_service ---
 [INFO] Changes detected - recompiling the module!
-[INFO] Compiling 34 source files to C:\Code\JavaFestMain\microservices\project_service\target\classes
+[INFO] Compiling 71 source files to C:\Code\JavaFestMain\microservices\project_service\target\classes
 [INFO] /C:/Code/JavaFestMain/microservices/project_service/src/main/java/org/solace/scholar_ai/project_service/service/latex/AIAssistanceService.java: C:\Code\JavaFestMain\microservices\project_service\src\main\java\org\solace\scholar_ai\project_service\service\latex\AIAssistanceService.java uses unchecked or unsafe operations.
 [INFO] /C:/Code/JavaFestMain/microservices/project_service/src/main/java/org/solace/scholar_ai/project_service/service/latex/AIAssistanceService.java: Recompile with -Xlint:unchecked for details.
 [INFO] 
 [INFO] --- spotless:2.43.0:check (default) @ project_service ---
 [INFO] Index file corresponds to a different configuration of the plugin. Either the plugin version or its configuration has changed. Fallback to an empty index
-[INFO] Spotless.Java is keeping 35 files clean - 0 needs changes to be clean, 35 were already clean, 0 were skipped because caching determined they were already clean
+[INFO] Spotless.Java is keeping 72 files clean - 0 needs changes to be clean, 72 were already clean, 0 were skipped because caching determined they were already clean
 [INFO] 
 [INFO] --- resources:3.3.1:testResources (default-testResources) @ project_service ---
 [INFO] skip non existing resourceDirectory C:\Code\JavaFestMain\microservices\project_service\src\test\resources
@@ -61,28 +56,28 @@
 
  :: Spring Boot ::                (v3.5.4)
 
-2025-08-16T00:07:53.845+06:00  INFO 67500 --- [project-service] [  restartedMain] o.s.s.p.ProjectServiceApplication        : Starting ProjectServiceApplication using Java 21.0.7 with PID 67500 (C:\Code\JavaFestMain\microservices\project_service\target\classes started by alami in C:\Code\JavaFestMain\microservices\project_service)
-2025-08-16T00:07:53.848+06:00  INFO 67500 --- [project-service] [  restartedMain] o.s.s.p.ProjectServiceApplication        : The following 1 profile is active: "local"
-2025-08-16T00:07:53.909+06:00  INFO 67500 --- [project-service] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
-2025-08-16T00:07:53.910+06:00  INFO 67500 --- [project-service] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
-2025-08-16T00:07:55.675+06:00  INFO 67500 --- [project-service] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2025-08-16T00:07:55.896+06:00  INFO 67500 --- [project-service] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 209 ms. Found 2 JPA repository interfaces.
-2025-08-16T00:07:56.216+06:00  INFO 67500 --- [project-service] [  restartedMain] o.s.cloud.context.scope.GenericScope     : BeanFactory id=d2c63af1-bbc2-31c6-8e50-222e7dd76379
-2025-08-16T00:07:56.887+06:00  INFO 67500 --- [project-service] [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8083 (http)
-2025-08-16T00:07:56.904+06:00  INFO 67500 --- [project-service] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2025-08-16T00:07:56.905+06:00  INFO 67500 --- [project-service] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.43]
-2025-08-16T00:07:56.978+06:00  INFO 67500 --- [project-service] [  restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2025-08-16T00:07:56.979+06:00  INFO 67500 --- [project-service] [  restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 3068 ms
-2025-08-16T00:07:57.193+06:00 DEBUG 67500 --- [project-service] [  restartedMain] o.s.w.f.ServerHttpObservationFilter      : Filter 'webMvcObservationFilter' configured for use
-2025-08-16T00:07:57.387+06:00  INFO 67500 --- [project-service] [  restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
-2025-08-16T00:07:57.478+06:00  INFO 67500 --- [project-service] [  restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.22.Final
-2025-08-16T00:07:57.527+06:00  INFO 67500 --- [project-service] [  restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
-2025-08-16T00:07:57.878+06:00  INFO 67500 --- [project-service] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2025-08-16T00:07:57.922+06:00  INFO 67500 --- [project-service] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2025-08-16T00:07:58.123+06:00  INFO 67500 --- [project-service] [  restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@439714db
-2025-08-16T00:07:58.126+06:00  INFO 67500 --- [project-service] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2025-08-16T00:07:58.170+06:00  WARN 67500 --- [project-service] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2025-08-16T00:07:58.200+06:00  INFO 67500 --- [project-service] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+2025-08-16T00:19:28.111+06:00  INFO 24396 --- [project-service] [  restartedMain] o.s.s.p.ProjectServiceApplication        : Starting ProjectServiceApplication using Java 21.0.7 with PID 24396 (C:\Code\JavaFestMain\microservices\project_service\target\classes started by alami in C:\Code\JavaFestMain\microservices\project_service)
+2025-08-16T00:19:28.114+06:00  INFO 24396 --- [project-service] [  restartedMain] o.s.s.p.ProjectServiceApplication        : The following 1 profile is active: "local"
+2025-08-16T00:19:28.157+06:00  INFO 24396 --- [project-service] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-08-16T00:19:28.157+06:00  INFO 24396 --- [project-service] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-08-16T00:19:29.648+06:00  INFO 24396 --- [project-service] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-08-16T00:19:29.932+06:00  INFO 24396 --- [project-service] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 275 ms. Found 7 JPA repository interfaces.
+2025-08-16T00:19:30.294+06:00  INFO 24396 --- [project-service] [  restartedMain] o.s.cloud.context.scope.GenericScope     : BeanFactory id=0ff576f6-eff3-3763-823c-95c53a8f1711
+2025-08-16T00:19:30.789+06:00  INFO 24396 --- [project-service] [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8083 (http)
+2025-08-16T00:19:30.802+06:00  INFO 24396 --- [project-service] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-08-16T00:19:30.802+06:00  INFO 24396 --- [project-service] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.43]
+2025-08-16T00:19:30.856+06:00  INFO 24396 --- [project-service] [  restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-08-16T00:19:30.857+06:00  INFO 24396 --- [project-service] [  restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2699 ms
+2025-08-16T00:19:31.017+06:00 DEBUG 24396 --- [project-service] [  restartedMain] o.s.w.f.ServerHttpObservationFilter      : Filter 'webMvcObservationFilter' configured for use
+2025-08-16T00:19:31.137+06:00  INFO 24396 --- [project-service] [  restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-08-16T00:19:31.189+06:00  INFO 24396 --- [project-service] [  restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.22.Final
+2025-08-16T00:19:31.224+06:00  INFO 24396 --- [project-service] [  restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-08-16T00:19:31.510+06:00  INFO 24396 --- [project-service] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-08-16T00:19:31.554+06:00  INFO 24396 --- [project-service] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-08-16T00:19:31.759+06:00  INFO 24396 --- [project-service] [  restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@4163a9d6
+2025-08-16T00:19:31.763+06:00  INFO 24396 --- [project-service] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-08-16T00:19:31.822+06:00  WARN 24396 --- [project-service] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-08-16T00:19:31.874+06:00  INFO 24396 --- [project-service] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
 	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
 	Database driver: undefined/unknown
 	Database version: 17.5
@@ -90,58 +85,60 @@
 	Isolation level: undefined/unknown
 	Minimum pool size: undefined/unknown
 	Maximum pool size: undefined/unknown
-2025-08-16T00:07:59.282+06:00  INFO 67500 --- [project-service] [  restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2025-08-16T00:07:59.365+06:00  INFO 67500 --- [project-service] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2025-08-16T00:07:59.755+06:00  INFO 67500 --- [project-service] [  restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
-2025-08-16T00:08:00.665+06:00  WARN 67500 --- [project-service] [  restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2025-08-16T00:08:00.798+06:00 DEBUG 67500 --- [project-service] [  restartedMain] s.w.s.m.m.a.RequestMappingHandlerMapping : 33 mappings in 'requestMappingHandlerMapping'
-2025-08-16T00:08:00.870+06:00 DEBUG 67500 --- [project-service] [  restartedMain] o.s.w.s.handler.SimpleUrlHandlerMapping  : Patterns [/webjars/**, /**, /swagger-ui*/*swagger-initializer.js, /swagger-ui*/**] in 'resourceHandlerMapping'
-2025-08-16T00:08:00.951+06:00 DEBUG 67500 --- [project-service] [  restartedMain] s.w.s.m.m.a.RequestMappingHandlerAdapter : ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
-2025-08-16T00:08:01.046+06:00 DEBUG 67500 --- [project-service] [  restartedMain] .m.m.a.ExceptionHandlerExceptionResolver : ControllerAdvice beans: 2 @ExceptionHandler, 1 ResponseBodyAdvice
-2025-08-16T00:08:02.820+06:00  INFO 67500 --- [project-service] [  restartedMain] o.s.cloud.commons.util.InetUtils         : Cannot determine local hostname
-2025-08-16T00:08:03.265+06:00  WARN 67500 --- [project-service] [  restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : Unable to start LiveReload server
-2025-08-16T00:08:04.297+06:00  INFO 67500 --- [project-service] [  restartedMain] o.s.cloud.commons.util.InetUtils         : Cannot determine local hostname
-2025-08-16T00:08:04.417+06:00  WARN 67500 --- [project-service] [  restartedMain] iguration$LoadBalancerCaffeineWarnLogger : Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
-2025-08-16T00:08:04.431+06:00  INFO 67500 --- [project-service] [  restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 3 endpoints beneath base path '/actuator'
-2025-08-16T00:08:04.849+06:00 DEBUG 67500 --- [project-service] [  restartedMain] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/
-2025-08-16T00:08:05.055+06:00 DEBUG 67500 --- [project-service] [  restartedMain] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:08:05.126+06:00 DEBUG 67500 --- [project-service] [  restartedMain] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:08:05.129+06:00 DEBUG 67500 --- [project-service] [  restartedMain] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
-2025-08-16T00:08:05.201+06:00 DEBUG 67500 --- [project-service] [foReplicator-%d] o.s.web.client.RestTemplate              : HTTP POST http://localhost:8761/eureka/apps/PROJECT-SERVICE
-2025-08-16T00:08:05.205+06:00 DEBUG 67500 --- [project-service] [foReplicator-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:08:05.223+06:00 DEBUG 67500 --- [project-service] [foReplicator-%d] o.s.web.client.RestTemplate              : Writing [InstanceInfo [instanceId = localhost:project-service:8083, appName = PROJECT-SERVICE, hostName = localhost, status = UP, ipAddr = 192.168.56.1, port = 8083, securePort = 443, dataCenterInfo = com.netflix.appinfo.MyDataCenterInfo@4e2e5c4a] as "application/json"
-2025-08-16T00:08:05.225+06:00  INFO 67500 --- [project-service] [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8083 (http) with context path '/'
-2025-08-16T00:08:05.260+06:00 DEBUG 67500 --- [project-service] [foReplicator-%d] o.s.web.client.RestTemplate              : Response 204 NO_CONTENT
-2025-08-16T00:08:06.240+06:00  INFO 67500 --- [project-service] [  restartedMain] o.s.cloud.commons.util.InetUtils         : Cannot determine local hostname
-2025-08-16T00:08:06.263+06:00  INFO 67500 --- [project-service] [  restartedMain] o.s.s.p.ProjectServiceApplication        : Started ProjectServiceApplication in 14.047 seconds (process running for 14.846)
-2025-08-16T00:08:35.192+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
-2025-08-16T00:08:35.194+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/PROJECT-SERVICE/localhost:project-service:8083?status=UP&lastDirtyTimestamp=1755281285193
-2025-08-16T00:08:35.194+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:08:35.199+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:08:35.211+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:08:35.211+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:08:35.211+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
-2025-08-16T00:09:05.212+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/PROJECT-SERVICE/localhost:project-service:8083?status=UP&lastDirtyTimestamp=1755281285193
-2025-08-16T00:09:05.212+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:09:05.227+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
-2025-08-16T00:09:05.228+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:09:05.232+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:09:05.245+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:09:05.245+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
-2025-08-16T00:09:15.158+06:00  INFO 67500 --- [project-service] [nio-8083-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2025-08-16T00:09:15.158+06:00  INFO 67500 --- [project-service] [nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2025-08-16T00:09:15.158+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Detected StandardServletMultipartResolver
-2025-08-16T00:09:15.158+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Detected AcceptHeaderLocaleResolver
-2025-08-16T00:09:15.158+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Detected FixedThemeResolver
-2025-08-16T00:09:15.160+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@b71ad0c
-2025-08-16T00:09:15.160+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Detected org.springframework.web.servlet.support.SessionFlashMapManager@5c650b3b
-2025-08-16T00:09:15.160+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
-2025-08-16T00:09:15.160+06:00  INFO 67500 --- [project-service] [nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
-2025-08-16T00:09:15.173+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : GET "/api/v1/projects?userId=a31653f9-f725-4e3d-ac69-e63beda5c55d", parameters={masked}
-2025-08-16T00:09:15.180+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-1] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.solace.scholar_ai.project_service.controller.project.ProjectController#getAllProjects(UUID)
-2025-08-16T00:09:15.199+06:00  INFO 67500 --- [project-service] [nio-8083-exec-1] o.s.s.p.c.project.ProjectController      : Get all projects endpoint hit for user: a31653f9-f725-4e3d-ac69-e63beda5c55d
-2025-08-16T00:09:15.209+06:00  INFO 67500 --- [project-service] [nio-8083-exec-1] o.s.s.p.service.project.ProjectService   : Fetching all projects for user: a31653f9-f725-4e3d-ac69-e63beda5c55d
-2025-08-16T00:09:15.287+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-1] org.hibernate.SQL                        : 
+2025-08-16T00:19:33.792+06:00  INFO 24396 --- [project-service] [  restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-16T00:19:34.617+06:00  INFO 24396 --- [project-service] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-08-16T00:19:35.414+06:00  INFO 24396 --- [project-service] [  restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-08-16T00:19:37.072+06:00  WARN 24396 --- [project-service] [  restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-08-16T00:19:37.192+06:00 DEBUG 24396 --- [project-service] [  restartedMain] s.w.s.m.m.a.RequestMappingHandlerMapping : 41 mappings in 'requestMappingHandlerMapping'
+2025-08-16T00:19:37.255+06:00 DEBUG 24396 --- [project-service] [  restartedMain] o.s.w.s.handler.SimpleUrlHandlerMapping  : Patterns [/webjars/**, /**, /swagger-ui*/*swagger-initializer.js, /swagger-ui*/**] in 'resourceHandlerMapping'
+2025-08-16T00:19:37.299+06:00 DEBUG 24396 --- [project-service] [  restartedMain] s.w.s.m.m.a.RequestMappingHandlerAdapter : ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2025-08-16T00:19:37.355+06:00 DEBUG 24396 --- [project-service] [  restartedMain] .m.m.a.ExceptionHandlerExceptionResolver : ControllerAdvice beans: 2 @ExceptionHandler, 1 ResponseBodyAdvice
+2025-08-16T00:19:38.679+06:00  INFO 24396 --- [project-service] [  restartedMain] o.s.cloud.commons.util.InetUtils         : Cannot determine local hostname
+2025-08-16T00:19:38.995+06:00  WARN 24396 --- [project-service] [  restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : Unable to start LiveReload server
+2025-08-16T00:19:40.012+06:00  INFO 24396 --- [project-service] [  restartedMain] o.s.cloud.commons.util.InetUtils         : Cannot determine local hostname
+2025-08-16T00:19:40.111+06:00  WARN 24396 --- [project-service] [  restartedMain] iguration$LoadBalancerCaffeineWarnLogger : Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+2025-08-16T00:19:40.123+06:00  INFO 24396 --- [project-service] [  restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 3 endpoints beneath base path '/actuator'
+2025-08-16T00:19:40.453+06:00 DEBUG 24396 --- [project-service] [  restartedMain] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/
+2025-08-16T00:19:40.604+06:00 DEBUG 24396 --- [project-service] [  restartedMain] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:19:40.651+06:00 DEBUG 24396 --- [project-service] [  restartedMain] o.s.web.client.RestTemplate              : Response 200 OK
+2025-08-16T00:19:40.653+06:00 DEBUG 24396 --- [project-service] [  restartedMain] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
+2025-08-16T00:19:40.703+06:00 DEBUG 24396 --- [project-service] [foReplicator-%d] o.s.web.client.RestTemplate              : HTTP POST http://localhost:8761/eureka/apps/PROJECT-SERVICE
+2025-08-16T00:19:40.706+06:00 DEBUG 24396 --- [project-service] [foReplicator-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:19:40.715+06:00  INFO 24396 --- [project-service] [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8083 (http) with context path '/'
+2025-08-16T00:19:40.719+06:00 DEBUG 24396 --- [project-service] [foReplicator-%d] o.s.web.client.RestTemplate              : Writing [InstanceInfo [instanceId = localhost:project-service:8083, appName = PROJECT-SERVICE, hostName = localhost, status = UP, ipAddr = 192.168.56.1, port = 8083, securePort = 443, dataCenterInfo = com.netflix.appinfo.MyDataCenterInfo@6645a8d1] as "application/json"
+2025-08-16T00:19:40.744+06:00 DEBUG 24396 --- [project-service] [foReplicator-%d] o.s.web.client.RestTemplate              : Response 204 NO_CONTENT
+2025-08-16T00:19:41.734+06:00  INFO 24396 --- [project-service] [  restartedMain] o.s.cloud.commons.util.InetUtils         : Cannot determine local hostname
+2025-08-16T00:19:41.736+06:00  INFO 24396 --- [project-service] [  restartedMain] o.s.a.r.c.CachingConnectionFactory       : Attempting to connect to: [localhost:5672]
+2025-08-16T00:19:41.788+06:00  INFO 24396 --- [project-service] [  restartedMain] o.s.a.r.c.CachingConnectionFactory       : Created new connection: rabbitConnectionFactory#7e412147:0/SimpleConnection@36514c5a [delegate=amqp://scholar@127.0.0.1:5672/, localPort=8227]
+2025-08-16T00:19:41.884+06:00  INFO 24396 --- [project-service] [  restartedMain] o.s.s.p.ProjectServiceApplication        : Started ProjectServiceApplication in 15.43 seconds (process running for 16.238)
+2025-08-16T00:20:10.695+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
+2025-08-16T00:20:10.695+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/PROJECT-SERVICE/localhost:project-service:8083?status=UP&lastDirtyTimestamp=1755281980696
+2025-08-16T00:20:10.695+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:20:10.699+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:20:10.712+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
+2025-08-16T00:20:10.712+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
+2025-08-16T00:20:10.713+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
+2025-08-16T00:20:40.716+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/PROJECT-SERVICE/localhost:project-service:8083?status=UP&lastDirtyTimestamp=1755281980696
+2025-08-16T00:20:40.716+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:20:40.730+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
+2025-08-16T00:20:40.730+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:20:40.733+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
+2025-08-16T00:20:40.749+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
+2025-08-16T00:20:40.749+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
+2025-08-16T00:20:46.443+06:00  INFO 24396 --- [project-service] [nio-8083-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-08-16T00:20:46.443+06:00  INFO 24396 --- [project-service] [nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-08-16T00:20:46.443+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Detected StandardServletMultipartResolver
+2025-08-16T00:20:46.443+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Detected AcceptHeaderLocaleResolver
+2025-08-16T00:20:46.443+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Detected FixedThemeResolver
+2025-08-16T00:20:46.445+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@343db368
+2025-08-16T00:20:46.446+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Detected org.springframework.web.servlet.support.SessionFlashMapManager@430ff07d
+2025-08-16T00:20:46.446+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+2025-08-16T00:20:46.446+06:00  INFO 24396 --- [project-service] [nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 3 ms
+2025-08-16T00:20:46.459+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : GET "/api/v1/projects?userId=a31653f9-f725-4e3d-ac69-e63beda5c55d", parameters={masked}
+2025-08-16T00:20:46.467+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-1] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.solace.scholar_ai.project_service.controller.project.ProjectController#getAllProjects(UUID)
+2025-08-16T00:20:46.487+06:00  INFO 24396 --- [project-service] [nio-8083-exec-1] o.s.s.p.c.project.ProjectController      : Get all projects endpoint hit for user: a31653f9-f725-4e3d-ac69-e63beda5c55d
+2025-08-16T00:20:46.498+06:00  INFO 24396 --- [project-service] [nio-8083-exec-1] o.s.s.p.service.project.ProjectService   : Fetching all projects for user: a31653f9-f725-4e3d-ac69-e63beda5c55d
+2025-08-16T00:20:46.586+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-1] org.hibernate.SQL                        : 
     /* <criteria> */ select
         p1_0.id,
         p1_0.active_tasks,
@@ -183,14 +180,14 @@ Hibernate:
         projects p1_0 
     where
         p1_0.user_id=?
-2025-08-16T00:09:15.355+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-1] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [application/json] and supported [application/json, application/*+json, application/yaml]
-2025-08-16T00:09:15.366+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-1] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [APIResponse(timestamp=2025-08-16T00:09:15.345414900, status=200, message=Projects retrieved successf (truncated)...]
-2025-08-16T00:09:15.384+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
-2025-08-16T00:09:15.394+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-2] o.s.web.servlet.DispatcherServlet        : GET "/api/v1/projects?userId=a31653f9-f725-4e3d-ac69-e63beda5c55d", parameters={masked}
-2025-08-16T00:09:15.395+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-2] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.solace.scholar_ai.project_service.controller.project.ProjectController#getAllProjects(UUID)
-2025-08-16T00:09:15.395+06:00  INFO 67500 --- [project-service] [nio-8083-exec-2] o.s.s.p.c.project.ProjectController      : Get all projects endpoint hit for user: a31653f9-f725-4e3d-ac69-e63beda5c55d
-2025-08-16T00:09:15.396+06:00  INFO 67500 --- [project-service] [nio-8083-exec-2] o.s.s.p.service.project.ProjectService   : Fetching all projects for user: a31653f9-f725-4e3d-ac69-e63beda5c55d
-2025-08-16T00:09:15.397+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-2] org.hibernate.SQL                        : 
+2025-08-16T00:20:46.646+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-1] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [application/json] and supported [application/json, application/*+json, application/yaml]
+2025-08-16T00:20:46.656+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-1] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [APIResponse(timestamp=2025-08-16T00:20:46.636756200, status=200, message=Projects retrieved successf (truncated)...]
+2025-08-16T00:20:46.688+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2025-08-16T00:20:46.696+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-2] o.s.web.servlet.DispatcherServlet        : GET "/api/v1/projects?userId=a31653f9-f725-4e3d-ac69-e63beda5c55d", parameters={masked}
+2025-08-16T00:20:46.698+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-2] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.solace.scholar_ai.project_service.controller.project.ProjectController#getAllProjects(UUID)
+2025-08-16T00:20:46.698+06:00  INFO 24396 --- [project-service] [nio-8083-exec-2] o.s.s.p.c.project.ProjectController      : Get all projects endpoint hit for user: a31653f9-f725-4e3d-ac69-e63beda5c55d
+2025-08-16T00:20:46.698+06:00  INFO 24396 --- [project-service] [nio-8083-exec-2] o.s.s.p.service.project.ProjectService   : Fetching all projects for user: a31653f9-f725-4e3d-ac69-e63beda5c55d
+2025-08-16T00:20:46.700+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-2] org.hibernate.SQL                        : 
     /* <criteria> */ select
         p1_0.id,
         p1_0.active_tasks,
@@ -232,14 +229,14 @@ Hibernate:
         projects p1_0 
     where
         p1_0.user_id=?
-2025-08-16T00:09:15.402+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-2] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [application/json] and supported [application/json, application/*+json, application/yaml]
-2025-08-16T00:09:15.402+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-2] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [APIResponse(timestamp=2025-08-16T00:09:15.401749300, status=200, message=Projects retrieved successf (truncated)...]
-2025-08-16T00:09:15.403+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-2] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
-2025-08-16T00:09:20.262+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-3] o.s.web.servlet.DispatcherServlet        : GET "/api/v1/projects/9027336c-0032-4dd8-b579-4d6d6bd22811?userId=a31653f9-f725-4e3d-ac69-e63beda5c55d", parameters={masked}
-2025-08-16T00:09:20.263+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-3] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.solace.scholar_ai.project_service.controller.project.ProjectController#getProjectById(UUID, UUID)
-2025-08-16T00:09:20.264+06:00  INFO 67500 --- [project-service] [nio-8083-exec-3] o.s.s.p.c.project.ProjectController      : Get project 9027336c-0032-4dd8-b579-4d6d6bd22811 endpoint hit for user: a31653f9-f725-4e3d-ac69-e63beda5c55d
-2025-08-16T00:09:20.267+06:00  INFO 67500 --- [project-service] [nio-8083-exec-3] o.s.s.p.service.project.ProjectService   : Fetching project with ID: 9027336c-0032-4dd8-b579-4d6d6bd22811 for user: a31653f9-f725-4e3d-ac69-e63beda5c55d
-2025-08-16T00:09:20.273+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-3] org.hibernate.SQL                        : 
+2025-08-16T00:20:46.706+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-2] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [application/json] and supported [application/json, application/*+json, application/yaml]
+2025-08-16T00:20:46.706+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-2] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [APIResponse(timestamp=2025-08-16T00:20:46.705720, status=200, message=Projects retrieved successfull (truncated)...]
+2025-08-16T00:20:46.707+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-2] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2025-08-16T00:20:51.507+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-3] o.s.web.servlet.DispatcherServlet        : GET "/api/v1/projects/9027336c-0032-4dd8-b579-4d6d6bd22811?userId=a31653f9-f725-4e3d-ac69-e63beda5c55d", parameters={masked}
+2025-08-16T00:20:51.509+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-3] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.solace.scholar_ai.project_service.controller.project.ProjectController#getProjectById(UUID, UUID)
+2025-08-16T00:20:51.510+06:00  INFO 24396 --- [project-service] [nio-8083-exec-3] o.s.s.p.c.project.ProjectController      : Get project 9027336c-0032-4dd8-b579-4d6d6bd22811 endpoint hit for user: a31653f9-f725-4e3d-ac69-e63beda5c55d
+2025-08-16T00:20:51.514+06:00  INFO 24396 --- [project-service] [nio-8083-exec-3] o.s.s.p.service.project.ProjectService   : Fetching project with ID: 9027336c-0032-4dd8-b579-4d6d6bd22811 for user: a31653f9-f725-4e3d-ac69-e63beda5c55d
+2025-08-16T00:20:51.517+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-3] org.hibernate.SQL                        : 
     /* <criteria> */ select
         p1_0.id,
         p1_0.active_tasks,
@@ -283,14 +280,14 @@ Hibernate:
     where
         p1_0.id=? 
         and p1_0.user_id=?
-2025-08-16T00:09:20.283+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-3] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [application/json] and supported [application/json, application/*+json, application/yaml]
-2025-08-16T00:09:20.283+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-3] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [APIResponse(timestamp=2025-08-16T00:09:20.282005100, status=200, message=Project retrieved successfu (truncated)...]
-2025-08-16T00:09:20.286+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-3] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
-2025-08-16T00:09:20.298+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-4] o.s.web.servlet.DispatcherServlet        : GET "/api/v1/projects/9027336c-0032-4dd8-b579-4d6d6bd22811?userId=a31653f9-f725-4e3d-ac69-e63beda5c55d", parameters={masked}
-2025-08-16T00:09:20.299+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-4] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.solace.scholar_ai.project_service.controller.project.ProjectController#getProjectById(UUID, UUID)
-2025-08-16T00:09:20.300+06:00  INFO 67500 --- [project-service] [nio-8083-exec-4] o.s.s.p.c.project.ProjectController      : Get project 9027336c-0032-4dd8-b579-4d6d6bd22811 endpoint hit for user: a31653f9-f725-4e3d-ac69-e63beda5c55d
-2025-08-16T00:09:20.300+06:00  INFO 67500 --- [project-service] [nio-8083-exec-4] o.s.s.p.service.project.ProjectService   : Fetching project with ID: 9027336c-0032-4dd8-b579-4d6d6bd22811 for user: a31653f9-f725-4e3d-ac69-e63beda5c55d
-2025-08-16T00:09:20.303+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-4] org.hibernate.SQL                        : 
+2025-08-16T00:20:51.525+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-3] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [application/json] and supported [application/json, application/*+json, application/yaml]
+2025-08-16T00:20:51.525+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-3] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [APIResponse(timestamp=2025-08-16T00:20:51.524693100, status=200, message=Project retrieved successfu (truncated)...]
+2025-08-16T00:20:51.527+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-3] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2025-08-16T00:20:51.541+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-4] o.s.web.servlet.DispatcherServlet        : GET "/api/v1/projects/9027336c-0032-4dd8-b579-4d6d6bd22811?userId=a31653f9-f725-4e3d-ac69-e63beda5c55d", parameters={masked}
+2025-08-16T00:20:51.542+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-4] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.solace.scholar_ai.project_service.controller.project.ProjectController#getProjectById(UUID, UUID)
+2025-08-16T00:20:51.543+06:00  INFO 24396 --- [project-service] [nio-8083-exec-4] o.s.s.p.c.project.ProjectController      : Get project 9027336c-0032-4dd8-b579-4d6d6bd22811 endpoint hit for user: a31653f9-f725-4e3d-ac69-e63beda5c55d
+2025-08-16T00:20:51.543+06:00  INFO 24396 --- [project-service] [nio-8083-exec-4] o.s.s.p.service.project.ProjectService   : Fetching project with ID: 9027336c-0032-4dd8-b579-4d6d6bd22811 for user: a31653f9-f725-4e3d-ac69-e63beda5c55d
+2025-08-16T00:20:51.547+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-4] org.hibernate.SQL                        : 
     /* <criteria> */ select
         p1_0.id,
         p1_0.active_tasks,
@@ -334,17 +331,18 @@ Hibernate:
     where
         p1_0.id=? 
         and p1_0.user_id=?
-2025-08-16T00:09:20.312+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-4] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [application/json] and supported [application/json, application/*+json, application/yaml]
-2025-08-16T00:09:20.312+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-4] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [APIResponse(timestamp=2025-08-16T00:09:20.311588900, status=200, message=Project retrieved successfu (truncated)...]
-2025-08-16T00:09:20.314+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-4] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
-2025-08-16T00:09:22.135+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-5] o.s.web.servlet.DispatcherServlet        : GET "/api/v1/projects/9027336c-0032-4dd8-b579-4d6d6bd22811?userId=a31653f9-f725-4e3d-ac69-e63beda5c55d", parameters={masked}
-2025-08-16T00:09:22.135+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-6] o.s.web.servlet.DispatcherServlet        : GET "/api/v1/projects/9027336c-0032-4dd8-b579-4d6d6bd22811/reading-list/stats?timeRange=all", parameters={masked}
-2025-08-16T00:09:22.136+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-5] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.solace.scholar_ai.project_service.controller.project.ProjectController#getProjectById(UUID, UUID)
-2025-08-16T00:09:22.136+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-6] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.solace.scholar_ai.project_service.controller.project.ProjectController#getReadingListStats(UUID, UUID, String)
-2025-08-16T00:09:22.136+06:00  INFO 67500 --- [project-service] [nio-8083-exec-5] o.s.s.p.c.project.ProjectController      : Get project 9027336c-0032-4dd8-b579-4d6d6bd22811 endpoint hit for user: a31653f9-f725-4e3d-ac69-e63beda5c55d
-2025-08-16T00:09:22.140+06:00  INFO 67500 --- [project-service] [nio-8083-exec-5] o.s.s.p.service.project.ProjectService   : Fetching project with ID: 9027336c-0032-4dd8-b579-4d6d6bd22811 for user: a31653f9-f725-4e3d-ac69-e63beda5c55d
-2025-08-16T00:09:22.143+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-6] o.s.web.method.HandlerMethod             : Could not resolve parameter [1] in public org.springframework.http.ResponseEntity<org.solace.scholar_ai.project_service.dto.response.APIResponse<org.solace.scholar_ai.project_service.dto.project.ReadingListStatsDto>> org.solace.scholar_ai.project_service.controller.project.ProjectController.getReadingListStats(java.util.UUID,java.util.UUID,java.lang.String): Required request parameter 'userId' for method parameter type UUID is not present
-2025-08-16T00:09:22.144+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-5] org.hibernate.SQL                        : 
+2025-08-16T00:20:51.554+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-4] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [application/json] and supported [application/json, application/*+json, application/yaml]
+2025-08-16T00:20:51.554+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-4] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [APIResponse(timestamp=2025-08-16T00:20:51.553642500, status=200, message=Project retrieved successfu (truncated)...]
+2025-08-16T00:20:51.555+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-4] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2025-08-16T00:20:53.695+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-5] o.s.web.servlet.DispatcherServlet        : POST "/api/v1/library/project/9027336c-0032-4dd8-b579-4d6d6bd22811/stats", parameters={}
+2025-08-16T00:20:53.696+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-5] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.solace.scholar_ai.project_service.controller.library.LibraryController#getProjectLibraryStats(UUID, LibraryRequestDto)
+2025-08-16T00:20:53.700+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-6] o.s.web.servlet.DispatcherServlet        : GET "/api/v1/projects/9027336c-0032-4dd8-b579-4d6d6bd22811?userId=a31653f9-f725-4e3d-ac69-e63beda5c55d", parameters={masked}
+2025-08-16T00:20:53.703+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-6] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.solace.scholar_ai.project_service.controller.project.ProjectController#getProjectById(UUID, UUID)
+2025-08-16T00:20:53.704+06:00  INFO 24396 --- [project-service] [nio-8083-exec-6] o.s.s.p.c.project.ProjectController      : Get project 9027336c-0032-4dd8-b579-4d6d6bd22811 endpoint hit for user: a31653f9-f725-4e3d-ac69-e63beda5c55d
+2025-08-16T00:20:53.705+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-7] o.s.web.servlet.DispatcherServlet        : POST "/api/v1/library/project/9027336c-0032-4dd8-b579-4d6d6bd22811/stats", parameters={}
+2025-08-16T00:20:53.706+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-7] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.solace.scholar_ai.project_service.controller.library.LibraryController#getProjectLibraryStats(UUID, LibraryRequestDto)
+2025-08-16T00:20:53.708+06:00  INFO 24396 --- [project-service] [nio-8083-exec-6] o.s.s.p.service.project.ProjectService   : Fetching project with ID: 9027336c-0032-4dd8-b579-4d6d6bd22811 for user: a31653f9-f725-4e3d-ac69-e63beda5c55d
+2025-08-16T00:20:53.710+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-6] org.hibernate.SQL                        : 
     /* <criteria> */ select
         p1_0.id,
         p1_0.active_tasks,
@@ -388,136 +386,16 @@ Hibernate:
     where
         p1_0.id=? 
         and p1_0.user_id=?
-2025-08-16T00:09:22.148+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-6] .m.m.a.ExceptionHandlerExceptionResolver : Using @ExceptionHandler org.solace.scholar_ai.project_service.exception.GlobalExceptionHandler#handleException(Exception, WebRequest)
-2025-08-16T00:09:22.154+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-7] o.s.web.servlet.DispatcherServlet        : GET "/api/v1/projects/9027336c-0032-4dd8-b579-4d6d6bd22811/notes", parameters={}
-2025-08-16T00:09:22.154+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-5] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [application/json] and supported [application/json, application/*+json, application/yaml]
-2025-08-16T00:09:22.154+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-5] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [APIResponse(timestamp=2025-08-16T00:09:22.153750900, status=200, message=Project retrieved successfu (truncated)...]
-2025-08-16T00:09:22.155+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-7] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.solace.scholar_ai.project_service.controller.project.ProjectController#getProjectNotes(UUID, UUID)
-2025-08-16T00:09:22.155+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-7] o.s.web.method.HandlerMethod             : Could not resolve parameter [1] in public org.springframework.http.ResponseEntity<org.solace.scholar_ai.project_service.dto.response.APIResponse<java.util.List<java.lang.Object>>> org.solace.scholar_ai.project_service.controller.project.ProjectController.getProjectNotes(java.util.UUID,java.util.UUID): Required request parameter 'userId' for method parameter type UUID is not present
-2025-08-16T00:09:22.156+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-5] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
-2025-08-16T00:09:22.157+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-7] .m.m.a.ExceptionHandlerExceptionResolver : Using @ExceptionHandler org.solace.scholar_ai.project_service.exception.GlobalExceptionHandler#handleException(Exception, WebRequest)
-2025-08-16T00:09:22.151+06:00 ERROR 67500 --- [project-service] [nio-8083-exec-6] o.s.s.p.e.GlobalExceptionHandler         : Exception occurred:
-
-org.springframework.web.bind.MissingServletRequestParameterException: Required request parameter 'userId' for method parameter type UUID is not present
-	at org.springframework.web.method.annotation.RequestParamMethodArgumentResolver.handleMissingValueInternal(RequestParamMethodArgumentResolver.java:220) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.method.annotation.RequestParamMethodArgumentResolver.handleMissingValue(RequestParamMethodArgumentResolver.java:196) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.method.annotation.AbstractNamedValueMethodArgumentResolver.resolveArgument(AbstractNamedValueMethodArgumentResolver.java:125) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.method.support.HandlerMethodArgumentResolverComposite.resolveArgument(HandlerMethodArgumentResolverComposite.java:122) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.method.support.InvocableHandlerMethod.getMethodArgumentValues(InvocableHandlerMethod.java:227) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:181) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:991) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:896) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:903) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:564) ~[tomcat-embed-core-10.1.43.jar:6.0]
-	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658) ~[tomcat-embed-core-10.1.43.jar:6.0]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51) ~[tomcat-embed-websocket-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:110) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:116) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:398) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1769) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1189) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:658) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at java.base/java.lang.Thread.run(Thread.java:1583) ~[na:na]
-
-2025-08-16T00:09:22.158+06:00 ERROR 67500 --- [project-service] [nio-8083-exec-7] o.s.s.p.e.GlobalExceptionHandler         : Exception occurred:
-
-org.springframework.web.bind.MissingServletRequestParameterException: Required request parameter 'userId' for method parameter type UUID is not present
-	at org.springframework.web.method.annotation.RequestParamMethodArgumentResolver.handleMissingValueInternal(RequestParamMethodArgumentResolver.java:220) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.method.annotation.RequestParamMethodArgumentResolver.handleMissingValue(RequestParamMethodArgumentResolver.java:196) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.method.annotation.AbstractNamedValueMethodArgumentResolver.resolveArgument(AbstractNamedValueMethodArgumentResolver.java:125) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.method.support.HandlerMethodArgumentResolverComposite.resolveArgument(HandlerMethodArgumentResolverComposite.java:122) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.method.support.InvocableHandlerMethod.getMethodArgumentValues(InvocableHandlerMethod.java:227) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:181) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:991) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:896) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:903) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:564) ~[tomcat-embed-core-10.1.43.jar:6.0]
-	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658) ~[tomcat-embed-core-10.1.43.jar:6.0]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51) ~[tomcat-embed-websocket-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:110) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:116) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:398) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1769) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1189) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:658) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at java.base/java.lang.Thread.run(Thread.java:1583) ~[na:na]
-
-2025-08-16T00:09:22.167+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-8] o.s.web.servlet.DispatcherServlet        : GET "/api/v1/projects/9027336c-0032-4dd8-b579-4d6d6bd22811?userId=a31653f9-f725-4e3d-ac69-e63beda5c55d", parameters={masked}
-2025-08-16T00:09:22.168+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-8] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.solace.scholar_ai.project_service.controller.project.ProjectController#getProjectById(UUID, UUID)
-2025-08-16T00:09:22.169+06:00  INFO 67500 --- [project-service] [nio-8083-exec-8] o.s.s.p.c.project.ProjectController      : Get project 9027336c-0032-4dd8-b579-4d6d6bd22811 endpoint hit for user: a31653f9-f725-4e3d-ac69-e63beda5c55d
-2025-08-16T00:09:22.170+06:00  INFO 67500 --- [project-service] [nio-8083-exec-8] o.s.s.p.service.project.ProjectService   : Fetching project with ID: 9027336c-0032-4dd8-b579-4d6d6bd22811 for user: a31653f9-f725-4e3d-ac69-e63beda5c55d
-2025-08-16T00:09:22.173+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-6] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [application/json] and supported [application/json, application/*+json, application/yaml]
-2025-08-16T00:09:22.173+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-8] org.hibernate.SQL                        : 
+2025-08-16T00:20:53.712+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-5] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [LibraryRequestDto[userId=a31653f9-f725-4e3d-ac69-e63beda5c55d, projectId=9027336c-0032-4dd8-b579-4d6 (truncated)...]
+2025-08-16T00:20:53.712+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-7] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [LibraryRequestDto[userId=a31653f9-f725-4e3d-ac69-e63beda5c55d, projectId=9027336c-0032-4dd8-b579-4d6 (truncated)...]
+2025-08-16T00:20:53.724+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-6] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [application/json] and supported [application/json, application/*+json, application/yaml]
+2025-08-16T00:20:53.725+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-6] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [APIResponse(timestamp=2025-08-16T00:20:53.721812700, status=200, message=Project retrieved successfu (truncated)...]
+2025-08-16T00:20:53.726+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-6] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2025-08-16T00:20:53.742+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-8] o.s.web.servlet.DispatcherServlet        : GET "/api/v1/projects/9027336c-0032-4dd8-b579-4d6d6bd22811?userId=a31653f9-f725-4e3d-ac69-e63beda5c55d", parameters={masked}
+2025-08-16T00:20:53.746+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-8] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.solace.scholar_ai.project_service.controller.project.ProjectController#getProjectById(UUID, UUID)
+2025-08-16T00:20:53.746+06:00  INFO 24396 --- [project-service] [nio-8083-exec-8] o.s.s.p.c.project.ProjectController      : Get project 9027336c-0032-4dd8-b579-4d6d6bd22811 endpoint hit for user: a31653f9-f725-4e3d-ac69-e63beda5c55d
+2025-08-16T00:20:53.747+06:00  INFO 24396 --- [project-service] [nio-8083-exec-8] o.s.s.p.service.project.ProjectService   : Fetching project with ID: 9027336c-0032-4dd8-b579-4d6d6bd22811 for user: a31653f9-f725-4e3d-ac69-e63beda5c55d
+2025-08-16T00:20:53.749+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-8] org.hibernate.SQL                        : 
     /* <criteria> */ select
         p1_0.id,
         p1_0.active_tasks,
@@ -561,222 +439,258 @@ Hibernate:
     where
         p1_0.id=? 
         and p1_0.user_id=?
-2025-08-16T00:09:22.173+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-7] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [application/json] and supported [application/json, application/*+json, application/yaml]
-2025-08-16T00:09:22.177+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-7] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [APIErrorResponse(timestamp=2025-08-16T00:09:22.169751400, status=400, code=MISSING_PARAMETER, messag (truncated)...]
-2025-08-16T00:09:22.177+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-6] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [APIErrorResponse(timestamp=2025-08-16T00:09:22.169751400, status=400, code=MISSING_PARAMETER, messag (truncated)...]
-2025-08-16T00:09:22.179+06:00  WARN 67500 --- [project-service] [nio-8083-exec-6] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.bind.MissingServletRequestParameterException: Required request parameter 'userId' for method parameter type UUID is not present]
-2025-08-16T00:09:22.179+06:00  WARN 67500 --- [project-service] [nio-8083-exec-7] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.bind.MissingServletRequestParameterException: Required request parameter 'userId' for method parameter type UUID is not present]
-2025-08-16T00:09:22.179+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-6] o.s.web.servlet.DispatcherServlet        : Completed 400 BAD_REQUEST
-2025-08-16T00:09:22.179+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-7] o.s.web.servlet.DispatcherServlet        : Completed 400 BAD_REQUEST
-2025-08-16T00:09:22.182+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-8] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [application/json] and supported [application/json, application/*+json, application/yaml]
-2025-08-16T00:09:22.183+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-8] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [APIResponse(timestamp=2025-08-16T00:09:22.181864800, status=200, message=Project retrieved successfu (truncated)...]
-2025-08-16T00:09:22.185+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-8] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
-2025-08-16T00:09:22.191+06:00 DEBUG 67500 --- [project-service] [io-8083-exec-10] o.s.web.servlet.DispatcherServlet        : GET "/api/v1/projects/9027336c-0032-4dd8-b579-4d6d6bd22811/notes", parameters={}
-2025-08-16T00:09:22.191+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-9] o.s.web.servlet.DispatcherServlet        : GET "/api/v1/projects/9027336c-0032-4dd8-b579-4d6d6bd22811/reading-list/stats?timeRange=all", parameters={masked}
-2025-08-16T00:09:22.192+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-9] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.solace.scholar_ai.project_service.controller.project.ProjectController#getReadingListStats(UUID, UUID, String)
-2025-08-16T00:09:22.192+06:00 DEBUG 67500 --- [project-service] [io-8083-exec-10] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to org.solace.scholar_ai.project_service.controller.project.ProjectController#getProjectNotes(UUID, UUID)
-2025-08-16T00:09:22.192+06:00 DEBUG 67500 --- [project-service] [io-8083-exec-10] o.s.web.method.HandlerMethod             : Could not resolve parameter [1] in public org.springframework.http.ResponseEntity<org.solace.scholar_ai.project_service.dto.response.APIResponse<java.util.List<java.lang.Object>>> org.solace.scholar_ai.project_service.controller.project.ProjectController.getProjectNotes(java.util.UUID,java.util.UUID): Required request parameter 'userId' for method parameter type UUID is not present
-2025-08-16T00:09:22.193+06:00 DEBUG 67500 --- [project-service] [io-8083-exec-10] .m.m.a.ExceptionHandlerExceptionResolver : Using @ExceptionHandler org.solace.scholar_ai.project_service.exception.GlobalExceptionHandler#handleException(Exception, WebRequest)
-2025-08-16T00:09:22.193+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-9] o.s.web.method.HandlerMethod             : Could not resolve parameter [1] in public org.springframework.http.ResponseEntity<org.solace.scholar_ai.project_service.dto.response.APIResponse<org.solace.scholar_ai.project_service.dto.project.ReadingListStatsDto>> org.solace.scholar_ai.project_service.controller.project.ProjectController.getReadingListStats(java.util.UUID,java.util.UUID,java.lang.String): Required request parameter 'userId' for method parameter type UUID is not present
-2025-08-16T00:09:22.193+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-9] .m.m.a.ExceptionHandlerExceptionResolver : Using @ExceptionHandler org.solace.scholar_ai.project_service.exception.GlobalExceptionHandler#handleException(Exception, WebRequest)
-2025-08-16T00:09:22.193+06:00 ERROR 67500 --- [project-service] [io-8083-exec-10] o.s.s.p.e.GlobalExceptionHandler         : Exception occurred:
-
-org.springframework.web.bind.MissingServletRequestParameterException: Required request parameter 'userId' for method parameter type UUID is not present
-	at org.springframework.web.method.annotation.RequestParamMethodArgumentResolver.handleMissingValueInternal(RequestParamMethodArgumentResolver.java:220) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.method.annotation.RequestParamMethodArgumentResolver.handleMissingValue(RequestParamMethodArgumentResolver.java:196) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.method.annotation.AbstractNamedValueMethodArgumentResolver.resolveArgument(AbstractNamedValueMethodArgumentResolver.java:125) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.method.support.HandlerMethodArgumentResolverComposite.resolveArgument(HandlerMethodArgumentResolverComposite.java:122) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.method.support.InvocableHandlerMethod.getMethodArgumentValues(InvocableHandlerMethod.java:227) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:181) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:991) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:896) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:903) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:564) ~[tomcat-embed-core-10.1.43.jar:6.0]
-	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658) ~[tomcat-embed-core-10.1.43.jar:6.0]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51) ~[tomcat-embed-websocket-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:110) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:116) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:398) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1769) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1189) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:658) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at java.base/java.lang.Thread.run(Thread.java:1583) ~[na:na]
-
-2025-08-16T00:09:22.193+06:00 ERROR 67500 --- [project-service] [nio-8083-exec-9] o.s.s.p.e.GlobalExceptionHandler         : Exception occurred:
-
-org.springframework.web.bind.MissingServletRequestParameterException: Required request parameter 'userId' for method parameter type UUID is not present
-	at org.springframework.web.method.annotation.RequestParamMethodArgumentResolver.handleMissingValueInternal(RequestParamMethodArgumentResolver.java:220) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.method.annotation.RequestParamMethodArgumentResolver.handleMissingValue(RequestParamMethodArgumentResolver.java:196) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.method.annotation.AbstractNamedValueMethodArgumentResolver.resolveArgument(AbstractNamedValueMethodArgumentResolver.java:125) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.method.support.HandlerMethodArgumentResolverComposite.resolveArgument(HandlerMethodArgumentResolverComposite.java:122) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.method.support.InvocableHandlerMethod.getMethodArgumentValues(InvocableHandlerMethod.java:227) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:181) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:991) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:896) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:903) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:564) ~[tomcat-embed-core-10.1.43.jar:6.0]
-	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885) ~[spring-webmvc-6.2.9.jar:6.2.9]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658) ~[tomcat-embed-core-10.1.43.jar:6.0]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51) ~[tomcat-embed-websocket-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:110) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.9.jar:6.2.9]
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:116) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:398) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1769) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1189) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:658) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63) ~[tomcat-embed-core-10.1.43.jar:10.1.43]
-	at java.base/java.lang.Thread.run(Thread.java:1583) ~[na:na]
-
-2025-08-16T00:09:22.195+06:00 DEBUG 67500 --- [project-service] [io-8083-exec-10] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [application/json] and supported [application/json, application/*+json, application/yaml]
-2025-08-16T00:09:22.195+06:00 DEBUG 67500 --- [project-service] [io-8083-exec-10] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [APIErrorResponse(timestamp=2025-08-16T00:09:22.193927900, status=400, code=MISSING_PARAMETER, messag (truncated)...]
-2025-08-16T00:09:22.195+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-9] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [application/json] and supported [application/json, application/*+json, application/yaml]
-2025-08-16T00:09:22.196+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-9] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [APIErrorResponse(timestamp=2025-08-16T00:09:22.195440500, status=400, code=MISSING_PARAMETER, messag (truncated)...]
-2025-08-16T00:09:22.196+06:00  WARN 67500 --- [project-service] [io-8083-exec-10] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.bind.MissingServletRequestParameterException: Required request parameter 'userId' for method parameter type UUID is not present]
-2025-08-16T00:09:22.196+06:00 DEBUG 67500 --- [project-service] [io-8083-exec-10] o.s.web.servlet.DispatcherServlet        : Completed 400 BAD_REQUEST
-2025-08-16T00:09:22.197+06:00  WARN 67500 --- [project-service] [nio-8083-exec-9] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.bind.MissingServletRequestParameterException: Required request parameter 'userId' for method parameter type UUID is not present]
-2025-08-16T00:09:22.198+06:00 DEBUG 67500 --- [project-service] [nio-8083-exec-9] o.s.web.servlet.DispatcherServlet        : Completed 400 BAD_REQUEST
-2025-08-16T00:09:35.240+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/PROJECT-SERVICE/localhost:project-service:8083?status=UP&lastDirtyTimestamp=1755281285193
-2025-08-16T00:09:35.240+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:09:35.256+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
-2025-08-16T00:09:35.256+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:09:35.259+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:09:35.273+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:09:35.273+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
-2025-08-16T00:10:05.274+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/PROJECT-SERVICE/localhost:project-service:8083?status=UP&lastDirtyTimestamp=1755281285193
-2025-08-16T00:10:05.275+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:10:05.289+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
-2025-08-16T00:10:05.289+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:10:05.292+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:10:05.308+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:10:05.308+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
-2025-08-16T00:10:35.297+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/PROJECT-SERVICE/localhost:project-service:8083?status=UP&lastDirtyTimestamp=1755281285193
-2025-08-16T00:10:35.298+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:10:35.313+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
-2025-08-16T00:10:35.313+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:10:35.316+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:10:35.331+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:10:35.332+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
-2025-08-16T00:11:05.326+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/PROJECT-SERVICE/localhost:project-service:8083?status=UP&lastDirtyTimestamp=1755281285193
-2025-08-16T00:11:05.326+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:11:05.341+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
-2025-08-16T00:11:05.341+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:11:05.343+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:11:05.359+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:11:05.360+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
-2025-08-16T00:11:35.357+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/PROJECT-SERVICE/localhost:project-service:8083?status=UP&lastDirtyTimestamp=1755281285193
-2025-08-16T00:11:35.358+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:11:35.372+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
-2025-08-16T00:11:35.373+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:11:35.375+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:11:35.390+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:11:35.391+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
-2025-08-16T00:12:05.389+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/PROJECT-SERVICE/localhost:project-service:8083?status=UP&lastDirtyTimestamp=1755281285193
-2025-08-16T00:12:05.390+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:12:05.405+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
-2025-08-16T00:12:05.406+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:12:05.408+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:12:05.423+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:12:05.423+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
-2025-08-16T00:12:35.417+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/PROJECT-SERVICE/localhost:project-service:8083?status=UP&lastDirtyTimestamp=1755281285193
-2025-08-16T00:12:35.417+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:12:35.432+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
-2025-08-16T00:12:35.433+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:12:35.435+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:12:35.450+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:12:35.450+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
-2025-08-16T00:13:05.438+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/PROJECT-SERVICE/localhost:project-service:8083?status=UP&lastDirtyTimestamp=1755281285193
-2025-08-16T00:13:05.439+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:13:05.453+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
-2025-08-16T00:13:05.454+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:13:05.458+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:13:05.471+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:13:05.471+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
-2025-08-16T00:13:35.462+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/PROJECT-SERVICE/localhost:project-service:8083?status=UP&lastDirtyTimestamp=1755281285193
-2025-08-16T00:13:35.462+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:13:35.477+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
-2025-08-16T00:13:35.477+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:13:35.479+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:13:35.496+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:13:35.496+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
-2025-08-16T00:14:05.488+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/PROJECT-SERVICE/localhost:project-service:8083?status=UP&lastDirtyTimestamp=1755281285193
-2025-08-16T00:14:05.489+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:14:05.504+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
-2025-08-16T00:14:05.504+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:14:05.506+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:14:05.522+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:14:05.522+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
-2025-08-16T00:14:35.511+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/PROJECT-SERVICE/localhost:project-service:8083?status=UP&lastDirtyTimestamp=1755281285193
-2025-08-16T00:14:35.511+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:14:35.526+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
-2025-08-16T00:14:35.526+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
-2025-08-16T00:14:35.529+06:00 DEBUG 67500 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:14:35.544+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
-2025-08-16T00:14:35.545+06:00 DEBUG 67500 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
+2025-08-16T00:20:53.765+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-8] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [application/json] and supported [application/json, application/*+json, application/yaml]
+2025-08-16T00:20:53.765+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-8] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [APIResponse(timestamp=2025-08-16T00:20:53.764914900, status=200, message=Project retrieved successfu (truncated)...]
+2025-08-16T00:20:53.767+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-8] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2025-08-16T00:20:53.789+06:00  INFO 24396 --- [project-service] [nio-8083-exec-7] o.s.s.p.c.library.LibraryController      : Get project library stats 9027336c-0032-4dd8-b579-4d6d6bd22811 endpoint hit by user: a31653f9-f725-4e3d-ac69-e63beda5c55d
+2025-08-16T00:20:53.789+06:00  INFO 24396 --- [project-service] [nio-8083-exec-5] o.s.s.p.c.library.LibraryController      : Get project library stats 9027336c-0032-4dd8-b579-4d6d6bd22811 endpoint hit by user: a31653f9-f725-4e3d-ac69-e63beda5c55d
+2025-08-16T00:20:53.790+06:00  INFO 24396 --- [project-service] [nio-8083-exec-7] o.s.s.p.service.library.LibraryService   : Retrieving library for project: 9027336c-0032-4dd8-b579-4d6d6bd22811 by user: a31653f9-f725-4e3d-ac69-e63beda5c55d
+2025-08-16T00:20:53.791+06:00  INFO 24396 --- [project-service] [nio-8083-exec-5] o.s.s.p.service.library.LibraryService   : Retrieving library for project: 9027336c-0032-4dd8-b579-4d6d6bd22811 by user: a31653f9-f725-4e3d-ac69-e63beda5c55d
+2025-08-16T00:20:53.793+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-7] org.hibernate.SQL                        : 
+    /* <criteria> */ select
+        p1_0.id,
+        p1_0.active_tasks,
+        p1_0.created_at,
+        p1_0.description,
+        p1_0.domain,
+        p1_0.is_starred,
+        p1_0.last_activity,
+        p1_0.name,
+        p1_0.progress,
+        p1_0.status,
+        p1_0.tags,
+        p1_0.topics,
+        p1_0.total_papers,
+        p1_0.updated_at,
+        p1_0.user_id 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    /* <criteria> */ select
+        p1_0.id,
+        p1_0.active_tasks,
+        p1_0.created_at,
+        p1_0.description,
+        p1_0.domain,
+        p1_0.is_starred,
+        p1_0.last_activity,
+        p1_0.name,
+        p1_0.progress,
+        p1_0.status,
+        p1_0.tags,
+        p1_0.topics,
+        p1_0.total_papers,
+        p1_0.updated_at,
+        p1_0.user_id 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+2025-08-16T00:20:53.796+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-5] org.hibernate.SQL                        : 
+    /* <criteria> */ select
+        p1_0.id,
+        p1_0.active_tasks,
+        p1_0.created_at,
+        p1_0.description,
+        p1_0.domain,
+        p1_0.is_starred,
+        p1_0.last_activity,
+        p1_0.name,
+        p1_0.progress,
+        p1_0.status,
+        p1_0.tags,
+        p1_0.topics,
+        p1_0.total_papers,
+        p1_0.updated_at,
+        p1_0.user_id 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+Hibernate: 
+    /* <criteria> */ select
+        p1_0.id,
+        p1_0.active_tasks,
+        p1_0.created_at,
+        p1_0.description,
+        p1_0.domain,
+        p1_0.is_starred,
+        p1_0.last_activity,
+        p1_0.name,
+        p1_0.progress,
+        p1_0.status,
+        p1_0.tags,
+        p1_0.topics,
+        p1_0.total_papers,
+        p1_0.updated_at,
+        p1_0.user_id 
+    from
+        projects p1_0 
+    where
+        p1_0.id=? 
+        and p1_0.user_id=?
+2025-08-16T00:20:53.803+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-7] org.hibernate.SQL                        : 
+    /* <criteria> */ select
+        wso1_0.correlation_id,
+        wso1_0.batch_size,
+        wso1_0.completed_at,
+        wso1_0.created_at,
+        wso1_0.domain,
+        wso1_0.error_message,
+        wso1_0.project_id,
+        wso1_0.query_terms,
+        wso1_0.search_duration_ms,
+        wso1_0.status,
+        wso1_0.submitted_at,
+        wso1_0.total_papers_found,
+        wso1_0.updated_at 
+    from
+        web_search_operations wso1_0 
+    where
+        wso1_0.project_id=? 
+    order by
+        wso1_0.submitted_at desc
+Hibernate: 
+    /* <criteria> */ select
+        wso1_0.correlation_id,
+        wso1_0.batch_size,
+        wso1_0.completed_at,
+        wso1_0.created_at,
+        wso1_0.domain,
+        wso1_0.error_message,
+        wso1_0.project_id,
+        wso1_0.query_terms,
+        wso1_0.search_duration_ms,
+        wso1_0.status,
+        wso1_0.submitted_at,
+        wso1_0.total_papers_found,
+        wso1_0.updated_at 
+    from
+        web_search_operations wso1_0 
+    where
+        wso1_0.project_id=? 
+    order by
+        wso1_0.submitted_at desc
+2025-08-16T00:20:53.809+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-5] org.hibernate.SQL                        : 
+    /* <criteria> */ select
+        wso1_0.correlation_id,
+        wso1_0.batch_size,
+        wso1_0.completed_at,
+        wso1_0.created_at,
+        wso1_0.domain,
+        wso1_0.error_message,
+        wso1_0.project_id,
+        wso1_0.query_terms,
+        wso1_0.search_duration_ms,
+        wso1_0.status,
+        wso1_0.submitted_at,
+        wso1_0.total_papers_found,
+        wso1_0.updated_at 
+    from
+        web_search_operations wso1_0 
+    where
+        wso1_0.project_id=? 
+    order by
+        wso1_0.submitted_at desc
+Hibernate: 
+    /* <criteria> */ select
+        wso1_0.correlation_id,
+        wso1_0.batch_size,
+        wso1_0.completed_at,
+        wso1_0.created_at,
+        wso1_0.domain,
+        wso1_0.error_message,
+        wso1_0.project_id,
+        wso1_0.query_terms,
+        wso1_0.search_duration_ms,
+        wso1_0.status,
+        wso1_0.submitted_at,
+        wso1_0.total_papers_found,
+        wso1_0.updated_at 
+    from
+        web_search_operations wso1_0 
+    where
+        wso1_0.project_id=? 
+    order by
+        wso1_0.submitted_at desc
+2025-08-16T00:20:53.818+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-7] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [application/json] and supported [application/json, application/*+json, application/yaml]
+2025-08-16T00:20:53.820+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-5] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [application/json] and supported [application/json, application/*+json, application/yaml]
+2025-08-16T00:20:53.821+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-7] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [APIResponse(timestamp=2025-08-16T00:20:53.817215200, status=200, message=Project has 0 papers from 0 (truncated)...]
+2025-08-16T00:20:53.821+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-5] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [APIResponse(timestamp=2025-08-16T00:20:53.820454900, status=200, message=Project has 0 papers from 0 (truncated)...]
+2025-08-16T00:20:53.831+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-7] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2025-08-16T00:20:53.831+06:00 DEBUG 24396 --- [project-service] [nio-8083-exec-5] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2025-08-16T00:21:10.745+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/PROJECT-SERVICE/localhost:project-service:8083?status=UP&lastDirtyTimestamp=1755281980696
+2025-08-16T00:21:10.746+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:21:10.760+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
+2025-08-16T00:21:10.760+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:21:10.763+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
+2025-08-16T00:21:10.778+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
+2025-08-16T00:21:10.779+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
+2025-08-16T00:21:40.769+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/PROJECT-SERVICE/localhost:project-service:8083?status=UP&lastDirtyTimestamp=1755281980696
+2025-08-16T00:21:40.770+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:21:40.785+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
+2025-08-16T00:21:40.785+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:21:40.789+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
+2025-08-16T00:21:40.804+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
+2025-08-16T00:21:40.805+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
+2025-08-16T00:22:10.796+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/PROJECT-SERVICE/localhost:project-service:8083?status=UP&lastDirtyTimestamp=1755281980696
+2025-08-16T00:22:10.796+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:22:10.811+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
+2025-08-16T00:22:10.812+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:22:10.814+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
+2025-08-16T00:22:10.830+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
+2025-08-16T00:22:10.830+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
+2025-08-16T00:22:40.826+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/PROJECT-SERVICE/localhost:project-service:8083?status=UP&lastDirtyTimestamp=1755281980696
+2025-08-16T00:22:40.826+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:22:40.841+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
+2025-08-16T00:22:40.841+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:22:40.843+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
+2025-08-16T00:22:40.858+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
+2025-08-16T00:22:40.858+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
+2025-08-16T00:23:10.851+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/PROJECT-SERVICE/localhost:project-service:8083?status=UP&lastDirtyTimestamp=1755281980696
+2025-08-16T00:23:10.851+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:23:10.866+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
+2025-08-16T00:23:10.867+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:23:10.870+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
+2025-08-16T00:23:10.885+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
+2025-08-16T00:23:10.885+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
+2025-08-16T00:23:40.874+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/PROJECT-SERVICE/localhost:project-service:8083?status=UP&lastDirtyTimestamp=1755281980696
+2025-08-16T00:23:40.874+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:23:40.888+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
+2025-08-16T00:23:40.889+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:23:40.892+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
+2025-08-16T00:23:40.907+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
+2025-08-16T00:23:40.907+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
+2025-08-16T00:24:10.894+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/PROJECT-SERVICE/localhost:project-service:8083?status=UP&lastDirtyTimestamp=1755281980696
+2025-08-16T00:24:10.894+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:24:10.909+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
+2025-08-16T00:24:10.910+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:24:10.912+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
+2025-08-16T00:24:10.928+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
+2025-08-16T00:24:10.928+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
+2025-08-16T00:24:40.922+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/PROJECT-SERVICE/localhost:project-service:8083?status=UP&lastDirtyTimestamp=1755281980696
+2025-08-16T00:24:40.923+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:24:40.937+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
+2025-08-16T00:24:40.937+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:24:40.940+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
+2025-08-16T00:24:40.955+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
+2025-08-16T00:24:40.955+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
+2025-08-16T00:25:10.953+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/PROJECT-SERVICE/localhost:project-service:8083?status=UP&lastDirtyTimestamp=1755281980696
+2025-08-16T00:25:10.954+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:25:10.969+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
+2025-08-16T00:25:10.969+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:25:10.971+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
+2025-08-16T00:25:10.986+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
+2025-08-16T00:25:10.986+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
+2025-08-16T00:25:40.975+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/PROJECT-SERVICE/localhost:project-service:8083?status=UP&lastDirtyTimestamp=1755281980696
+2025-08-16T00:25:40.976+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:25:40.990+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
+2025-08-16T00:25:40.991+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Accept=[application/json, application/yaml, application/*+json]
+2025-08-16T00:25:40.993+06:00 DEBUG 24396 --- [project-service] [beatExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
+2025-08-16T00:25:41.010+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Response 200 OK
+2025-08-16T00:25:41.010+06:00 DEBUG 24396 --- [project-service] [reshExecutor-%d] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]
