@@ -1,7 +1,6 @@
 package org.solace.scholar_ai.project_service.service.latex;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.solace.scholar_ai.project_service.dto.latex.CreateDocumentRequestDTO;
@@ -88,17 +87,24 @@ public class DocumentService {
             fileName = fileName + ".tex";
         }
 
-        // Check if document with same name already exists
-        Optional<Document> existingDoc = documentRepository.findByProjectIdAndTitle(projectId, fileName);
-        if (existingDoc.isPresent()) {
-            throw new RuntimeException("Document with name '" + fileName + "' already exists in this project");
+        // Handle duplicate names by appending a number
+        String finalFileName = fileName;
+        int counter = 1;
+
+        while (documentRepository
+                .findByProjectIdAndTitle(projectId, finalFileName)
+                .isPresent()) {
+            String nameWithoutExt = fileName.substring(0, fileName.lastIndexOf("."));
+            String extension = fileName.substring(fileName.lastIndexOf("."));
+            finalFileName = nameWithoutExt + " (" + counter + ")" + extension;
+            counter++;
         }
 
         Document document = Document.builder()
                 .projectId(projectId)
-                .title(fileName)
+                .title(finalFileName)
                 .content(
-                        "% " + fileName
+                        "% " + finalFileName
                                 + "\n\\documentclass{article}\n\\begin{document}\n\n% Start writing your LaTeX document here...\n\n\\end{document}")
                 .documentType(org.solace.scholar_ai.project_service.model.latex.DocumentType.LATEX)
                 .fileExtension("tex")
