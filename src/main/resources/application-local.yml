@@ -107,8 +107,7 @@ scholarai:
       completed-routing-key: scholarai.websearch.completed
 
 
-cors:
-  allowed-origins: "https://localhost:3000,https://example.com"
+
 
 logging:
   level:
