@@ -6,7 +6,7 @@ spring:
       enabled: true
 
   datasource:
-    url: jdbc:postgresql://localhost:${PROJECT_DB_PORT}/projectDB
+    url: jdbc:postgresql://project-db:5432/projectDB
     username: ${PROJECT_DB_USER}
     password: ${PROJECT_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
@@ -31,6 +31,15 @@ spring:
     username: ${RABBITMQ_USER}
     password: ${RABBITMQ_PASSWORD}
 
+scholarai:
+  rabbitmq:
+    exchange: scholarai.exchange
+    web-search:
+      queue: web-search-queue
+      routing-key: web-search
+      completed-queue: web-search-completed-queue
+      completed-routing-key: web-search-completed
+
 server:
   port: 8083
   error:
@@ -42,11 +51,12 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://service-registry:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
   instance:
-    hostname: localhost
+    hostname: project-service
+    prefer-ip-address: true
 
 
 management:
