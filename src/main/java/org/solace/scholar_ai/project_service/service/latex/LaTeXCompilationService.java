@@ -349,6 +349,12 @@ public class LaTeXCompilationService {
                     String emph = extractBraceContent(line, "\\emph{");
                     html.append("<em>").append(escapeHtml(emph)).append("</em>\n");
 
+                    // Handle inline display math \[...\] 
+                } else if (line.contains("\\[") && line.contains("\\]")) {
+                    // Process line with inline display math
+                    String processedLine = processInlineDisplayMath(escapeHtml(line));
+                    html.append("<p>").append(processedLine).append("</p>\n");
+
                     // Regular content
                 } else if (!line.isEmpty() && !line.startsWith("\\") && !inMathDisplay) {
                     html.append("<p>")
@@ -385,6 +391,29 @@ public class LaTeXCompilationService {
             result = result.substring(0, start) + replacement + result.substring(end + 1);
         }
         return result;
+    }
+
+    /**
+     * Process display math \[...\] within a line using safe string operations
+     */
+    private String processInlineDisplayMath(String text) {
+        String result = text;
+        
+        // Handle \[...\] display math using simple string operations
+        while (result.contains("\\[")) {
+            int start = result.indexOf("\\[");
+            if (start == -1) break;
+            int end = result.indexOf("\\]", start + 2);
+            if (end == -1) break;
+            
+            String mathContent = result.substring(start + 2, end);
+            String replacement = "$$" + mathContent + "$$";
+            
+            result = result.substring(0, start) + replacement + result.substring(end + 2);
+        }
+        
+        // Also handle inline math $...$ in the same line
+        return processInlineMath(result);
     }
 
     /**
