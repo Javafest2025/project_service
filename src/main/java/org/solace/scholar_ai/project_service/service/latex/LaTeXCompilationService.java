@@ -6,8 +6,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import java.util.Map;
 import java.util.HashMap;
 import org.springframework.core.io.ByteArrayResource;
@@ -370,7 +368,7 @@ public class LaTeXCompilationService {
     }
 
     /**
-     * Process inline math expressions
+     * Process inline math expressions - SAFE VERSION WITHOUT REGEX GROUP REFERENCES
      */
     private String processInlineMath(String text) {
         // Handle $...$ inline math using simple string operations to avoid regex issues
@@ -708,7 +706,7 @@ public class LaTeXCompilationService {
     }
 
     /**
-     * Convert LaTeX to HTML (legacy method)
+     * Convert LaTeX to HTML (legacy method) - SAFE VERSION WITHOUT REGEX GROUP REFERENCES
      */
     private String convertLatexToHtml(String latex) {
         String html = latex;
@@ -717,60 +715,165 @@ public class LaTeXCompilationService {
         Map<String, String> mathPlaceholders = new HashMap<>();
         html = replaceMathWithPlaceholders(html, mathPlaceholders);
 
-        // Convert title
-        html = html.replaceAll("\\\\title\\{([^}]+)\\}", "<h1>$1</h1>");
+        // Basic document structure cleanup (without problematic regex)
+        html = html.replace("\\documentclass[conference]{IEEEtran}", "");
+        html = html.replace("\\documentclass{article}", "");
+        html = html.replace("\\usepackage{amsmath}", "");
+        html = html.replace("\\usepackage{amssymb}", "");
+        html = html.replace("\\usepackage{algorithm}", "");
+        html = html.replace("\\usepackage{algpseudocode}", "");
+        html = html.replace("\\usepackage{graphicx}", "");
+        html = html.replace("\\begin{document}", "");
+        html = html.replace("\\end{document}", "");
+        html = html.replace("\\maketitle", "");
 
-        // Convert author
-        html = html.replaceAll("\\\\author\\{([^}]+)\\}", "<div class=\"center\"><strong>$1</strong></div>");
+        // Title, author, date - use safe pattern matching
+        html = safeTitleReplace(html);
+        html = safeAuthorReplace(html);
+        html = safeDateReplace(html);
 
-        // Convert date
-        html = html.replaceAll("\\\\date\\{([^}]+)\\}", "<div class=\"center\">$1</div>");
-        html = html.replaceAll(
-                "\\\\today", new java.text.SimpleDateFormat("MMMM dd, yyyy").format(new java.util.Date()));
-
-        // Remove document class and packages
-        html = html.replaceAll("\\\\documentclass(\\[[^\\]]*\\])?\\{[^}]+\\}", "");
-        html = html.replaceAll("\\\\usepackage(\\[[^\\]]*\\])?\\{[^}]+\\}", "");
-
-        // Remove begin/end document
-        html = html.replaceAll("\\\\begin\\{document\\}", "");
-        html = html.replaceAll("\\\\end\\{document\\}", "");
-
-        // Convert maketitle
-        html = html.replaceAll("\\\\maketitle", "");
-
-        // Convert sections
-        html = html.replaceAll("\\\\section\\{([^}]+)\\}", "<h2>$1</h2>");
-        html = html.replaceAll("\\\\subsection\\{([^}]+)\\}", "<h3>$1</h3>");
-        html = html.replaceAll("\\\\subsubsection\\{([^}]+)\\}", "<h4>$1</h4>");
-
-        // Convert abstract
-        html = html.replaceAll("\\\\begin\\{abstract\\}", "<div class=\"abstract\"><strong>Abstract:</strong><br>");
-        html = html.replaceAll("\\\\end\\{abstract\\}", "</div>");
-
-        // Convert emphasis
-        html = html.replaceAll("\\\\textbf\\{([^}]+)\\}", "<strong>$1</strong>");
-        html = html.replaceAll("\\\\textit\\{([^}]+)\\}", "<em>$1</em>");
-
-        // Convert line breaks
-        html = html.replaceAll("\\\\\\\\", "<br>");
-
-        // Convert itemize and enumerate
-        html = html.replaceAll("\\\\begin\\{itemize\\}", "<ul>");
-        html = html.replaceAll("\\\\end\\{itemize\\}", "</ul>");
-        html = html.replaceAll("\\\\begin\\{enumerate\\}", "<ol>");
-        html = html.replaceAll("\\\\end\\{enumerate\\}", "</ol>");
-        html = html.replaceAll("\\\\item\\s+", "<li>");
-
-        // Math expressions already converted at the beginning of this method
+        // Section headers - use safe pattern matching  
+        html = safeSectionReplace(html);
         
-        // Clean up extra whitespace
-        html = html.replaceAll("\\n\\s*\\n", "\n\n");
-        html = html.replaceAll("\\n", "<br>\n");
+        // Abstract - already handled with simple replace above
+        html = html.replace("\\begin{abstract}", "<div class=\"abstract\"><strong>Abstract:</strong><br>");
+        html = html.replace("\\end{abstract}", "</div>");
+        
+        // Text formatting - use safe pattern matching
+        html = safeTextFormatReplace(html);
+
+        // Lists - use safe pattern matching
+        html = safeListReplace(html);
+
+        // Line breaks
+        html = html.replace("\\\\", "<br>");
+
+        // Clean up extra whitespace - use safe string operations
+        html = safeWhitespaceCleanup(html);
+        html = html.replace("\n", "<br>\n");
 
         // FINAL: Restore math expressions from placeholders
         html = restoreMathFromPlaceholders(html, mathPlaceholders);
 
+        return html;
+    }
+
+    /**
+     * Safe title replacement without regex group references
+     */
+    private String safeTitleReplace(String html) {
+        int start = html.indexOf("\\title{");
+        if (start == -1) return html;
+        
+        int end = html.indexOf("}", start + 7);
+        if (end == -1) return html;
+        
+        String title = html.substring(start + 7, end);
+        return html.substring(0, start) + "<h1>" + title + "</h1>" + html.substring(end + 1);
+    }
+
+    /**
+     * Safe author replacement without regex group references
+     */
+    private String safeAuthorReplace(String html) {
+        int start = html.indexOf("\\author{");
+        if (start == -1) return html;
+        
+        int end = html.indexOf("}", start + 8);
+        if (end == -1) return html;
+        
+        String author = html.substring(start + 8, end);
+        return html.substring(0, start) + "<div class=\"center\"><strong>" + author + "</strong></div>" + html.substring(end + 1);
+    }
+
+    /**
+     * Safe date replacement without regex group references
+     */
+    private String safeDateReplace(String html) {
+        // Handle \date{...}
+        int start = html.indexOf("\\date{");
+        if (start != -1) {
+            int end = html.indexOf("}", start + 6);
+            if (end != -1) {
+                String date = html.substring(start + 6, end);
+                html = html.substring(0, start) + "<div class=\"center\">" + date + "</div>" + html.substring(end + 1);
+            }
+        }
+        
+        // Handle \today
+        if (html.contains("\\today")) {
+            String today = new java.text.SimpleDateFormat("MMMM dd, yyyy").format(new java.util.Date());
+            html = html.replace("\\today", today);
+        }
+        
+        return html;
+    }
+
+    /**
+     * Safe section replacement without regex group references
+     */
+    private String safeSectionReplace(String html) {
+        // Process sections
+        html = safeSingleSectionReplace(html, "\\section{", "<h2>", "</h2>");
+        html = safeSingleSectionReplace(html, "\\subsection{", "<h3>", "</h3>");
+        html = safeSingleSectionReplace(html, "\\subsubsection{", "<h4>", "</h4>");
+        return html;
+    }
+
+    private String safeSingleSectionReplace(String html, String latexTag, String openTag, String closeTag) {
+        while (true) {
+            int start = html.indexOf(latexTag);
+            if (start == -1) break;
+            
+            int end = html.indexOf("}", start + latexTag.length());
+            if (end == -1) break;
+            
+            String content = html.substring(start + latexTag.length(), end);
+            html = html.substring(0, start) + openTag + content + closeTag + html.substring(end + 1);
+        }
+        return html;
+    }
+
+    /**
+     * Safe text formatting replacement without regex group references
+     */
+    private String safeTextFormatReplace(String html) {
+        // Process textbf
+        html = safeSingleTextReplace(html, "\\textbf{", "<strong>", "</strong>");
+        // Process textit
+        html = safeSingleTextReplace(html, "\\textit{", "<em>", "</em>");
+        return html;
+    }
+
+    private String safeSingleTextReplace(String html, String latexTag, String openTag, String closeTag) {
+        while (true) {
+            int start = html.indexOf(latexTag);
+            if (start == -1) break;
+            
+            int end = html.indexOf("}", start + latexTag.length());
+            if (end == -1) break;
+            
+            String content = html.substring(start + latexTag.length(), end);
+            html = html.substring(0, start) + openTag + content + closeTag + html.substring(end + 1);
+        }
+        return html;
+    }
+
+    /**
+     * Safe list replacement without regex group references
+     */
+    private String safeListReplace(String html) {
+        // Replace list environments
+        html = html.replace("\\begin{itemize}", "<ul>");
+        html = html.replace("\\end{itemize}", "</ul>");
+        html = html.replace("\\begin{enumerate}", "<ol>");
+        html = html.replace("\\end{enumerate}", "</ol>");
+        
+        // Replace items - simple approach
+        html = html.replace("\\item ", "<li>");
+        html = html.replace("\\item\n", "<li>");
+        html = html.replace("\\item\t", "<li>");
+        
         return html;
     }
 
@@ -813,12 +916,47 @@ public class LaTeXCompilationService {
     }
 
     /**
+     * Safe whitespace cleanup without regex group references
+     */
+    private String safeWhitespaceCleanup(String text) {
+        String result = text;
+        
+        // Replace multiple newlines with double newlines - safe string operations
+        while (result.contains("\n\n\n")) {
+            result = result.replace("\n\n\n", "\n\n");
+        }
+        
+        // Replace newline followed by spaces and another newline with double newline
+        while (result.contains("\n \n") || result.contains("\n  \n") || result.contains("\n   \n") || 
+               result.contains("\n\t\n") || result.contains("\n \t\n") || result.contains("\n\t \n")) {
+            result = result.replace("\n \n", "\n\n");
+            result = result.replace("\n  \n", "\n\n");
+            result = result.replace("\n   \n", "\n\n");
+            result = result.replace("\n\t\n", "\n\n");
+            result = result.replace("\n \t\n", "\n\n");
+            result = result.replace("\n\t \n", "\n\n");
+        }
+        
+        return result;
+    }
+
+    /**
      * Restore math expressions from placeholders
      */
     private String restoreMathFromPlaceholders(String text, Map<String, String> placeholders) {
         String result = text;
         for (Map.Entry<String, String> entry : placeholders.entrySet()) {
-            result = result.replace(entry.getKey(), entry.getValue());
+            // Use safe string replacement to avoid any interpretation of $ as group references
+            String placeholder = entry.getKey();
+            String mathValue = entry.getValue();
+            
+            // Replace using StringBuilder to be completely safe
+            while (result.contains(placeholder)) {
+                int index = result.indexOf(placeholder);
+                if (index == -1) break;
+                
+                result = result.substring(0, index) + mathValue + result.substring(index + placeholder.length());
+            }
         }
         return result;
     }
