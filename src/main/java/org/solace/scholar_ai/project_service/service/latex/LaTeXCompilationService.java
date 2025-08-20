@@ -373,17 +373,20 @@ public class LaTeXCompilationService {
      * Process inline math expressions
      */
     private String processInlineMath(String text) {
-        // Handle $...$ inline math - use safe replacement with StringBuffer
-        Pattern inlineMathPattern = Pattern.compile("\\$([^$]+)\\$");
-        Matcher inlineMathMatcher = inlineMathPattern.matcher(text);
-        StringBuffer sb = new StringBuffer();
-        while (inlineMathMatcher.find()) {
-            String mathContent = inlineMathMatcher.group(1);
+        // Handle $...$ inline math using simple string operations to avoid regex issues
+        String result = text;
+        while (result.contains("$")) {
+            int start = result.indexOf("$");
+            if (start == -1) break;
+            int end = result.indexOf("$", start + 1);
+            if (end == -1) break;
+            
+            String mathContent = result.substring(start + 1, end);
             String replacement = "\\\\(" + mathContent + "\\\\)";
-            inlineMathMatcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
+            
+            result = result.substring(0, start) + replacement + result.substring(end + 1);
         }
-        inlineMathMatcher.appendTail(sb);
-        return sb.toString();
+        return result;
     }
 
     /**
@@ -778,31 +781,33 @@ public class LaTeXCompilationService {
         String result = text;
         int counter = 0;
         
-        // Replace inline math $...$
-        Pattern inlinePattern = Pattern.compile("\\$([^$]+)\\$");
-        Matcher inlineMatcher = inlinePattern.matcher(result);
-        StringBuffer sb1 = new StringBuffer();
-        while (inlineMatcher.find()) {
-            String mathContent = inlineMatcher.group(1);
+        // Replace inline math $...$ using simple string operations
+        while (result.contains("$")) {
+            int start = result.indexOf("$");
+            if (start == -1) break;
+            int end = result.indexOf("$", start + 1);
+            if (end == -1) break;
+            
+            String mathContent = result.substring(start + 1, end);
             String placeholder = "MATHPLACEHOLDER" + (counter++) + "MATHPLACEHOLDER";
             placeholders.put(placeholder, "\\\\(" + mathContent + "\\\\)");
-            inlineMatcher.appendReplacement(sb1, Matcher.quoteReplacement(placeholder));
+            
+            result = result.substring(0, start) + placeholder + result.substring(end + 1);
         }
-        inlineMatcher.appendTail(sb1);
-        result = sb1.toString();
         
-        // Replace display math \[...\]
-        Pattern displayPattern = Pattern.compile("\\\\\\[([^\\]]+)\\\\\\]");
-        Matcher displayMatcher = displayPattern.matcher(result);
-        StringBuffer sb2 = new StringBuffer();
-        while (displayMatcher.find()) {
-            String mathContent = displayMatcher.group(1);
+        // Replace display math \[...\] using simple string operations
+        while (result.contains("\\[")) {
+            int start = result.indexOf("\\[");
+            if (start == -1) break;
+            int end = result.indexOf("\\]", start + 2);
+            if (end == -1) break;
+            
+            String mathContent = result.substring(start + 2, end);
             String placeholder = "MATHPLACEHOLDER" + (counter++) + "MATHPLACEHOLDER";
             placeholders.put(placeholder, "\\\\[" + mathContent + "\\\\]");
-            displayMatcher.appendReplacement(sb2, Matcher.quoteReplacement(placeholder));
+            
+            result = result.substring(0, start) + placeholder + result.substring(end + 2);
         }
-        displayMatcher.appendTail(sb2);
-        result = sb2.toString();
         
         return result;
     }
