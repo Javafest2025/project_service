@@ -708,6 +708,31 @@ public class LaTeXCompilationService {
     private String convertLatexToHtml(String latex) {
         String html = latex;
 
+        // FIRST: Convert math expressions to avoid conflicts with $ in other replacements
+        // Convert simple math (inline) - use StringBuffer for safe replacement
+        Pattern inlineMathPattern = Pattern.compile("\\$([^$]+)\\$");
+        Matcher inlineMathMatcher = inlineMathPattern.matcher(html);
+        StringBuffer sb1 = new StringBuffer();
+        while (inlineMathMatcher.find()) {
+            String mathContent = inlineMathMatcher.group(1);
+            String replacement = "\\\\(" + mathContent + "\\\\)";
+            inlineMathMatcher.appendReplacement(sb1, Matcher.quoteReplacement(replacement));
+        }
+        inlineMathMatcher.appendTail(sb1);
+        html = sb1.toString();
+
+        // Convert display math - use StringBuffer for safe replacement
+        Pattern displayMathPattern = Pattern.compile("\\\\\\[([^\\]]+)\\\\\\]");
+        Matcher displayMathMatcher = displayMathPattern.matcher(html);
+        StringBuffer sb2 = new StringBuffer();
+        while (displayMathMatcher.find()) {
+            String mathContent = displayMathMatcher.group(1);
+            String replacement = "\\\\[" + mathContent + "\\\\]";
+            displayMathMatcher.appendReplacement(sb2, Matcher.quoteReplacement(replacement));
+        }
+        displayMathMatcher.appendTail(sb2);
+        html = sb2.toString();
+
         // Convert title
         html = html.replaceAll("\\\\title\\{([^}]+)\\}", "<h1>$1</h1>");
 
@@ -753,29 +778,9 @@ public class LaTeXCompilationService {
         html = html.replaceAll("\\\\end\\{enumerate\\}", "</ol>");
         html = html.replaceAll("\\\\item\\s+", "<li>");
 
-        // Convert simple math (inline) - use StringBuffer for safe replacement
-        Pattern inlineMathPattern = Pattern.compile("\\$([^$]+)\\$");
-        Matcher inlineMathMatcher = inlineMathPattern.matcher(html);
-        StringBuffer sb1 = new StringBuffer();
-        while (inlineMathMatcher.find()) {
-            String mathContent = inlineMathMatcher.group(1);
-            String replacement = "\\\\(" + mathContent + "\\\\)";
-            inlineMathMatcher.appendReplacement(sb1, Matcher.quoteReplacement(replacement));
-        }
-        inlineMathMatcher.appendTail(sb1);
-        html = sb1.toString();
-
-        // Convert display math - use StringBuffer for safe replacement
-        Pattern displayMathPattern = Pattern.compile("\\\\\\[([^\\]]+)\\\\\\]");
-        Matcher displayMathMatcher = displayMathPattern.matcher(html);
-        StringBuffer sb2 = new StringBuffer();
-        while (displayMathMatcher.find()) {
-            String mathContent = displayMathMatcher.group(1);
-            String replacement = "\\\\[" + mathContent + "\\\\]";
-            displayMathMatcher.appendReplacement(sb2, Matcher.quoteReplacement(replacement));
-        }
-        displayMathMatcher.appendTail(sb2);
-        html = sb2.toString();        // Clean up extra whitespace
+        // Math expressions already converted at the beginning of this method
+        
+        // Clean up extra whitespace
         html = html.replaceAll("\\n\\s*\\n", "\n\n");
         html = html.replaceAll("\\n", "<br>\n");
 
