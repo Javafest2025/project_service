@@ -759,24 +759,23 @@ public class LaTeXCompilationService {
         html = html.replace("\\maketitle", "");
 
         // Title, author, date - use safe pattern matching
-        html = safeTitleReplace(html);
-        html = safeAuthorReplace(html);
-        html = safeDateReplace(html);
+        // Temporarily disabled for debugging
+        // html = safeTitleReplace(html);
+        // html = safeAuthorReplace(html);
+        // html = safeDateReplace(html);
 
         // Section headers - use safe pattern matching  
-        html = safeSectionReplace(html);
-        
+        // html = safeSectionReplace(html);
+
         // Abstract - already handled with simple replace above
         html = html.replace("\\begin{abstract}", "<div class=\"abstract\"><strong>Abstract:</strong><br>");
         html = html.replace("\\end{abstract}", "</div>");
-        
+
         // Text formatting - use safe pattern matching
-        html = safeTextFormatReplace(html);
+        // html = safeTextFormatReplace(html);
 
         // Lists - use safe pattern matching
-        html = safeListReplace(html);
-
-        // Line breaks
+        // html = safeListReplace(html);        // Line breaks
         html = html.replace("\\\\", "<br>");
 
         // Clean up extra whitespace - use safe string operations
