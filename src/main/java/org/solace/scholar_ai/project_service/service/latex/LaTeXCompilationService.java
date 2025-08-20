@@ -412,8 +412,9 @@ public class LaTeXCompilationService {
             result = result.substring(0, start) + replacement + result.substring(end + 2);
         }
         
-        // Also handle inline math $...$ in the same line
-        return processInlineMath(result);
+        // Also handle inline math $...$ in the same line - but do this safely
+        // For now, let's skip this to isolate the issue
+        return result;
     }
 
     /**
