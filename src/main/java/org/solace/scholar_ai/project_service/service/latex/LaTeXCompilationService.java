@@ -743,7 +743,8 @@ public class LaTeXCompilationService {
 
         // FIRST: Replace math expressions with safe placeholders to avoid conflicts
         Map<String, String> mathPlaceholders = new HashMap<>();
-        html = replaceMathWithPlaceholders(html, mathPlaceholders);
+        // Temporarily disable math placeholder processing to debug
+        // html = replaceMathWithPlaceholders(html, mathPlaceholders);
 
         // Basic document structure cleanup (without problematic regex)
         html = html.replace("\\documentclass[conference]{IEEEtran}", "");
@@ -783,7 +784,8 @@ public class LaTeXCompilationService {
         html = html.replace("\n", "<br>\n");
 
         // FINAL: Restore math expressions from placeholders
-        html = restoreMathFromPlaceholders(html, mathPlaceholders);
+        // Temporarily disabled for debugging
+        // html = restoreMathFromPlaceholders(html, mathPlaceholders);
 
         return html;
     }
