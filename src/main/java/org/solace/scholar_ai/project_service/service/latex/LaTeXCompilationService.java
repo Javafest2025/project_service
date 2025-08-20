@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -369,8 +371,16 @@ public class LaTeXCompilationService {
      * Process inline math expressions
      */
     private String processInlineMath(String text) {
-        // Handle $...$ inline math - use Matcher to avoid group reference issues
-        return text.replaceAll("\\$([^$]+)\\$", "\\\\\\($1\\\\\\)");
+        // Handle $...$ inline math - use safe replacement with StringBuffer
+        Pattern inlineMathPattern = Pattern.compile("\\$([^$]+)\\$");
+        Matcher inlineMathMatcher = inlineMathPattern.matcher(text);
+        StringBuffer sb = new StringBuffer();
+        while (inlineMathMatcher.find()) {
+            String mathContent = inlineMathMatcher.group(1);
+            inlineMathMatcher.appendReplacement(sb, "\\\\(" + mathContent + "\\\\)");
+        }
+        inlineMathMatcher.appendTail(sb);
+        return sb.toString();
     }
 
     /**
@@ -742,13 +752,27 @@ public class LaTeXCompilationService {
         html = html.replaceAll("\\\\end\\{enumerate\\}", "</ol>");
         html = html.replaceAll("\\\\item\\s+", "<li>");
 
-        // Convert simple math (inline) - use Pattern.LITERAL to avoid group reference issues
-        html = html.replaceAll("\\$([^$]+)\\$", "\\\\($1\\\\)");
+        // Convert simple math (inline) - use StringBuffer for safe replacement
+        Pattern inlineMathPattern = Pattern.compile("\\$([^$]+)\\$");
+        Matcher inlineMathMatcher = inlineMathPattern.matcher(html);
+        StringBuffer sb1 = new StringBuffer();
+        while (inlineMathMatcher.find()) {
+            String mathContent = inlineMathMatcher.group(1);
+            inlineMathMatcher.appendReplacement(sb1, "\\\\(" + mathContent + "\\\\)");
+        }
+        inlineMathMatcher.appendTail(sb1);
+        html = sb1.toString();
 
-        // Convert display math - use Pattern.LITERAL to avoid group reference issues  
-        html = html.replaceAll("\\\\\\[([^\\]]+)\\\\\\]", "\\\\[$1\\\\]");
-
-        // Clean up extra whitespace
+        // Convert display math - use StringBuffer for safe replacement
+        Pattern displayMathPattern = Pattern.compile("\\\\\\[([^\\]]+)\\\\\\]");
+        Matcher displayMathMatcher = displayMathPattern.matcher(html);
+        StringBuffer sb2 = new StringBuffer();
+        while (displayMathMatcher.find()) {
+            String mathContent = displayMathMatcher.group(1);
+            displayMathMatcher.appendReplacement(sb2, "\\\\[" + mathContent + "\\\\]");
+        }
+        displayMathMatcher.appendTail(sb2);
+        html = sb2.toString();        // Clean up extra whitespace
         html = html.replaceAll("\\n\\s*\\n", "\n\n");
         html = html.replaceAll("\\n", "<br>\n");
 
