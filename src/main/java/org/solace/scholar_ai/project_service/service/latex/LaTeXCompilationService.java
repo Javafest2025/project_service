@@ -369,8 +369,8 @@ public class LaTeXCompilationService {
      * Process inline math expressions
      */
     private String processInlineMath(String text) {
-        // Handle $...$ inline math
-        return text.replaceAll("\\$([^$]+)\\$", "\\$$$1$$");
+        // Handle $...$ inline math - use Matcher to avoid group reference issues
+        return text.replaceAll("\\$([^$]+)\\$", "\\\\\\($1\\\\\\)");
     }
 
     /**
@@ -743,10 +743,10 @@ public class LaTeXCompilationService {
         html = html.replaceAll("\\\\item\\s+", "<li>");
 
         // Convert simple math (inline)
-        html = html.replaceAll("\\$([^$]+)\\$", "\\($1\\)");
+        html = html.replaceAll("\\$([^$]+)\\$", "\\\\($1\\\\)");
 
         // Convert display math
-        html = html.replaceAll("\\\\\\[([^\\]]+)\\\\\\]", "\\[$$1$$\\]");
+        html = html.replaceAll("\\\\\\[([^\\]]+)\\\\\\]", "\\\\[$1\\\\]");
 
         // Clean up extra whitespace
         html = html.replaceAll("\\n\\s*\\n", "\n\n");
