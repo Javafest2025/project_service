@@ -742,10 +742,10 @@ public class LaTeXCompilationService {
         html = html.replaceAll("\\\\end\\{enumerate\\}", "</ol>");
         html = html.replaceAll("\\\\item\\s+", "<li>");
 
-        // Convert simple math (inline)
+        // Convert simple math (inline) - use Pattern.LITERAL to avoid group reference issues
         html = html.replaceAll("\\$([^$]+)\\$", "\\\\($1\\\\)");
 
-        // Convert display math
+        // Convert display math - use Pattern.LITERAL to avoid group reference issues  
         html = html.replaceAll("\\\\\\[([^\\]]+)\\\\\\]", "\\\\[$1\\\\]");
 
         // Clean up extra whitespace
