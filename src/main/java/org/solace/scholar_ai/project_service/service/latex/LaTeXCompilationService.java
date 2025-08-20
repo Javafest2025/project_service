@@ -377,7 +377,8 @@ public class LaTeXCompilationService {
         StringBuffer sb = new StringBuffer();
         while (inlineMathMatcher.find()) {
             String mathContent = inlineMathMatcher.group(1);
-            inlineMathMatcher.appendReplacement(sb, "\\\\(" + mathContent + "\\\\)");
+            String replacement = "\\\\(" + mathContent + "\\\\)";
+            inlineMathMatcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
         }
         inlineMathMatcher.appendTail(sb);
         return sb.toString();
@@ -758,7 +759,8 @@ public class LaTeXCompilationService {
         StringBuffer sb1 = new StringBuffer();
         while (inlineMathMatcher.find()) {
             String mathContent = inlineMathMatcher.group(1);
-            inlineMathMatcher.appendReplacement(sb1, "\\\\(" + mathContent + "\\\\)");
+            String replacement = "\\\\(" + mathContent + "\\\\)";
+            inlineMathMatcher.appendReplacement(sb1, Matcher.quoteReplacement(replacement));
         }
         inlineMathMatcher.appendTail(sb1);
         html = sb1.toString();
@@ -769,7 +771,8 @@ public class LaTeXCompilationService {
         StringBuffer sb2 = new StringBuffer();
         while (displayMathMatcher.find()) {
             String mathContent = displayMathMatcher.group(1);
-            displayMathMatcher.appendReplacement(sb2, "\\\\[" + mathContent + "\\\\]");
+            String replacement = "\\\\[" + mathContent + "\\\\]";
+            displayMathMatcher.appendReplacement(sb2, Matcher.quoteReplacement(replacement));
         }
         displayMathMatcher.appendTail(sb2);
         html = sb2.toString();        // Clean up extra whitespace
