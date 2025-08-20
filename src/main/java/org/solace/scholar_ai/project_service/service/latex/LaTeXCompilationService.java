@@ -8,6 +8,8 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.Map;
+import java.util.HashMap;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -708,30 +710,9 @@ public class LaTeXCompilationService {
     private String convertLatexToHtml(String latex) {
         String html = latex;
 
-        // FIRST: Convert math expressions to avoid conflicts with $ in other replacements
-        // Convert simple math (inline) - use StringBuffer for safe replacement
-        Pattern inlineMathPattern = Pattern.compile("\\$([^$]+)\\$");
-        Matcher inlineMathMatcher = inlineMathPattern.matcher(html);
-        StringBuffer sb1 = new StringBuffer();
-        while (inlineMathMatcher.find()) {
-            String mathContent = inlineMathMatcher.group(1);
-            String replacement = "\\\\(" + mathContent + "\\\\)";
-            inlineMathMatcher.appendReplacement(sb1, Matcher.quoteReplacement(replacement));
-        }
-        inlineMathMatcher.appendTail(sb1);
-        html = sb1.toString();
-
-        // Convert display math - use StringBuffer for safe replacement
-        Pattern displayMathPattern = Pattern.compile("\\\\\\[([^\\]]+)\\\\\\]");
-        Matcher displayMathMatcher = displayMathPattern.matcher(html);
-        StringBuffer sb2 = new StringBuffer();
-        while (displayMathMatcher.find()) {
-            String mathContent = displayMathMatcher.group(1);
-            String replacement = "\\\\[" + mathContent + "\\\\]";
-            displayMathMatcher.appendReplacement(sb2, Matcher.quoteReplacement(replacement));
-        }
-        displayMathMatcher.appendTail(sb2);
-        html = sb2.toString();
+        // FIRST: Replace math expressions with safe placeholders to avoid conflicts
+        Map<String, String> mathPlaceholders = new HashMap<>();
+        html = replaceMathWithPlaceholders(html, mathPlaceholders);
 
         // Convert title
         html = html.replaceAll("\\\\title\\{([^}]+)\\}", "<h1>$1</h1>");
@@ -784,7 +765,57 @@ public class LaTeXCompilationService {
         html = html.replaceAll("\\n\\s*\\n", "\n\n");
         html = html.replaceAll("\\n", "<br>\n");
 
+        // FINAL: Restore math expressions from placeholders
+        html = restoreMathFromPlaceholders(html, mathPlaceholders);
+
         return html;
+    }
+
+    /**
+     * Replace math expressions with safe placeholders
+     */
+    private String replaceMathWithPlaceholders(String text, Map<String, String> placeholders) {
+        String result = text;
+        int counter = 0;
+        
+        // Replace inline math $...$
+        Pattern inlinePattern = Pattern.compile("\\$([^$]+)\\$");
+        Matcher inlineMatcher = inlinePattern.matcher(result);
+        StringBuffer sb1 = new StringBuffer();
+        while (inlineMatcher.find()) {
+            String mathContent = inlineMatcher.group(1);
+            String placeholder = "MATHPLACEHOLDER" + (counter++) + "MATHPLACEHOLDER";
+            placeholders.put(placeholder, "\\\\(" + mathContent + "\\\\)");
+            inlineMatcher.appendReplacement(sb1, Matcher.quoteReplacement(placeholder));
+        }
+        inlineMatcher.appendTail(sb1);
+        result = sb1.toString();
+        
+        // Replace display math \[...\]
+        Pattern displayPattern = Pattern.compile("\\\\\\[([^\\]]+)\\\\\\]");
+        Matcher displayMatcher = displayPattern.matcher(result);
+        StringBuffer sb2 = new StringBuffer();
+        while (displayMatcher.find()) {
+            String mathContent = displayMatcher.group(1);
+            String placeholder = "MATHPLACEHOLDER" + (counter++) + "MATHPLACEHOLDER";
+            placeholders.put(placeholder, "\\\\[" + mathContent + "\\\\]");
+            displayMatcher.appendReplacement(sb2, Matcher.quoteReplacement(placeholder));
+        }
+        displayMatcher.appendTail(sb2);
+        result = sb2.toString();
+        
+        return result;
+    }
+
+    /**
+     * Restore math expressions from placeholders
+     */
+    private String restoreMathFromPlaceholders(String text, Map<String, String> placeholders) {
+        String result = text;
+        for (Map.Entry<String, String> entry : placeholders.entrySet()) {
+            result = result.replace(entry.getKey(), entry.getValue());
+        }
+        return result;
     }
 
     /**
