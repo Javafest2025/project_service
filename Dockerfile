@@ -1,8 +1,11 @@
 # Project Service Dockerfile
 FROM openjdk:21-jdk-slim
 
-# Install curl for health checks
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+# Install curl for health checks and LaTeX for PDF processing
+RUN apt-get update && \
+    apt-get install -y curl pandoc texlive-full && \
+    which pdflatex && \
+    rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app

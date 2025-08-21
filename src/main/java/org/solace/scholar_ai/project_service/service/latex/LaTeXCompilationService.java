@@ -4,10 +4,10 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.Map;
-import java.util.HashMap;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -349,7 +349,7 @@ public class LaTeXCompilationService {
                     String emph = extractBraceContent(line, "\\emph{");
                     html.append("<em>").append(escapeHtml(emph)).append("</em>\n");
 
-                    // Handle inline display math \[...\] 
+                    // Handle inline display math \[...\]
                 } else if (line.contains("\\[") && line.contains("\\]")) {
                     // Process line with inline display math
                     String processedLine = processInlineDisplayMath(escapeHtml(line));
@@ -384,10 +384,10 @@ public class LaTeXCompilationService {
             if (start == -1) break;
             int end = result.indexOf("$", start + 1);
             if (end == -1) break;
-            
+
             String mathContent = result.substring(start + 1, end);
             String replacement = "\\\\(" + mathContent + "\\\\)";
-            
+
             result = result.substring(0, start) + replacement + result.substring(end + 1);
         }
         return result;
@@ -398,20 +398,20 @@ public class LaTeXCompilationService {
      */
     private String processInlineDisplayMath(String text) {
         String result = text;
-        
+
         // Handle \[...\] display math using simple string operations
         while (result.contains("\\[")) {
             int start = result.indexOf("\\[");
             if (start == -1) break;
             int end = result.indexOf("\\]", start + 2);
             if (end == -1) break;
-            
+
             String mathContent = result.substring(start + 2, end);
             String replacement = "$$" + mathContent + "$$";
-            
+
             result = result.substring(0, start) + replacement + result.substring(end + 2);
         }
-        
+
         // Also handle inline math $...$ in the same line - but do this safely
         // For now, let's skip this to isolate the issue
         return result;
@@ -764,7 +764,7 @@ public class LaTeXCompilationService {
         // html = safeAuthorReplace(html);
         // html = safeDateReplace(html);
 
-        // Section headers - use safe pattern matching  
+        // Section headers - use safe pattern matching
         // html = safeSectionReplace(html);
 
         // Abstract - already handled with simple replace above
@@ -776,18 +776,18 @@ public class LaTeXCompilationService {
 
         // Lists - use safe pattern matching
         // html = safeListReplace(html);        // Line breaks
-        html = html.replace("\\\\", "<br>");
+        // Temporarily disable to test for regex issues
+        // html = html.replace("\\\\", "<br>");
 
         // Clean up extra whitespace - use safe string operations
-        html = safeWhitespaceCleanup(html);
-        html = html.replace("\n", "<br>\n");
-
-        // FINAL: Restore math expressions from placeholders
         // Temporarily disabled for debugging
-        // html = restoreMathFromPlaceholders(html, mathPlaceholders);
+        // html = safeWhitespaceCleanup(html);
+        // html = html.replace("\n", "<br>\n");
 
         return html;
     }
+
+    // Safe helper methods for replacing patterns
 
     /**
      * Safe title replacement without regex group references
@@ -795,10 +795,10 @@ public class LaTeXCompilationService {
     private String safeTitleReplace(String html) {
         int start = html.indexOf("\\title{");
         if (start == -1) return html;
-        
+
         int end = html.indexOf("}", start + 7);
         if (end == -1) return html;
-        
+
         String title = html.substring(start + 7, end);
         return html.substring(0, start) + "<h1>" + title + "</h1>" + html.substring(end + 1);
     }
@@ -809,12 +809,13 @@ public class LaTeXCompilationService {
     private String safeAuthorReplace(String html) {
         int start = html.indexOf("\\author{");
         if (start == -1) return html;
-        
+
         int end = html.indexOf("}", start + 8);
         if (end == -1) return html;
-        
+
         String author = html.substring(start + 8, end);
-        return html.substring(0, start) + "<div class=\"center\"><strong>" + author + "</strong></div>" + html.substring(end + 1);
+        return html.substring(0, start) + "<div class=\"center\"><strong>" + author + "</strong></div>"
+                + html.substring(end + 1);
     }
 
     /**
@@ -830,13 +831,13 @@ public class LaTeXCompilationService {
                 html = html.substring(0, start) + "<div class=\"center\">" + date + "</div>" + html.substring(end + 1);
             }
         }
-        
+
         // Handle \today
         if (html.contains("\\today")) {
             String today = new java.text.SimpleDateFormat("MMMM dd, yyyy").format(new java.util.Date());
             html = html.replace("\\today", today);
         }
-        
+
         return html;
     }
 
@@ -855,10 +856,10 @@ public class LaTeXCompilationService {
         while (true) {
             int start = html.indexOf(latexTag);
             if (start == -1) break;
-            
+
             int end = html.indexOf("}", start + latexTag.length());
             if (end == -1) break;
-            
+
             String content = html.substring(start + latexTag.length(), end);
             html = html.substring(0, start) + openTag + content + closeTag + html.substring(end + 1);
         }
@@ -880,10 +881,10 @@ public class LaTeXCompilationService {
         while (true) {
             int start = html.indexOf(latexTag);
             if (start == -1) break;
-            
+
             int end = html.indexOf("}", start + latexTag.length());
             if (end == -1) break;
-            
+
             String content = html.substring(start + latexTag.length(), end);
             html = html.substring(0, start) + openTag + content + closeTag + html.substring(end + 1);
         }
@@ -899,12 +900,12 @@ public class LaTeXCompilationService {
         html = html.replace("\\end{itemize}", "</ul>");
         html = html.replace("\\begin{enumerate}", "<ol>");
         html = html.replace("\\end{enumerate}", "</ol>");
-        
+
         // Replace items - simple approach
         html = html.replace("\\item ", "<li>");
         html = html.replace("\\item\n", "<li>");
         html = html.replace("\\item\t", "<li>");
-        
+
         return html;
     }
 
@@ -914,35 +915,35 @@ public class LaTeXCompilationService {
     private String replaceMathWithPlaceholders(String text, Map<String, String> placeholders) {
         String result = text;
         int counter = 0;
-        
+
         // Replace inline math $...$ using simple string operations
         while (result.contains("$")) {
             int start = result.indexOf("$");
             if (start == -1) break;
             int end = result.indexOf("$", start + 1);
             if (end == -1) break;
-            
+
             String mathContent = result.substring(start + 1, end);
             String placeholder = "MATHPLACEHOLDER" + (counter++) + "MATHPLACEHOLDER";
             placeholders.put(placeholder, "\\\\(" + mathContent + "\\\\)");
-            
+
             result = result.substring(0, start) + placeholder + result.substring(end + 1);
         }
-        
+
         // Replace display math \[...\] using simple string operations
         while (result.contains("\\[")) {
             int start = result.indexOf("\\[");
             if (start == -1) break;
             int end = result.indexOf("\\]", start + 2);
             if (end == -1) break;
-            
+
             String mathContent = result.substring(start + 2, end);
             String placeholder = "MATHPLACEHOLDER" + (counter++) + "MATHPLACEHOLDER";
             placeholders.put(placeholder, "\\\\[" + mathContent + "\\\\]");
-            
+
             result = result.substring(0, start) + placeholder + result.substring(end + 2);
         }
-        
+
         return result;
     }
 
@@ -951,15 +952,19 @@ public class LaTeXCompilationService {
      */
     private String safeWhitespaceCleanup(String text) {
         String result = text;
-        
+
         // Replace multiple newlines with double newlines - safe string operations
         while (result.contains("\n\n\n")) {
             result = result.replace("\n\n\n", "\n\n");
         }
-        
+
         // Replace newline followed by spaces and another newline with double newline
-        while (result.contains("\n \n") || result.contains("\n  \n") || result.contains("\n   \n") || 
-               result.contains("\n\t\n") || result.contains("\n \t\n") || result.contains("\n\t \n")) {
+        while (result.contains("\n \n")
+                || result.contains("\n  \n")
+                || result.contains("\n   \n")
+                || result.contains("\n\t\n")
+                || result.contains("\n \t\n")
+                || result.contains("\n\t \n")) {
             result = result.replace("\n \n", "\n\n");
             result = result.replace("\n  \n", "\n\n");
             result = result.replace("\n   \n", "\n\n");
@@ -967,7 +972,7 @@ public class LaTeXCompilationService {
             result = result.replace("\n \t\n", "\n\n");
             result = result.replace("\n\t \n", "\n\n");
         }
-        
+
         return result;
     }
 
@@ -980,12 +985,12 @@ public class LaTeXCompilationService {
             // Use safe string replacement to avoid any interpretation of $ as group references
             String placeholder = entry.getKey();
             String mathValue = entry.getValue();
-            
+
             // Replace using StringBuilder to be completely safe
             while (result.contains(placeholder)) {
                 int index = result.indexOf(placeholder);
                 if (index == -1) break;
-                
+
                 result = result.substring(0, index) + mathValue + result.substring(index + placeholder.length());
             }
         }
