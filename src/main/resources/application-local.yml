@@ -95,6 +95,10 @@ springdoc:
     # Enable try it out by default
     tryItOutEnabled: true
 
+gemini:
+  api-key: ${GEMINI_API_KEY:your-gemini-api-key-here}
+  api-url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent    
+
 scholarai:
   fastapi:
     papersearch-url: http://localhost:8001
