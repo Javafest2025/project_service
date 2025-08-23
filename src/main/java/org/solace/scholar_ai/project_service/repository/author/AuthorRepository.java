@@ -1,5 +1,6 @@
 package org.solace.scholar_ai.project_service.repository.author;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,25 +18,31 @@ public interface AuthorRepository extends JpaRepository<Author, UUID> {
     // Basic search methods
     List<Author> findByNameContainingIgnoreCase(String name);
 
-    Optional<Author> findByAuthorId(String authorId);
+    Optional<Author> findByNameIgnoreCase(String name);
 
-    Optional<Author> findByOrcid(String orcid);
+    Optional<Author> findByOrcidId(String orcidId);
 
     Optional<Author> findByEmail(String email);
+
+    List<Author> findAllByOrderByNameAsc();
+
+    List<Author> findByLastSyncAtBeforeOrLastSyncAtIsNull(Instant cutoff);
+
+    List<Author> findByPrimaryAffiliationContainingIgnoreCase(String primaryAffiliation);
 
     // Advanced search with pagination
     Page<Author> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
     @Query(
-            "SELECT a FROM Author a WHERE a.name LIKE %:keyword% OR a.fieldsOfStudy LIKE %:keyword% OR a.affiliations LIKE %:keyword%")
+            "SELECT a FROM Author a WHERE a.name LIKE %:keyword% OR a.primaryAffiliation LIKE %:keyword% OR a.allAffiliations LIKE %:keyword% OR a.researchAreas LIKE %:keyword%")
     Page<Author> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
-    // Search by fields of study
-    @Query("SELECT a FROM Author a WHERE a.fieldsOfStudy LIKE %:field%")
-    List<Author> findByFieldOfStudy(@Param("field") String field);
+    // Search by research areas
+    @Query("SELECT a FROM Author a WHERE a.researchAreas LIKE %:field%")
+    List<Author> findByResearchArea(@Param("field") String field);
 
     // Search by affiliation
-    @Query("SELECT a FROM Author a WHERE a.affiliations LIKE %:affiliation%")
+    @Query("SELECT a FROM Author a WHERE a.allAffiliations LIKE %:affiliation%")
     List<Author> findByAffiliation(@Param("affiliation") String affiliation);
 
     // Find authors with high citation count
@@ -44,10 +51,10 @@ public interface AuthorRepository extends JpaRepository<Author, UUID> {
     // Find authors by paper count
     List<Author> findByPaperCountGreaterThanOrderByPaperCountDesc(Integer minPaperCount);
 
-    // Find authors by confidence score
-    List<Author> findByConfidenceScoreGreaterThanOrderByConfidenceScoreDesc(Double minConfidence);
+    // Find authors by data quality score
+    List<Author> findByDataQualityScoreGreaterThanOrderByDataQualityScoreDesc(Double minQualityScore);
 
-    // Find authors by source
-    @Query("SELECT a FROM Author a WHERE a.sources LIKE %:source%")
-    List<Author> findBySource(@Param("source") String source);
+    // Find authors by data source
+    @Query("SELECT a FROM Author a WHERE a.dataSources LIKE %:source%")
+    List<Author> findByDataSource(@Param("source") String source);
 }

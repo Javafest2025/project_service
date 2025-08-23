@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.solace.scholar_ai.project_service.model.author.Author;
+import org.solace.scholar_ai.project_service.model.extraction.PaperExtraction;
 
 @Getter
 @Setter
@@ -84,6 +85,33 @@ public class Paper {
 
     @OneToOne(mappedBy = "paper", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private PaperMetrics metrics;
+
+    // Extraction-related fields
+    @Column(name = "is_extracted")
+    @Builder.Default
+    private Boolean isExtracted = false;
+
+    @Column(name = "extraction_status", length = 50)
+    private String extractionStatus; // PENDING, PROCESSING, COMPLETED, FAILED
+
+    @Column(name = "extraction_job_id", length = 100)
+    private String extractionJobId;
+
+    @Column(name = "extraction_started_at")
+    private java.time.Instant extractionStartedAt;
+
+    @Column(name = "extraction_completed_at")
+    private java.time.Instant extractionCompletedAt;
+
+    @Column(name = "extraction_error", columnDefinition = "TEXT")
+    private String extractionError;
+
+    @Column(name = "extraction_coverage")
+    private Double extractionCoverage; // 0-100%
+
+    // One-to-one relationship with paper extraction details
+    @OneToOne(mappedBy = "paper", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private PaperExtraction paperExtraction;
 
     public void addExternalId(ExternalId externalId) {
         externalIds.add(externalId);

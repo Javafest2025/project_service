@@ -100,7 +100,8 @@ public class LibraryController {
         try {
             log.info("Upload paper to project {} endpoint hit", projectId);
 
-            PaperMetadataDto savedPaper = uploadedPaperService.saveUploadedPaper(request, request.projectId());
+            // Extract userId from the request body - we'll add it to UploadedPaperRequest
+            PaperMetadataDto savedPaper = uploadedPaperService.saveUploadedPaper(request, request.userId());
 
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(APIResponse.success(HttpStatus.CREATED.value(), "Paper uploaded successfully", savedPaper));

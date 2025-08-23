@@ -12,6 +12,8 @@ import org.solace.scholar_ai.project_service.dto.author.AuthorDto;
 
 @Schema(description = "Request DTO for uploading a paper to a project library")
 public record UploadedPaperRequest(
+        @Schema(description = "User ID for authentication", example = "123e4567-e89b-12d3-a456-426614174000")
+                @NotNull(message = "User ID is required") UUID userId,
         @Schema(description = "Project ID to upload the paper to", example = "123e4567-e89b-12d3-a456-426614174000")
                 @NotNull(message = "Project ID is required") UUID projectId,
         @Schema(description = "Paper title", example = "Deep Learning for Natural Language Processing")

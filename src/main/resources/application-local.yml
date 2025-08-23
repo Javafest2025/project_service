@@ -97,7 +97,8 @@ springdoc:
 
 scholarai:
   fastapi:
-    base-url: http://localhost:8001
+    papersearch-url: http://localhost:8001
+    extractor-url: http://localhost:8002
   rabbitmq:
     exchange: scholarai.exchange
     web-search:
@@ -105,6 +106,11 @@ scholarai:
       routing-key: scholarai.websearch
       completed-queue: scholarai.websearch.completed.queue
       completed-routing-key: scholarai.websearch.completed
+    extraction:
+      queue: scholarai.extraction.queue
+      routing-key: scholarai.extraction
+      completed-queue: scholarai.extraction.completed.queue
+      completed-routing-key: scholarai.extraction.completed
 
 
 
