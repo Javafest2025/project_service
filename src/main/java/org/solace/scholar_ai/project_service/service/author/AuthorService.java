@@ -14,7 +14,10 @@ import org.solace.scholar_ai.project_service.exception.CustomException;
 import org.solace.scholar_ai.project_service.exception.ErrorCode;
 import org.solace.scholar_ai.project_service.mapping.author.AuthorMapper;
 import org.solace.scholar_ai.project_service.model.author.Author;
+import org.solace.scholar_ai.project_service.model.paper.Paper;
+import org.solace.scholar_ai.project_service.model.paper.PaperAuthor;
 import org.solace.scholar_ai.project_service.repository.author.AuthorRepository;
+import org.solace.scholar_ai.project_service.repository.paper.PaperAuthorRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +31,7 @@ import org.springframework.web.client.RestTemplate;
 public class AuthorService {
 
     private final AuthorRepository authorRepository;
+    private final PaperAuthorRepository paperAuthorRepository;
     private final AuthorMapper authorMapper;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
@@ -45,6 +49,7 @@ public class AuthorService {
     public AuthorDto fetchAuthor(String name, String strategy, String userId) {
         log.info("Fetching author: {} with strategy: {}", name, strategy);
 
+        // Find existing author by name (now unique)
         Optional<Author> existingAuthor = authorRepository.findByNameIgnoreCase(name.trim());
 
         if (existingAuthor.isPresent()) {
@@ -120,8 +125,7 @@ public class AuthorService {
                 request.userId());
 
         // Find existing author or create new one
-        Optional<Author> existingAuthor =
-                authorRepository.findByNameIgnoreCase(request.name().trim());
+        Optional<Author> existingAuthor = authorRepository.findByNameIgnoreCase(request.name().trim());
 
         // Always fetch fresh data for sync (unless explicitly using cache)
         boolean shouldFetch = request.forceRefresh() == null || request.forceRefresh();
@@ -197,6 +201,75 @@ public class AuthorService {
         List<Author> staleAuthors = authorRepository.findByLastSyncAtBeforeOrLastSyncAtIsNull(cutoff);
 
         return staleAuthors.stream().map(authorMapper::toDto).collect(Collectors.toList());
+    }
+
+    /**
+     * Get or create author and link to paper (handles many-to-many relationship)
+     * This method ensures unique author names and proper paper-author relationships
+     */
+    @Transactional
+    public Author getOrCreateAuthorForPaper(
+            String authorName, Paper paper, Integer authorOrder, Boolean isCorrespondingAuthor) {
+        log.info("Getting or creating author '{}' for paper '{}'", authorName, paper.getId());
+
+        // Check if author already exists
+        Optional<Author> existingAuthor = authorRepository.findByNameIgnoreCase(authorName.trim());
+
+        Author author;
+        if (existingAuthor.isPresent()) {
+            author = existingAuthor.get();
+            log.info("Found existing author: {} with ID: {}", author.getName(), author.getId());
+        } else {
+            // Create new author with basic information
+            author = new Author();
+            author.setName(authorName.trim());
+            author.setIsSynced(false);
+            author = authorRepository.save(author);
+            log.info("Created new author: {} with ID: {}", author.getName(), author.getId());
+        }
+
+        // Check if paper-author relationship already exists
+        if (!paperAuthorRepository.existsByPaperIdAndAuthorId(paper.getId(), author.getId())) {
+            // Create paper-author relationship
+            PaperAuthor paperAuthor = new PaperAuthor(paper, author, authorOrder);
+            paperAuthor.setIsCorrespondingAuthor(isCorrespondingAuthor);
+            paperAuthorRepository.save(paperAuthor);
+            log.info(
+                    "Created paper-author relationship for paper '{}' and author '{}'",
+                    paper.getId(),
+                    author.getName());
+        } else {
+            log.info(
+                    "Paper-author relationship already exists for paper '{}' and author '{}'",
+                    paper.getId(),
+                    author.getName());
+        }
+
+        return author;
+    }
+
+    /**
+     * Get all authors for a specific paper
+     */
+    @Transactional(readOnly = true)
+    public List<AuthorDto> getAuthorsForPaper(UUID paperId) {
+        log.info("Fetching authors for paper: {}", paperId);
+
+        List<PaperAuthor> paperAuthors = paperAuthorRepository.findByPaperIdOrderByAuthorOrderAsc(paperId);
+
+        return paperAuthors.stream()
+                .map(pa -> authorMapper.toDto(pa.getAuthor()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get all papers for a specific author
+     */
+    @Transactional(readOnly = true)
+    public List<PaperAuthor> getPapersForAuthor(UUID authorId) {
+        log.info("Fetching papers for author: {}", authorId);
+
+        return paperAuthorRepository.findByAuthorId(authorId);
     }
 
     /**

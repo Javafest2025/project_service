@@ -31,9 +31,8 @@ public class CommandParserService {
             String jsonResponse = extractJsonFromResponse(geminiResponse);
             log.info("📄 Extracted JSON: {}", jsonResponse);
 
-            Map<String, Object> parsedResponse = objectMapper.readValue(
-                    jsonResponse, new TypeReference<Map<String, Object>>() {
-                    });
+            Map<String, Object> parsedResponse =
+                    objectMapper.readValue(jsonResponse, new TypeReference<Map<String, Object>>() {});
             log.info("✅ Parsed response: {}", parsedResponse);
 
             // Safely extract values with null checks

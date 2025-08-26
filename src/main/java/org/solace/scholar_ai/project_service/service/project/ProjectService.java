@@ -30,6 +30,7 @@ public class ProjectService {
         log.info("Creating new project: {} for user: {}", createProjectDto.name(), userId);
 
         Project project = projectMapper.fromCreateDto(createProjectDto, userId);
+        project.setLastActivity("Project created");
         Project savedProject = projectRepository.save(project);
 
         log.info("Project created successfully with ID: {}", savedProject.getId());
@@ -122,6 +123,11 @@ public class ProjectService {
             existingProject.setIsStarred(updateProjectDto.isStarred());
         }
 
+        // Set last activity if not provided
+        if (updateProjectDto.lastActivity() == null) {
+            existingProject.setLastActivity("Project updated");
+        }
+
         Project savedProject = projectRepository.save(existingProject);
 
         log.info("Project updated successfully with ID: {}", savedProject.getId());
@@ -150,10 +156,11 @@ public class ProjectService {
     public void updateProjectPaperCount(UUID projectId, int totalPapers) {
         log.info("Updating paper count for project: {} to: {}", projectId, totalPapers);
 
-        Project project =
-                projectRepository.findById(projectId).orElseThrow(() -> new RuntimeException("Project not found"));
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
 
         project.setTotalPapers(totalPapers);
+        project.setLastActivity("Paper count updated");
         projectRepository.save(project);
     }
 
@@ -163,10 +170,11 @@ public class ProjectService {
     public void updateProjectActiveTasksCount(UUID projectId, int activeTasks) {
         log.info("Updating active tasks count for project: {} to: {}", projectId, activeTasks);
 
-        Project project =
-                projectRepository.findById(projectId).orElseThrow(() -> new RuntimeException("Project not found"));
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
 
         project.setActiveTasks(activeTasks);
+        project.setLastActivity("Active tasks updated");
         projectRepository.save(project);
     }
 
@@ -189,6 +197,7 @@ public class ProjectService {
                 .orElseThrow(() -> new RuntimeException("Project not found or access denied"));
 
         project.setIsStarred(!project.getIsStarred());
+        project.setLastActivity("Star status toggled");
         Project savedProject = projectRepository.save(project);
 
         log.info("Project star status toggled successfully for ID: {}", projectId);

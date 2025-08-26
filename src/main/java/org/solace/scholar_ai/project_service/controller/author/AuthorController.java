@@ -100,4 +100,44 @@ public class AuthorController {
                     .body(APIResponse.error(503, "Failed to sync author: " + e.getMessage(), null));
         }
     }
+
+    @PostMapping("/resync/{name}")
+    @Operation(
+            summary = "🔄 Resync Author Data",
+            description = "Force resynchronization of author information from paper-search service. "
+                    + "This endpoint always fetches fresh data from external sources and updates the database. "
+                    + "Use this when you want to refresh cached author data.")
+    @ApiResponses(
+            value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Author information resynchronized successfully",
+                        content = @Content(schema = @Schema(implementation = APIResponse.class))),
+                @ApiResponse(responseCode = "404", description = "Author not found"),
+                @ApiResponse(responseCode = "503", description = "External service unavailable")
+            })
+    public ResponseEntity<APIResponse<AuthorDto>> resyncAuthor(
+            @PathVariable @Parameter(description = "Author name", example = "Andrew Y. Ng") String name,
+            @RequestParam(defaultValue = "comprehensive")
+                    @Parameter(description = "Search strategy", example = "comprehensive")
+                    String strategy,
+            @RequestParam(required = false) @Parameter(description = "User ID for tracking") String userId) {
+        try {
+            log.info("Resyncing author: {} with strategy: {}", name, strategy);
+
+            // Create a sync request with force refresh
+            AuthorSyncRequestDto syncRequest = new AuthorSyncRequestDto(userId, name, strategy, true);
+            AuthorDto author = authorService.syncAuthor(syncRequest);
+
+            return ResponseEntity.ok(APIResponse.success(
+                    200,
+                    "Author information resynchronized successfully from "
+                            + author.dataSources().size() + " sources",
+                    author));
+        } catch (Exception e) {
+            log.error("Error resyncing author: {}", name, e);
+            return ResponseEntity.status(503)
+                    .body(APIResponse.error(503, "Failed to resync author: " + e.getMessage(), null));
+        }
+    }
 }

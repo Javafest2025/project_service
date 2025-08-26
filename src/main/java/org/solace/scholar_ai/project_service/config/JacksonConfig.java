@@ -29,6 +29,7 @@ public class JacksonConfig {
         return Jackson2ObjectMapperBuilder.json()
                 .modules(javaTimeModule)
                 .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .timeZone(java.util.TimeZone.getTimeZone("UTC"))
                 .build();
     }
 }

@@ -108,7 +108,8 @@ public class CommandExecutorService {
     private Map<String, Object> searchTodos(Map<String, Object> parameters) throws Exception {
         String searchQuery = (String) parameters.get("searchQuery");
 
-        TodoFiltersReqDTO filters = TodoFiltersReqDTO.builder().search(searchQuery).build();
+        TodoFiltersReqDTO filters =
+                TodoFiltersReqDTO.builder().search(searchQuery).build();
 
         List<TodoResponseDTO> todos = todoService.filterTodos(filters);
 
