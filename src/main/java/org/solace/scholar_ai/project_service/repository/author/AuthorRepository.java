@@ -33,7 +33,8 @@ public interface AuthorRepository extends JpaRepository<Author, UUID> {
     // Advanced search with pagination
     Page<Author> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
-    @Query("SELECT a FROM Author a WHERE a.name LIKE %:keyword% OR a.primaryAffiliation LIKE %:keyword% OR a.allAffiliations LIKE %:keyword% OR a.researchAreas LIKE %:keyword%")
+    @Query(
+            "SELECT a FROM Author a WHERE a.name LIKE %:keyword% OR a.primaryAffiliation LIKE %:keyword% OR a.allAffiliations LIKE %:keyword% OR a.researchAreas LIKE %:keyword%")
     Page<Author> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
     // Search by research areas

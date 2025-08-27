@@ -105,4 +105,24 @@ public class ExtractionController {
 
         return ResponseEntity.ok(response);
     }
+
+    @Operation(
+            summary = "Check if paper is extracted",
+            description = "Returns a boolean indicating whether the paper content has been successfully extracted")
+    @ApiResponses(
+            value = {
+                @ApiResponse(responseCode = "200", description = "Extraction status retrieved successfully"),
+                @ApiResponse(responseCode = "404", description = "Paper not found"),
+                @ApiResponse(responseCode = "500", description = "Internal server error")
+            })
+    @GetMapping("/extracted/{paperId}")
+    public ResponseEntity<Boolean> isPaperExtracted(
+            @Parameter(description = "Paper ID", required = true) @PathVariable String paperId) {
+
+        log.info("Checking if paper is extracted for paper ID: {}", paperId);
+
+        Boolean isExtracted = extractionService.isPaperExtracted(paperId);
+
+        return ResponseEntity.ok(isExtracted);
+    }
 }

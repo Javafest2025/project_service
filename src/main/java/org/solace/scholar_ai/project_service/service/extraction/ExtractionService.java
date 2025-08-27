@@ -57,11 +57,12 @@ public class ExtractionService {
         }
 
         // Check if extraction is already in progress
-        if ("PROCESSING".equals(paper.getExtractionStatus())) {
+        String currentStatus = paper.getExtractionStatus();
+        if ("PROCESSING".equals(currentStatus)) {
             return new ExtractionResponse(
                     paper.getExtractionJobId(),
                     request.paperId(),
-                    paper.getExtractionStatus(),
+                    currentStatus,
                     "Extraction already in progress",
                     paper.getPdfContentUrl(),
                     paper.getExtractionStartedAt(),
@@ -214,6 +215,9 @@ public class ExtractionService {
     }
 
     private String getStatusMessage(String status) {
+        if (status == null) {
+            return "No extraction status available";
+        }
         return switch (status) {
             case "PENDING" -> "Extraction request is pending";
             case "PROCESSING" -> "Extraction is in progress";
@@ -224,9 +228,14 @@ public class ExtractionService {
     }
 
     private Double calculateProgress(Paper paper) {
-        if ("COMPLETED".equals(paper.getExtractionStatus())) {
+        String status = paper.getExtractionStatus();
+        if (status == null) {
+            return null;
+        }
+
+        if ("COMPLETED".equals(status)) {
             return 100.0;
-        } else if ("PROCESSING".equals(paper.getExtractionStatus())) {
+        } else if ("PROCESSING".equals(status)) {
             // Simple progress estimation based on time elapsed
             if (paper.getExtractionStartedAt() != null) {
                 long elapsed = Instant.now().getEpochSecond()
@@ -237,5 +246,23 @@ public class ExtractionService {
             }
         }
         return null;
+    }
+
+    /**
+     * Check if a paper has been successfully extracted
+     *
+     * @param paperId The paper ID
+     * @return Boolean indicating if the paper is extracted
+     */
+    @Transactional(readOnly = true)
+    public Boolean isPaperExtracted(String paperId) {
+        log.info("Checking if paper is extracted for paper ID: {}", paperId);
+
+        Paper paper = paperRepository
+                .findById(UUID.fromString(paperId))
+                .orElseThrow(() -> new CustomException(
+                        "Paper not found with ID: " + paperId, HttpStatus.NOT_FOUND, ErrorCode.RESOURCE_NOT_FOUND));
+
+        return paper.getIsExtracted() != null ? paper.getIsExtracted() : false;
     }
 }

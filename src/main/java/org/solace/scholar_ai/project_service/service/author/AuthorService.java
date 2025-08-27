@@ -125,7 +125,8 @@ public class AuthorService {
                 request.userId());
 
         // Find existing author or create new one
-        Optional<Author> existingAuthor = authorRepository.findByNameIgnoreCase(request.name().trim());
+        Optional<Author> existingAuthor =
+                authorRepository.findByNameIgnoreCase(request.name().trim());
 
         // Always fetch fresh data for sync (unless explicitly using cache)
         boolean shouldFetch = request.forceRefresh() == null || request.forceRefresh();

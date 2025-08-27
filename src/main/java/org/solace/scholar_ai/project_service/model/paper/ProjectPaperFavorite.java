@@ -18,9 +18,9 @@ import org.solace.scholar_ai.project_service.model.project.Project;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "project_paper_favorites", uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "project_id", "paper_id" })
-})
+@Table(
+        name = "project_paper_favorites",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"project_id", "paper_id"})})
 public class ProjectPaperFavorite {
 
     @Id

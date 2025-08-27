@@ -9,13 +9,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.solace.scholar_ai.project_service.dto.paper.PaperDto;
 import org.solace.scholar_ai.project_service.dto.paper.PaperFavoriteRequest;
 import org.solace.scholar_ai.project_service.dto.paper.PaperFavoriteResponse;
+import org.solace.scholar_ai.project_service.mapping.paper.PaperMapper;
 import org.solace.scholar_ai.project_service.model.paper.Paper;
 import org.solace.scholar_ai.project_service.model.paper.ProjectPaperFavorite;
 import org.solace.scholar_ai.project_service.model.project.Project;
 import org.solace.scholar_ai.project_service.repository.paper.PaperRepository;
 import org.solace.scholar_ai.project_service.repository.paper.ProjectPaperFavoriteRepository;
 import org.solace.scholar_ai.project_service.repository.project.ProjectRepository;
-import org.solace.scholar_ai.project_service.mapping.paper.PaperMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -32,21 +32,20 @@ public class PaperFavoriteService {
     private final PaperMapper paperMapper;
 
     @Transactional
-    public PaperFavoriteResponse addToFavorites(UUID projectId, UUID paperId, UUID userId,
-            PaperFavoriteRequest request) {
+    public PaperFavoriteResponse addToFavorites(
+            UUID projectId, UUID paperId, UUID userId, PaperFavoriteRequest request) {
         log.info("Adding paper {} to favorites for project {} by user {}", paperId, projectId, userId);
 
         // Validate project exists
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+        Project project =
+                projectRepository.findById(projectId).orElseThrow(() -> new RuntimeException("Project not found"));
 
         // Validate paper exists
-        Paper paper = paperRepository.findById(paperId)
-                .orElseThrow(() -> new RuntimeException("Paper not found"));
+        Paper paper = paperRepository.findById(paperId).orElseThrow(() -> new RuntimeException("Paper not found"));
 
         // Check if already favorited
-        Optional<ProjectPaperFavorite> existingFavorite = favoriteRepository
-                .findByProjectIdAndPaperIdAndUserId(projectId, paperId, userId);
+        Optional<ProjectPaperFavorite> existingFavorite =
+                favoriteRepository.findByProjectIdAndPaperIdAndUserId(projectId, paperId, userId);
 
         if (existingFavorite.isPresent()) {
             log.warn("Paper {} is already favorited in project {} by user {}", paperId, projectId, userId);
@@ -71,8 +70,8 @@ public class PaperFavoriteService {
     public void removeFromFavorites(UUID projectId, UUID paperId, UUID userId) {
         log.info("Removing paper {} from favorites for project {} by user {}", paperId, projectId, userId);
 
-        Optional<ProjectPaperFavorite> favorite = favoriteRepository
-                .findByProjectIdAndPaperIdAndUserId(projectId, paperId, userId);
+        Optional<ProjectPaperFavorite> favorite =
+                favoriteRepository.findByProjectIdAndPaperIdAndUserId(projectId, paperId, userId);
 
         if (favorite.isEmpty()) {
             log.warn("Paper {} is not favorited in project {} by user {}", paperId, projectId, userId);
@@ -83,12 +82,12 @@ public class PaperFavoriteService {
     }
 
     @Transactional
-    public PaperFavoriteResponse toggleFavorite(UUID projectId, UUID paperId, UUID userId,
-            PaperFavoriteRequest request) {
+    public PaperFavoriteResponse toggleFavorite(
+            UUID projectId, UUID paperId, UUID userId, PaperFavoriteRequest request) {
         log.info("Toggling favorite status for paper {} in project {} by user {}", paperId, projectId, userId);
 
-        Optional<ProjectPaperFavorite> existingFavorite = favoriteRepository
-                .findByProjectIdAndPaperIdAndUserId(projectId, paperId, userId);
+        Optional<ProjectPaperFavorite> existingFavorite =
+                favoriteRepository.findByProjectIdAndPaperIdAndUserId(projectId, paperId, userId);
 
         if (existingFavorite.isPresent()) {
             // Remove from favorites
@@ -110,9 +109,7 @@ public class PaperFavoriteService {
         log.info("Getting favorites for project {} by user {}", projectId, userId);
 
         List<ProjectPaperFavorite> favorites = favoriteRepository.findByProjectIdAndUserId(projectId, userId);
-        return favorites.stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+        return favorites.stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -129,8 +126,8 @@ public class PaperFavoriteService {
     }
 
     @Transactional
-    public PaperFavoriteResponse updateFavorite(UUID projectId, UUID paperId, UUID userId,
-            PaperFavoriteRequest request) {
+    public PaperFavoriteResponse updateFavorite(
+            UUID projectId, UUID paperId, UUID userId, PaperFavoriteRequest request) {
         log.info("Updating favorite for paper {} in project {} by user {}", paperId, projectId, userId);
 
         ProjectPaperFavorite favorite = favoriteRepository

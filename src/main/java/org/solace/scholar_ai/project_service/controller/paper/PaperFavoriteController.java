@@ -10,7 +10,6 @@ import org.solace.scholar_ai.project_service.dto.response.APIResponse;
 import org.solace.scholar_ai.project_service.service.paper.PaperFavoriteService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,9 +42,7 @@ public class PaperFavoriteController {
 
     @DeleteMapping("/{paperId}")
     public ResponseEntity<APIResponse<Void>> removeFromFavorites(
-            @PathVariable UUID projectId,
-            @PathVariable UUID paperId,
-            @RequestHeader("X-User-ID") UUID userId) {
+            @PathVariable UUID projectId, @PathVariable UUID paperId, @RequestHeader("X-User-ID") UUID userId) {
 
         log.info("Removing paper {} from favorites for project {} by user {}", paperId, projectId, userId);
 
@@ -84,8 +81,7 @@ public class PaperFavoriteController {
 
     @GetMapping
     public ResponseEntity<APIResponse<List<PaperFavoriteResponse>>> getFavorites(
-            @PathVariable UUID projectId,
-            @RequestHeader("X-User-ID") UUID userId) {
+            @PathVariable UUID projectId, @RequestHeader("X-User-ID") UUID userId) {
 
         log.info("Getting favorites for project {} by user {}", projectId, userId);
 
@@ -101,9 +97,7 @@ public class PaperFavoriteController {
 
     @GetMapping("/paginated")
     public ResponseEntity<APIResponse<Page<PaperFavoriteResponse>>> getFavoritesPaginated(
-            @PathVariable UUID projectId,
-            @RequestHeader("X-User-ID") UUID userId,
-            Pageable pageable) {
+            @PathVariable UUID projectId, @RequestHeader("X-User-ID") UUID userId, Pageable pageable) {
 
         log.info("Getting paginated favorites for project {} by user {}", projectId, userId);
 
@@ -119,8 +113,7 @@ public class PaperFavoriteController {
 
     @GetMapping("/count")
     public ResponseEntity<APIResponse<Long>> getFavoriteCount(
-            @PathVariable UUID projectId,
-            @RequestHeader("X-User-ID") UUID userId) {
+            @PathVariable UUID projectId, @RequestHeader("X-User-ID") UUID userId) {
 
         log.info("Getting favorite count for project {} by user {}", projectId, userId);
 
@@ -136,9 +129,7 @@ public class PaperFavoriteController {
 
     @GetMapping("/{paperId}/status")
     public ResponseEntity<APIResponse<Boolean>> isFavorited(
-            @PathVariable UUID projectId,
-            @PathVariable UUID paperId,
-            @RequestHeader("X-User-ID") UUID userId) {
+            @PathVariable UUID projectId, @PathVariable UUID paperId, @RequestHeader("X-User-ID") UUID userId) {
 
         log.info("Checking if paper {} is favorited in project {} by user {}", paperId, projectId, userId);
 

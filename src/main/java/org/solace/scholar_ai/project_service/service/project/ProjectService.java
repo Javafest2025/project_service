@@ -156,8 +156,8 @@ public class ProjectService {
     public void updateProjectPaperCount(UUID projectId, int totalPapers) {
         log.info("Updating paper count for project: {} to: {}", projectId, totalPapers);
 
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+        Project project =
+                projectRepository.findById(projectId).orElseThrow(() -> new RuntimeException("Project not found"));
 
         project.setTotalPapers(totalPapers);
         project.setLastActivity("Paper count updated");
@@ -170,8 +170,8 @@ public class ProjectService {
     public void updateProjectActiveTasksCount(UUID projectId, int activeTasks) {
         log.info("Updating active tasks count for project: {} to: {}", projectId, activeTasks);
 
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+        Project project =
+                projectRepository.findById(projectId).orElseThrow(() -> new RuntimeException("Project not found"));
 
         project.setActiveTasks(activeTasks);
         project.setLastActivity("Active tasks updated");

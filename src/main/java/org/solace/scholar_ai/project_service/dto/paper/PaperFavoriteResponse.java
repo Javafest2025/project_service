@@ -1,13 +1,11 @@
 package org.solace.scholar_ai.project_service.dto.paper;
 
+import java.time.Instant;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.Instant;
-import java.util.UUID;
-import org.solace.scholar_ai.project_service.dto.paper.PaperDto;
 
 @Data
 @Builder
