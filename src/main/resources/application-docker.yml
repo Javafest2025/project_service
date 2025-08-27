@@ -123,3 +123,7 @@ logging:
     org.springframework.cloud.netflix.eureka: WARN
     org.springframework.cloud.client.discovery: INFO
 
+gemini:
+  api:
+    key: ${GEMINI_API_KEY:AIzaSyD1f5phqFOLvgC4zRnpPCd6EBQOegKHNuw}
+
