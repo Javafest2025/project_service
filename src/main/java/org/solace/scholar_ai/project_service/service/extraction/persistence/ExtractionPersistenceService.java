@@ -93,7 +93,8 @@ public class ExtractionPersistenceService {
     }
 
     private void processExtractedSections(PaperExtraction paperExtraction, JsonNode sectionsNode) {
-        if (sectionsNode == null || !sectionsNode.isArray()) return;
+        if (sectionsNode == null || !sectionsNode.isArray())
+            return;
 
         int orderIndex = 0;
         for (JsonNode sectionNode : sectionsNode) {
@@ -155,7 +156,8 @@ public class ExtractionPersistenceService {
     }
 
     private void processExtractedFigures(PaperExtraction paperExtraction, JsonNode figuresNode) {
-        if (figuresNode == null || !figuresNode.isArray()) return;
+        if (figuresNode == null || !figuresNode.isArray())
+            return;
 
         int orderIndex = 0;
         for (JsonNode figureNode : figuresNode) {
@@ -175,6 +177,8 @@ public class ExtractionPersistenceService {
                 .figureType(getTextValue(figureNode, "type"))
                 .imagePath(getTextValue(figureNode, "image_path"))
                 .thumbnailPath(getTextValue(figureNode, "thumbnail_path"))
+                .ocrText(getTextValue(figureNode, "ocr_text"))
+                .ocrConfidence(getDoubleValue(figureNode, "ocr_confidence"))
                 .orderIndex(orderIndex)
                 .build();
 
@@ -198,7 +202,8 @@ public class ExtractionPersistenceService {
     }
 
     private void processExtractedTables(PaperExtraction paperExtraction, JsonNode tablesNode) {
-        if (tablesNode == null || !tablesNode.isArray()) return;
+        if (tablesNode == null || !tablesNode.isArray())
+            return;
 
         int orderIndex = 0;
         for (JsonNode tableNode : tablesNode) {
@@ -254,7 +259,8 @@ public class ExtractionPersistenceService {
     }
 
     private void processExtractedEquations(PaperExtraction paperExtraction, JsonNode equationsNode) {
-        if (equationsNode == null || !equationsNode.isArray()) return;
+        if (equationsNode == null || !equationsNode.isArray())
+            return;
 
         int orderIndex = 0;
         for (JsonNode equationNode : equationsNode) {
@@ -289,7 +295,8 @@ public class ExtractionPersistenceService {
     }
 
     private void processExtractedCodeBlocks(PaperExtraction paperExtraction, JsonNode codeBlocksNode) {
-        if (codeBlocksNode == null || !codeBlocksNode.isArray()) return;
+        if (codeBlocksNode == null || !codeBlocksNode.isArray())
+            return;
 
         int orderIndex = 0;
         for (JsonNode codeBlockNode : codeBlocksNode) {
@@ -324,7 +331,8 @@ public class ExtractionPersistenceService {
     }
 
     private void processExtractedReferences(PaperExtraction paperExtraction, JsonNode referencesNode) {
-        if (referencesNode == null || !referencesNode.isArray()) return;
+        if (referencesNode == null || !referencesNode.isArray())
+            return;
 
         int orderIndex = 0;
         for (JsonNode referenceNode : referencesNode) {
@@ -380,7 +388,8 @@ public class ExtractionPersistenceService {
     }
 
     private void processExtractedEntities(PaperExtraction paperExtraction, JsonNode entitiesNode) {
-        if (entitiesNode == null || !entitiesNode.isArray()) return;
+        if (entitiesNode == null || !entitiesNode.isArray())
+            return;
 
         int orderIndex = 0;
         for (JsonNode entityNode : entitiesNode) {

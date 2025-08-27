@@ -70,6 +70,13 @@ public class ExtractedFigure {
     @Column(name = "figure_references", columnDefinition = "TEXT")
     private String references; // section IDs that reference this figure
 
+    // OCR extracted text for LLM processing
+    @Column(name = "ocr_text", columnDefinition = "TEXT")
+    private String ocrText; // text extracted from the figure image
+
+    @Column(name = "ocr_confidence")
+    private Double ocrConfidence; // OCR confidence score (0-1)
+
     @Column(name = "order_index")
     private Integer orderIndex; // for maintaining figure order
 }
