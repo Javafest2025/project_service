@@ -1,11 +1,12 @@
 package org.solace.scholar_ai.project_service.service.latex;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.solace.scholar_ai.project_service.dto.latex.CreateDocumentRequestDTO;
 import org.solace.scholar_ai.project_service.dto.latex.DocumentResponseDTO;
+import org.solace.scholar_ai.project_service.dto.latex.DocumentVersionDTO;
 import org.solace.scholar_ai.project_service.dto.latex.UpdateDocumentRequestDTO;
 import org.solace.scholar_ai.project_service.mapping.latex.DocumentMapper;
 import org.solace.scholar_ai.project_service.model.latex.Document;
@@ -15,10 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DocumentService {
 
     private final DocumentRepository documentRepository;
     private final DocumentMapper documentMapper;
+    private final DocumentVersionService documentVersionService;
     private final LaTeXCompilationService latexCompilationService;
 
     @Transactional
@@ -50,6 +53,11 @@ public class DocumentService {
             document.setTitle(request.getTitle());
         }
         if (request.getContent() != null) {
+            // Create a version before updating the document
+            documentVersionService.createVersion(
+                    document.getId(), document.getContent(), "Content updated", null // createdBy can be null for now
+                    );
+
             document.setContent(request.getContent());
             // Calculate file size based on content length
             document.setFileSize((long) request.getContent().length());
@@ -88,17 +96,24 @@ public class DocumentService {
             fileName = fileName + ".tex";
         }
 
-        // Check if document with same name already exists
-        Optional<Document> existingDoc = documentRepository.findByProjectIdAndTitle(projectId, fileName);
-        if (existingDoc.isPresent()) {
-            throw new RuntimeException("Document with name '" + fileName + "' already exists in this project");
+        // Handle duplicate names by appending a number
+        String finalFileName = fileName;
+        int counter = 1;
+
+        while (documentRepository
+                .findByProjectIdAndTitle(projectId, finalFileName)
+                .isPresent()) {
+            String nameWithoutExt = fileName.substring(0, fileName.lastIndexOf("."));
+            String extension = fileName.substring(fileName.lastIndexOf("."));
+            finalFileName = nameWithoutExt + " (" + counter + ")" + extension;
+            counter++;
         }
 
         Document document = Document.builder()
                 .projectId(projectId)
-                .title(fileName)
+                .title(finalFileName)
                 .content(
-                        "% " + fileName
+                        "% " + finalFileName
                                 + "\n\\documentclass{article}\n\\begin{document}\n\n% Start writing your LaTeX document here...\n\n\\end{document}")
                 .documentType(org.solace.scholar_ai.project_service.model.latex.DocumentType.LATEX)
                 .fileExtension("tex")
@@ -119,6 +134,32 @@ public class DocumentService {
 
     public long getDocumentCount(UUID projectId) {
         return documentRepository.countByProjectId(projectId);
+    }
+
+    public List<DocumentVersionDTO> getDocumentVersionHistory(UUID documentId) {
+        return documentVersionService.getVersionHistory(documentId);
+    }
+
+    public DocumentVersionDTO getDocumentVersion(UUID documentId, Integer versionNumber) {
+        return documentVersionService
+                .getVersion(documentId, versionNumber)
+                .orElseThrow(() -> new RuntimeException("Version not found"));
+    }
+
+    public DocumentVersionDTO getPreviousVersion(UUID documentId, Integer currentVersion) {
+        return documentVersionService
+                .getPreviousVersion(documentId, currentVersion)
+                .orElseThrow(() -> new RuntimeException("No previous version found"));
+    }
+
+    public DocumentVersionDTO getNextVersion(UUID documentId, Integer currentVersion) {
+        return documentVersionService
+                .getNextVersion(documentId, currentVersion)
+                .orElseThrow(() -> new RuntimeException("No next version found"));
+    }
+
+    public DocumentVersionDTO createManualVersion(UUID documentId, String content, String commitMessage) {
+        return documentVersionService.createVersion(documentId, content, commitMessage, null);
     }
 
     @Transactional

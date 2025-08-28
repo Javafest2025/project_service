@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.solace.scholar_ai.project_service.dto.latex.CompileLatexRequestDTO;
 import org.solace.scholar_ai.project_service.dto.latex.CreateDocumentRequestDTO;
 import org.solace.scholar_ai.project_service.dto.latex.DocumentResponseDTO;
+import org.solace.scholar_ai.project_service.dto.latex.DocumentVersionDTO;
 import org.solace.scholar_ai.project_service.dto.latex.UpdateDocumentRequestDTO;
 import org.solace.scholar_ai.project_service.dto.response.APIResponse;
 import org.solace.scholar_ai.project_service.service.latex.DocumentService;
@@ -216,6 +217,106 @@ public class DocumentController {
                     .message("Failed to get document count: " + e.getMessage())
                     .build();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    // Version control endpoints
+    @GetMapping("/{documentId}/versions")
+    public ResponseEntity<APIResponse<List<DocumentVersionDTO>>> getVersionHistory(@PathVariable UUID documentId) {
+        try {
+            List<DocumentVersionDTO> versions = documentService.getDocumentVersionHistory(documentId);
+            APIResponse<List<DocumentVersionDTO>> response = APIResponse.<List<DocumentVersionDTO>>builder()
+                    .status(HttpStatus.OK.value())
+                    .message("Version history retrieved successfully")
+                    .data(versions)
+                    .build();
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            APIResponse<List<DocumentVersionDTO>> response = APIResponse.<List<DocumentVersionDTO>>builder()
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .message("Failed to get version history: " + e.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @PostMapping("/{documentId}/versions")
+    public ResponseEntity<APIResponse<DocumentVersionDTO>> createVersion(
+            @PathVariable UUID documentId, @RequestParam String commitMessage, @RequestParam String content) {
+        try {
+            DocumentVersionDTO version = documentService.createManualVersion(documentId, content, commitMessage);
+            APIResponse<DocumentVersionDTO> response = APIResponse.<DocumentVersionDTO>builder()
+                    .status(HttpStatus.CREATED.value())
+                    .message("Version created successfully")
+                    .data(version)
+                    .build();
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception e) {
+            APIResponse<DocumentVersionDTO> response = APIResponse.<DocumentVersionDTO>builder()
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .message("Failed to create version: " + e.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @GetMapping("/{documentId}/versions/{versionNumber}")
+    public ResponseEntity<APIResponse<DocumentVersionDTO>> getVersion(
+            @PathVariable UUID documentId, @PathVariable Integer versionNumber) {
+        try {
+            DocumentVersionDTO version = documentService.getDocumentVersion(documentId, versionNumber);
+            APIResponse<DocumentVersionDTO> response = APIResponse.<DocumentVersionDTO>builder()
+                    .status(HttpStatus.OK.value())
+                    .message("Version retrieved successfully")
+                    .data(version)
+                    .build();
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            APIResponse<DocumentVersionDTO> response = APIResponse.<DocumentVersionDTO>builder()
+                    .status(HttpStatus.NOT_FOUND.value())
+                    .message("Version not found: " + e.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+
+    @GetMapping("/{documentId}/versions/{versionNumber}/previous")
+    public ResponseEntity<APIResponse<DocumentVersionDTO>> getPreviousVersion(
+            @PathVariable UUID documentId, @PathVariable Integer versionNumber) {
+        try {
+            DocumentVersionDTO version = documentService.getPreviousVersion(documentId, versionNumber);
+            APIResponse<DocumentVersionDTO> response = APIResponse.<DocumentVersionDTO>builder()
+                    .status(HttpStatus.OK.value())
+                    .message("Previous version retrieved successfully")
+                    .data(version)
+                    .build();
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            APIResponse<DocumentVersionDTO> response = APIResponse.<DocumentVersionDTO>builder()
+                    .status(HttpStatus.NOT_FOUND.value())
+                    .message("No previous version found: " + e.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+
+    @GetMapping("/{documentId}/versions/{versionNumber}/next")
+    public ResponseEntity<APIResponse<DocumentVersionDTO>> getNextVersion(
+            @PathVariable UUID documentId, @PathVariable Integer versionNumber) {
+        try {
+            DocumentVersionDTO version = documentService.getNextVersion(documentId, versionNumber);
+            APIResponse<DocumentVersionDTO> response = APIResponse.<DocumentVersionDTO>builder()
+                    .status(HttpStatus.OK.value())
+                    .message("Next version retrieved successfully")
+                    .data(version)
+                    .build();
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            APIResponse<DocumentVersionDTO> response = APIResponse.<DocumentVersionDTO>builder()
+                    .status(HttpStatus.NOT_FOUND.value())
+                    .message("No next version found: " + e.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
     }
 }
