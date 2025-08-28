@@ -25,9 +25,13 @@ public enum ErrorCode {
     INTERNAL_ERROR("Please try again later or contact support if the issue persists."),
     EMAIL_SENDING_FAILED("Please check the email service configuration and try again."),
     EXTERNAL_API_ERROR("External API request failed. Please try again later or contact support."),
+    EXTERNAL_SERVICE_ERROR("External service communication failed. Please try again later."),
     DUPLICATE("Please ensure the resource you're trying to create does not already exist."),
     VALIDATION_ERROR("Please review the validation errors and correct your request."),
-    CONFIGURATION_ERROR("Please check the application configuration for any issues.");
+    CONFIGURATION_ERROR("Please check the application configuration for any issues."),
+    // Author-specific errors
+    AUTHOR_NOT_FOUND("The requested author could not be found. Please check the author name or ID."),
+    DATA_CONVERSION_ERROR("Error processing data. Please verify the data format and try again.");
 
     private final String suggestion;
 

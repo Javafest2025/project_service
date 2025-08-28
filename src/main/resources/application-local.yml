@@ -24,6 +24,8 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
         use_sql_comments: true
+        jdbc:
+          time_zone: UTC
 
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
@@ -95,9 +97,14 @@ springdoc:
     # Enable try it out by default
     tryItOutEnabled: true
 
+gemini:
+  api-key: ${GEMINI_API_KEY:your-gemini-api-key-here}
+  api-url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent    
+
 scholarai:
   fastapi:
-    base-url: http://localhost:8001
+    papersearch-url: http://localhost:8001
+    extractor-url: http://localhost:8002
   rabbitmq:
     exchange: scholarai.exchange
     web-search:
@@ -105,6 +112,11 @@ scholarai:
       routing-key: scholarai.websearch
       completed-queue: scholarai.websearch.completed.queue
       completed-routing-key: scholarai.websearch.completed
+    extraction:
+      queue: scholarai.extraction.queue
+      routing-key: scholarai.extraction
+      completed-queue: scholarai.extraction.completed.queue
+      completed-routing-key: scholarai.extraction.completed
 
 
 

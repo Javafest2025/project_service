@@ -35,6 +35,19 @@ public class RabbitMQConfig {
     @Value("${scholarai.rabbitmq.web-search.completed-routing-key}")
     private String webSearchCompletedRoutingKey;
 
+    // Extraction queue properties
+    @Value("${scholarai.rabbitmq.extraction.queue}")
+    private String extractionQueue;
+
+    @Value("${scholarai.rabbitmq.extraction.routing-key}")
+    private String extractionRoutingKey;
+
+    @Value("${scholarai.rabbitmq.extraction.completed-queue}")
+    private String extractionCompletedQueue;
+
+    @Value("${scholarai.rabbitmq.extraction.completed-routing-key}")
+    private String extractionCompletedRoutingKey;
+
     /**
      * Creates a durable topic exchange for the application.
      * Topic exchanges route messages based on wildcard matches between the routing
@@ -95,6 +108,56 @@ public class RabbitMQConfig {
     @Bean
     public Binding bindWebSearchCompleted(Queue webSearchCompletedQueue, TopicExchange appExchange) {
         return BindingBuilder.bind(webSearchCompletedQueue).to(appExchange).with(webSearchCompletedRoutingKey);
+    }
+
+    /**
+     * Creates a durable queue for extraction tasks.
+     * Configured with TTL and max length to match the Python service configuration.
+     *
+     * @return The configured Queue for extraction.
+     */
+    @Bean
+    public Queue extractionQueue() {
+        return QueueBuilder.durable(extractionQueue)
+                .withArgument("x-message-ttl", 600000) // 10 minutes TTL for longer extraction tasks
+                .withArgument("x-max-length", 500) // Max 500 messages
+                .build();
+    }
+
+    /**
+     * Creates a durable queue for completed extraction tasks.
+     *
+     * @return The configured Queue for completed extraction.
+     */
+    @Bean
+    public Queue extractionCompletedQueue() {
+        return QueueBuilder.durable(extractionCompletedQueue).build();
+    }
+
+    /**
+     * Binds the extraction queue to the application exchange using its specific
+     * routing key.
+     *
+     * @param extractionQueue The queue for extraction tasks.
+     * @param appExchange     The main application topic exchange.
+     * @return The Binding definition.
+     */
+    @Bean
+    public Binding bindExtraction(Queue extractionQueue, TopicExchange appExchange) {
+        return BindingBuilder.bind(extractionQueue).to(appExchange).with(extractionRoutingKey);
+    }
+
+    /**
+     * Binds the extraction completed queue to the application exchange using its
+     * specific routing key.
+     *
+     * @param extractionCompletedQueue The queue for completed extraction tasks.
+     * @param appExchange              The main application topic exchange.
+     * @return The Binding definition.
+     */
+    @Bean
+    public Binding bindExtractionCompleted(Queue extractionCompletedQueue, TopicExchange appExchange) {
+        return BindingBuilder.bind(extractionCompletedQueue).to(appExchange).with(extractionCompletedRoutingKey);
     }
 
     /**
