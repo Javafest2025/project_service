@@ -41,6 +41,13 @@ scholarai:
       routing-key: web-search
       completed-queue: web-search-completed-queue
       completed-routing-key: web-search-completed
+    extraction:
+      queue: extraction-queue
+      routing-key: extraction
+      completed-queue: extraction-completed-queue
+      completed-routing-key: extraction-completed
+  fastapi:
+    papersearch-url: ${FASTAPI_PAPERSEARCH_URL:http://localhost:8000/search/papers}
 
 server:
   port: 8083
