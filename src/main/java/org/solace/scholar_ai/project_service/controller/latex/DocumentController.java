@@ -12,6 +12,7 @@ import org.solace.scholar_ai.project_service.dto.latex.UpdateDocumentRequestDTO;
 import org.solace.scholar_ai.project_service.dto.response.APIResponse;
 import org.solace.scholar_ai.project_service.service.latex.DocumentService;
 import org.solace.scholar_ai.project_service.service.latex.LaTeXCompilationService;
+import org.solace.scholar_ai.project_service.service.latex.PDFLatexService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ public class DocumentController {
 
     private final DocumentService documentService;
     private final LaTeXCompilationService latexCompilationService;
+    private final PDFLatexService pdfLatexService;
 
     @PostMapping
     public ResponseEntity<APIResponse<DocumentResponseDTO>> createDocument(
@@ -105,6 +107,38 @@ public class DocumentController {
                 .data(compiledContent)
                 .build();
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/compile-pdf")
+    public ResponseEntity<Resource> compileToPdf(@Valid @RequestBody CompileLatexRequestDTO request) {
+        try {
+            Resource pdfResource = pdfLatexService.compileLatexToPDF(request.getLatexContent());
+            return ResponseEntity.ok()
+                    .header("Content-Disposition", "attachment; filename=\"document.pdf\"")
+                    .header("Content-Type", "application/pdf")
+                    .header("Cache-Control", "no-cache, no-store, must-revalidate")
+                    .header("Pragma", "no-cache")
+                    .header("Expires", "0")
+                    .body(pdfResource);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to compile LaTeX to PDF: " + e.getMessage(), e);
+        }
+    }
+
+    @PostMapping("/preview-pdf")
+    public ResponseEntity<Resource> previewPdf(@Valid @RequestBody CompileLatexRequestDTO request) {
+        try {
+            Resource pdfResource = pdfLatexService.compileLatexToPDF(request.getLatexContent());
+            return ResponseEntity.ok()
+                    .header("Content-Disposition", "inline; filename=\"preview.pdf\"")
+                    .header("Content-Type", "application/pdf")
+                    .header("Cache-Control", "no-cache, no-store, must-revalidate")
+                    .header("Pragma", "no-cache")
+                    .header("Expires", "0")
+                    .body(pdfResource);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to preview LaTeX PDF: " + e.getMessage(), e);
+        }
     }
 
     @PostMapping("/generate-pdf")

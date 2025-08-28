@@ -23,6 +23,7 @@ public class DocumentService {
     private final DocumentMapper documentMapper;
     private final DocumentVersionService documentVersionService;
     private final LaTeXCompilationService latexCompilationService;
+    private final ProfessionalLaTeXService professionalLaTeXService;
 
     @Transactional
     public DocumentResponseDTO createDocument(CreateDocumentRequestDTO request) {
@@ -172,11 +173,17 @@ public class DocumentService {
 
     public String compileLatex(String latexContent) {
         try {
-            // Try using pandoc first
-            return latexCompilationService.compileLatexToHtml(latexContent);
+            // Use the new professional LaTeX service
+            return professionalLaTeXService.compileLatex(latexContent);
         } catch (Exception e) {
-            // Fallback to manual conversion if pandoc fails
-            return latexCompilationService.compileLatexFallback(latexContent);
+            log.error("Professional LaTeX compilation failed", e);
+            // Fallback to old service
+            try {
+                return latexCompilationService.compileLatexToHtml(latexContent);
+            } catch (Exception fallbackException) {
+                log.error("Fallback compilation also failed", fallbackException);
+                return latexCompilationService.compileLatexFallback(latexContent);
+            }
         }
     }
 }
