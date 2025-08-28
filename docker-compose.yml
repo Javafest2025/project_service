@@ -6,18 +6,22 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: scholar-project-service
+    env_file:
+      - .env
     ports:
       - "8083:8083"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILE}
       - SERVER_PORT=8083
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://service-registry:8761/eureka/
-      - PROJECT_DB_USER=scholar
-      - PROJECT_DB_PASSWORD=FindSolace@0
+      - PROJECT_DB_PORT=${PROJECT_DB_PORT}
+      - PROJECT_DB_USER=${PROJECT_DB_USER}
+      - PROJECT_DB_PASSWORD=${PROJECT_DB_PASSWORD}
       - RABBITMQ_HOST=user-rabbitmq
-      - RABBITMQ_PORT=5672
-      - RABBITMQ_USER=scholar
-      - RABBITMQ_PASSWORD=FindSolace@0
+      - RABBITMQ_PORT=${RABBITMQ_PORT}
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
     networks:
       - scholarai-network
     restart: unless-stopped
