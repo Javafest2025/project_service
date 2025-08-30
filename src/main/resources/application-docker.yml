@@ -35,8 +35,8 @@ spring:
 
 scholarai:
   fastapi:
-    papersearch-url: ${FASTAPI_PAPERSEARCH_URL:http://localhost:8001}
-    extractor-url: ${FASTAPI_EXTRACTOR_URL:http://localhost:8002}
+    papersearch-url: ${FASTAPI_PAPERSEARCH_URL:http://scholar-paper-search:8001}
+    extractor-url: ${FASTAPI_EXTRACTOR_URL:http://scholar-extractor:8002}
   rabbitmq:
     exchange: scholarai.exchange
     web-search:
@@ -51,7 +51,7 @@ scholarai:
       completed-routing-key: scholarai.extraction.completed
 
 server:
-  port: 8083
+  port: ${SERVER_PORT:8083}
   error:
     include-message: always
     include-binding-errors: always

@@ -34,7 +34,7 @@ spring:
     password: ${RABBITMQ_PASSWORD}
 
 server:
-  port: 8083
+  port: ${SERVER_PORT:8083}
   error:
     include-message: always
     include-binding-errors: always
@@ -99,7 +99,7 @@ springdoc:
 
 gemini:
   api-key: ${GEMINI_API_KEY:your-gemini-api-key-here}
-  api-url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent    
+  api-url: ${GEMINI_API_URL:https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent}   
 
 scholarai:
   fastapi:

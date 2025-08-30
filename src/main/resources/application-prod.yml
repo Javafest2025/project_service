@@ -6,7 +6,7 @@ spring:
       enabled: true
 
   datasource:
-    url: jdbc:postgresql://localhost:${PROJECT_DB_PORT}/projectDB
+    url: jdbc:postgresql://project-db:5432/projectDB
     username: ${PROJECT_DB_USER}
     password: ${PROJECT_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
@@ -33,8 +33,25 @@ spring:
     username: ${RABBITMQ_USER}
     password: ${RABBITMQ_PASSWORD}
 
+scholarai:
+  fastapi:
+    papersearch-url: ${FASTAPI_PAPERSEARCH_URL:http://localhost:8001}
+    extractor-url: ${FASTAPI_EXTRACTOR_URL:http://localhost:8002}
+  rabbitmq:
+    exchange: scholarai.exchange
+    web-search:
+      queue: scholarai.websearch.queue
+      routing-key: scholarai.websearch
+      completed-queue: scholarai.websearch.completed.queue
+      completed-routing-key: scholarai.websearch.completed
+    extraction:
+      queue: scholarai.extraction.queue
+      routing-key: scholarai.extraction
+      completed-queue: scholarai.extraction.completed.queue
+      completed-routing-key: scholarai.extraction.completed
+
 server:
-  port: 8083
+  port: ${SERVER_PORT:8083}
   error:
     include-message: always
     include-binding-errors: always
@@ -44,11 +61,12 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://service-registry:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
   instance:
-    hostname: localhost
+    hostname: project-service
+    prefer-ip-address: true
 
 
 management:
@@ -114,4 +132,8 @@ logging:
     com.netflix.eureka: WARN
     org.springframework.cloud.netflix.eureka: WARN
     org.springframework.cloud.client.discovery: INFO
+
+gemini:
+  api-key: ${GEMINI_API_KEY:your-gemini-api-key-here}
+  api-url: ${GEMINI_API_URL:https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent}
 

@@ -1,0 +1,94 @@
+# Maven build artifacts
+target/
+!target/*.jar
+!target/classes/
+!target/generated-sources/
+
+# Maven wrapper (keep these for Docker builds)
+# .mvn/wrapper/maven-wrapper.jar
+# .mvn/wrapper/maven-wrapper.properties
+
+# IDE and editor files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentation
+README.md
+*.md
+HELP.md
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+.env.*
+!env.example
+
+# Test files
+src/test/
+**/*Test.java
+**/*Tests.java
+**/*Test.class
+**/*Tests.class
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Maven local repository cache
+.m2/
+
+# Application properties for different environments
+src/main/resources/application-dev.properties
+src/main/resources/application-test.properties
+src/main/resources/application-local.properties
+
+# Build scripts
+scripts/
+*.sh
+*.bat
+
+# Node.js (if any frontend assets)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Coverage reports
+coverage/
+.nyc_output/
+
+# JVM crash logs
+hs_err_pid*
+
+# Spring Boot specific
+.springBeans
