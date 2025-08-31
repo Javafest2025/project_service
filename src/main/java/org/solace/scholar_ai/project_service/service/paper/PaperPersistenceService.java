@@ -155,4 +155,43 @@ public class PaperPersistenceService {
         List<Paper> papers = findPapersByProjectId(projectId);
         return papers.stream().map(paperMapper::toMetadataDto).toList();
     }
+
+    /**
+     * Find papers marked as LaTeX context for a specific project
+     */
+    @Transactional(readOnly = true)
+    public List<PaperMetadataDto> findLatexContextPapersByProjectId(UUID projectId) {
+        log.debug("Finding LaTeX context papers for project {}", projectId);
+
+        // Get all correlation IDs for this project from WebSearchOperations
+        List<String> correlationIds =
+                webSearchOperationRepository.findByProjectIdOrderBySubmittedAtDesc(projectId).stream()
+                        .map(operation -> operation.getCorrelationId())
+                        .toList();
+
+        if (correlationIds.isEmpty()) {
+            log.debug("No web search operations found for project {}", projectId);
+            return Collections.emptyList();
+        }
+
+        List<Paper> latexContextPapers = paperRepository.findByCorrelationIdInAndIsLatexContext(correlationIds, true);
+        return latexContextPapers.stream().map(paperMapper::toMetadataDto).toList();
+    }
+
+    /**
+     * Toggle LaTeX context status for a paper
+     */
+    @Transactional
+    public PaperMetadataDto toggleLatexContext(UUID paperId, boolean isLatexContext) {
+        log.info("Toggling LaTeX context status for paper {} to {}", paperId, isLatexContext);
+
+        Paper paper = paperRepository.findById(paperId)
+                .orElseThrow(() -> new RuntimeException("Paper not found with id: " + paperId));
+
+        paper.setIsLatexContext(isLatexContext);
+        Paper savedPaper = paperRepository.save(paper);
+        
+        log.info("Updated LaTeX context status for paper {}: {}", paperId, isLatexContext);
+        return paperMapper.toMetadataDto(savedPaper);
+    }
 }

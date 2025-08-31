@@ -22,4 +22,5 @@ public record CreatePaperDto(
         @Schema(description = "Paper URL") String paperUrl,
         @Schema(description = "Publication types") List<String> publicationTypes,
         @Schema(description = "Fields of study") List<String> fieldsOfStudy,
-        @Schema(description = "External identifiers") Map<String, Object> externalIds) {}
+        @Schema(description = "External identifiers") Map<String, Object> externalIds,
+        @Schema(description = "Whether this paper is added to LaTeX context") Boolean isLatexContext) {}

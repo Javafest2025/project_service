@@ -50,4 +50,5 @@ public record PaperMetadataDto(
         @Schema(description = "Total number of citations") Integer citationCount,
         @Schema(description = "Total number of references") Integer referenceCount,
         @Schema(description = "Number of influential citations") Integer influentialCitationCount,
-        @Schema(description = "List of research fields associated with the paper") List<String> fieldsOfStudy) {}
+        @Schema(description = "List of research fields associated with the paper") List<String> fieldsOfStudy,
+        @Schema(description = "Whether this paper is added to LaTeX context") Boolean isLatexContext) {}

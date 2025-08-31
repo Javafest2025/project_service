@@ -50,4 +50,7 @@ public interface PaperRepository extends JpaRepository<Paper, UUID> {
     // Search methods with pagination
     Page<Paper> findByTitleContainingIgnoreCaseOrAbstractTextContainingIgnoreCase(
             String titleQuery, String abstractQuery, Pageable pageable);
+
+    // LaTeX Context methods
+    List<Paper> findByCorrelationIdInAndIsLatexContext(List<String> correlationIds, Boolean isLatexContext);
 }
