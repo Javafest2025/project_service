@@ -161,15 +161,15 @@ public class AIAssistanceService {
                 Full document context: %s
 
                 Based on the selected text and user request, provide a helpful LaTeX response.
-                
+
                 IMPORTANT: Structure your response in exactly this format:
-                
+
                 1. First, provide a brief explanation of what you're doing (1-2 sentences)
                 2. Then, on a new line, provide the LaTeX code in a code block like this:
                 ```latex
                 [your LaTeX code here]
                 ```
-                
+
                 Examples:
                 - If adding content: "I'll add a new table at the specified position."
                 ```latex
@@ -185,17 +185,17 @@ public class AIAssistanceService {
                 \\end{tabular}
                 \\end{table}
                 ```
-                
+
                 - If replacing content: "I'll replace the selected text with an improved version."
                 ```latex
                 [new LaTeX content]
                 ```
-                
+
                 - If deleting content: "I'll remove the selected text as requested."
                 ```latex
                 [empty or comment]
                 ```
-                
+
                 Keep responses focused on LaTeX editing and be specific about the changes.
                 """,
                     selectedText,

@@ -36,24 +36,75 @@ public class ExtractionPersistenceService {
 
             // Parse the extraction result JSON
             JsonNode resultJson = objectMapper.readTree(event.extractionResult());
+            log.info("Successfully parsed extraction JSON for paper: {}", paper.getId());
 
             // Create or update PaperExtraction entity
             PaperExtraction paperExtraction = createPaperExtraction(paper, event, resultJson);
+            log.info("Created PaperExtraction entity for paper: {}", paper.getId());
 
             // Save the main extraction entity
             paperExtraction = paperExtractionRepository.save(paperExtraction);
+            log.info("Saved PaperExtraction entity with ID: {}", paperExtraction.getId());
 
-            // Process and save all extracted content
-            processExtractedSections(paperExtraction, resultJson.get("sections"));
-            processExtractedFigures(paperExtraction, resultJson.get("figures"));
-            processExtractedTables(paperExtraction, resultJson.get("tables"));
-            processExtractedEquations(paperExtraction, resultJson.get("equations"));
-            processExtractedCodeBlocks(paperExtraction, resultJson.get("code_blocks"));
-            processExtractedReferences(paperExtraction, resultJson.get("references"));
-            processExtractedEntities(paperExtraction, resultJson.get("entities"));
+            // Process and save all extracted content with individual error handling
+            try {
+                log.info("Starting to process sections for paper: {}", paper.getId());
+                processExtractedSections(paperExtraction, resultJson.get("sections"));
+                log.info("Completed processing sections for paper: {}", paper.getId());
+            } catch (Exception e) {
+                log.error("Failed to process sections for paper {}: {}", paper.getId(), e.getMessage(), e);
+            }
+
+            try {
+                processExtractedFigures(paperExtraction, resultJson.get("figures"));
+            } catch (Exception e) {
+                log.error("Failed to process figures for paper {}: {}", paper.getId(), e.getMessage());
+            }
+
+            try {
+                processExtractedTables(paperExtraction, resultJson.get("tables"));
+            } catch (Exception e) {
+                log.error("Failed to process tables for paper {}: {}", paper.getId(), e.getMessage());
+            }
+
+            try {
+                processExtractedEquations(paperExtraction, resultJson.get("equations"));
+            } catch (Exception e) {
+                log.error("Failed to process equations for paper {}: {}", paper.getId(), e.getMessage());
+            }
+
+            try {
+                processExtractedCodeBlocks(paperExtraction, resultJson.get("code_blocks"));
+            } catch (Exception e) {
+                log.error("Failed to process code blocks for paper {}: {}", paper.getId(), e.getMessage());
+            }
+
+            try {
+                processExtractedReferences(paperExtraction, resultJson.get("references"));
+            } catch (Exception e) {
+                log.error("Failed to process references for paper {}: {}", paper.getId(), e.getMessage());
+            }
+
+            try {
+                processExtractedEntities(paperExtraction, resultJson.get("entities"));
+            } catch (Exception e) {
+                log.error("Failed to process entities for paper {}: {}", paper.getId(), e.getMessage());
+            }
 
             // Save the final entity with all relationships
-            paperExtractionRepository.save(paperExtraction);
+            log.info("Saving final PaperExtraction with all relationships for paper: {}", paper.getId());
+            paperExtraction = paperExtractionRepository.save(paperExtraction);
+
+            // Log final counts
+            int totalSections = paperExtraction.getSections().size();
+            int totalParagraphs = paperExtraction.getSections().stream()
+                    .mapToInt(section -> section.getParagraphs().size())
+                    .sum();
+            log.info(
+                    "Final counts for paper {}: {} sections, {} paragraphs",
+                    paper.getId(),
+                    totalSections,
+                    totalParagraphs);
 
             log.info("Successfully persisted extraction results for paper: {}", paper.getId());
 
@@ -66,10 +117,9 @@ public class ExtractionPersistenceService {
     private PaperExtraction createPaperExtraction(Paper paper, ExtractionCompletedEvent event, JsonNode resultJson) {
         PaperExtraction extraction = PaperExtraction.builder()
                 .paper(paper)
-                .extractionId(resultJson.get("id").asText())
-                .pdfHash(resultJson.get("pdf_hash").asText())
-                .extractionTimestamp(
-                        parseTimestamp(resultJson.get("extraction_timestamp").asText()))
+                .extractionId(getTextValue(resultJson, "id"))
+                .pdfHash(getTextValue(resultJson, "pdf_hash"))
+                .extractionTimestamp(parseTimestamp(getTextValue(resultJson, "extraction_timestamp")))
                 .processingTime(event.processingTime())
                 .extractionCoverage(event.extractionCoverage())
                 .build();
@@ -77,17 +127,52 @@ public class ExtractionPersistenceService {
         // Extract metadata
         JsonNode metadata = resultJson.get("metadata");
         if (metadata != null) {
-            extraction.setTitle(metadata.get("title").asText());
+            extraction.setTitle(getTextValue(metadata, "title"));
             extraction.setAbstractText(getTextValue(metadata, "abstract"));
             extraction.setLanguage(getTextValue(metadata, "language"));
             extraction.setPageCount(getIntValue(metadata, "page_count"));
         }
 
-        // Set processing metadata
-        extraction.setExtractionMethods(getTextValue(resultJson, "extraction_methods"));
-        extraction.setErrors(event.errors());
-        extraction.setWarnings(event.warnings());
-        extraction.setConfidenceScores(event.confidenceScores());
+        // Set processing metadata - map from Python field names to Java
+        JsonNode extractionMethodsNode = resultJson.get("extraction_methods");
+        if (extractionMethodsNode != null && extractionMethodsNode.isArray()) {
+            StringBuilder methods = new StringBuilder();
+            for (JsonNode method : extractionMethodsNode) {
+                if (methods.length() > 0)
+                    methods.append(", ");
+                methods.append(method.asText());
+            }
+            extraction.setExtractionMethods(methods.toString());
+        }
+
+        // Set confidence scores
+        JsonNode confidenceScoresNode = resultJson.get("confidence_scores");
+        if (confidenceScoresNode != null) {
+            extraction.setConfidenceScores(confidenceScoresNode.toString());
+        }
+
+        // Set errors and warnings
+        JsonNode errorsNode = resultJson.get("errors");
+        if (errorsNode != null && errorsNode.isArray()) {
+            StringBuilder errors = new StringBuilder();
+            for (JsonNode error : errorsNode) {
+                if (errors.length() > 0)
+                    errors.append("; ");
+                errors.append(error.asText());
+            }
+            extraction.setErrors(errors.toString());
+        }
+
+        JsonNode warningsNode = resultJson.get("warnings");
+        if (warningsNode != null && warningsNode.isArray()) {
+            StringBuilder warnings = new StringBuilder();
+            for (JsonNode warning : warningsNode) {
+                if (warnings.length() > 0)
+                    warnings.append("; ");
+                warnings.append(warning.asText());
+            }
+            extraction.setWarnings(warnings.toString());
+        }
 
         return extraction;
     }
@@ -250,6 +335,7 @@ public class ExtractionPersistenceService {
             table.setStructure(structureNode.toString());
         }
 
+        // Extract references (new field we added)
         JsonNode referencesNode = tableNode.get("references");
         if (referencesNode != null) {
             table.setReferences(referencesNode.toString());
@@ -380,8 +466,14 @@ public class ExtractionPersistenceService {
         }
 
         JsonNode citedBySectionsNode = referenceNode.get("cited_by_sections");
-        if (citedBySectionsNode != null) {
-            reference.setCitedBySections(citedBySectionsNode.toString());
+        if (citedBySectionsNode != null && citedBySectionsNode.isArray()) {
+            StringBuilder sections = new StringBuilder();
+            for (JsonNode section : citedBySectionsNode) {
+                if (sections.length() > 0)
+                    sections.append(", ");
+                sections.append(section.asText());
+            }
+            reference.setCitedBySections(sections.toString());
         }
 
         return reference;
@@ -416,9 +508,63 @@ public class ExtractionPersistenceService {
     // Helper methods for safe JSON extraction
     private String getTextValue(JsonNode node, String fieldName) {
         if (node != null && node.has(fieldName) && !node.get(fieldName).isNull()) {
-            return node.get(fieldName).asText();
+            String text = node.get(fieldName).asText();
+            String sanitized = sanitizeText(text);
+
+            // Log if text was significantly changed during sanitization
+            if (sanitized != null
+                    && text != null
+                    && (sanitized.length() < text.length() * 0.9 || sanitized.contains("€") || text.contains("€"))) {
+                log.warn(
+                        "Text sanitization may have corrupted content for field '{}'. Original length: {}, Sanitized length: {}",
+                        fieldName,
+                        text.length(),
+                        sanitized != null ? sanitized.length() : 0);
+                log.debug("Original text: {}", text);
+                log.debug("Sanitized text: {}", sanitized);
+            }
+
+            return sanitized;
         }
         return null;
+    }
+
+    /**
+     * Sanitize text to remove null bytes and invalid UTF-8 sequences
+     *
+     * @param text The text to sanitize
+     * @return Sanitized text safe for database storage
+     */
+    private String sanitizeText(String text) {
+        if (text == null) {
+            return null;
+        }
+
+        try {
+            // Remove null bytes and other problematic control characters
+            String sanitized = text.replaceAll("[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]", "");
+
+            // Remove any remaining problematic characters but preserve newlines, tabs, and
+            // carriage returns
+            sanitized = sanitized.replaceAll("[\\p{Cntrl}&&[^\\r\\n\\t]]", "");
+
+            // Ensure proper UTF-8 encoding
+            byte[] bytes = sanitized.getBytes("UTF-8");
+            String cleaned = new String(bytes, "UTF-8");
+
+            // Additional safety check: if the cleaned string is significantly shorter,
+            // it might indicate encoding issues, so return the original sanitized version
+            if (cleaned.length() < sanitized.length() * 0.8) {
+                log.warn("Text sanitization may have corrupted content, using original sanitized version");
+                return sanitized.trim();
+            }
+
+            return cleaned.trim();
+        } catch (Exception e) {
+            log.warn("Failed to sanitize text, returning original text: {}", e.getMessage());
+            // Return the original text instead of null to preserve content
+            return text.trim();
+        }
     }
 
     private Integer getIntValue(JsonNode node, String fieldName) {

@@ -20,16 +20,47 @@ services:
       - RABBITMQ_USER=${RABBITMQ_USER}
       - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
       - GEMINI_API_KEY=${GEMINI_API_KEY}
+
+      # --- JVM tuning ---
+      - JAVA_TOOL_OPTIONS=-XX:InitialRAMPercentage=25 -XX:MaxRAMPercentage=65 -XX:+UseStringDeduplication -XX:MaxGCPauseMillis=200
+
+      # --- Spring Boot resource usage ---
+      - SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE=10
+      - SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE=2
+      - SPRING_JPA_OPEN_IN_VIEW=false
+      - SERVER_TOMCAT_MAX_THREADS=50
+      - SERVER_TOMCAT_MAX_CONNECTIONS=200
+      - SERVER_TOMCAT_ACCEPT_COUNT=50
+      - SPRING_THREADS_VIRTUAL_ENABLED=true
+
     networks:
       - scholarai-network
     restart: unless-stopped
-    # Will connect to existing infrastructure via network
+
+    # Resource caps
+    cpus: 1.0
+    mem_limit: 1250m
+    mem_reservation: 768m
+    pids_limit: 512
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+
+    # Keep your original curl healthcheck
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:${SERVER_PORT:-8083}/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 60s
+
+networks:
+  scholarai-network:
+    external: true
+    name: docker_scholarai-network
+
+
 
 # Note: project-postgres is already running from meta/Scripts/docker.sh
 # This service will connect to the existing project-db container
@@ -38,8 +69,3 @@ services:
 # This service will connect to the existing service-registry container
 
 # Volumes are managed by meta/Scripts/docker.sh
-
-networks:
-  scholarai-network:
-    external: true
-    name: docker_scholarai-network
