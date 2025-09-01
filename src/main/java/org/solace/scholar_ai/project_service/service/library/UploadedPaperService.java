@@ -158,8 +158,7 @@ public class UploadedPaperService {
                 request.citationCount(),
                 request.referenceCount(),
                 request.influentialCitationCount(),
-                fieldsOfStudy,
-                false); // isLatexContext - default to false for uploaded papers
+                fieldsOfStudy);
     }
 
     /**
