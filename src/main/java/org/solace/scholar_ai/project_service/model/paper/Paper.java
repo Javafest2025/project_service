@@ -113,6 +113,11 @@ public class Paper {
     @OneToOne(mappedBy = "paper", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private PaperExtraction paperExtraction;
 
+    // LaTeX Context field - indicates if paper is added to LaTeX context for a project
+    @Column(name = "is_latex_context")
+    @Builder.Default
+    private Boolean isLatexContext = false;
+
     public void addExternalId(ExternalId externalId) {
         externalIds.add(externalId);
         externalId.setPaper(this);
