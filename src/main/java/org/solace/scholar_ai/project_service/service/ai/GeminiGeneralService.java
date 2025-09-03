@@ -17,7 +17,7 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class GeminiService {
+public class GeminiGeneralService {
     private final RestTemplate restTemplate;
     private final GeminiConfig geminiConfig;
     private final ObjectMapper objectMapper;
