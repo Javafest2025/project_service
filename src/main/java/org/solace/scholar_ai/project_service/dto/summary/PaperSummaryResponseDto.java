@@ -1,5 +1,7 @@
 package org.solace.scholar_ai.project_service.dto.summary;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.solace.scholar_ai.project_service.model.summary.PaperSummary;
 
 /**
@@ -17,7 +20,10 @@ import org.solace.scholar_ai.project_service.model.summary.PaperSummary;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Slf4j
 public class PaperSummaryResponseDto {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private UUID id;
     private UUID paperId; // Just the ID, not the full Paper object
@@ -159,7 +165,42 @@ public class PaperSummaryResponseDto {
     }
 
     /**
-     * Parse JSON string to List<String>
+     * Utility method to safely get a string value from a map
+     */
+    private static String getStringValue(Map<String, Object> map, String key) {
+        if (map == null || key == null) {
+            return null;
+        }
+        Object value = map.get(key);
+        if (value instanceof String) {
+            String str = (String) value;
+            return str.trim().isEmpty() ? null : str;
+        }
+        return value != null ? value.toString() : null;
+    }
+
+    /**
+     * Utility method to safely get a list value from a map
+     */
+    @SuppressWarnings("unchecked")
+    private static List<String> getStringListValue(Map<String, Object> map, String key) {
+        if (map == null || key == null) {
+            return null;
+        }
+        Object value = map.get(key);
+        if (value instanceof List) {
+            List<?> list = (List<?>) value;
+            return list.stream()
+                    .filter(item -> item != null)
+                    .map(Object::toString)
+                    .filter(str -> !str.trim().isEmpty())
+                    .toList();
+        }
+        return null;
+    }
+
+    /**
+     * Parse JSON string to List<String> using Jackson
      */
     @SuppressWarnings("unchecked")
     private static List<String> parseJsonArray(String jsonString) {
@@ -167,63 +208,33 @@ public class PaperSummaryResponseDto {
             return null;
         }
         try {
-            // Simple parsing for common JSON array patterns
             if (jsonString.startsWith("[") && jsonString.endsWith("]")) {
-                // Remove brackets and split by comma, handling quotes
-                String content = jsonString.substring(1, jsonString.length() - 1).trim();
-                if (content.isEmpty()) {
-                    return List.of();
-                }
-
-                // Split by comma, handling quoted strings
-                List<String> result = new java.util.ArrayList<>();
-                StringBuilder current = new StringBuilder();
-                boolean inQuotes = false;
-                boolean escaped = false;
-
-                for (int i = 0; i < content.length(); i++) {
-                    char c = content.charAt(i);
-                    if (escaped) {
-                        current.append(c);
-                        escaped = false;
-                    } else if (c == '\\') {
-                        escaped = true;
-                    } else if (c == '"') {
-                        inQuotes = !inQuotes;
-                    } else if (c == ',' && !inQuotes) {
-                        String item = current.toString().trim();
-                        if (!item.isEmpty()) {
-                            // Remove surrounding quotes if present
-                            if (item.startsWith("\"") && item.endsWith("\"")) {
-                                item = item.substring(1, item.length() - 1);
-                            }
-                            result.add(item);
-                        }
-                        current.setLength(0);
-                    } else {
-                        current.append(c);
-                    }
-                }
-
-                // Add the last item
-                String lastItem = current.toString().trim();
-                if (!lastItem.isEmpty()) {
-                    if (lastItem.startsWith("\"") && lastItem.endsWith("\"")) {
-                        lastItem = lastItem.substring(1, lastItem.length() - 1);
-                    }
-                    result.add(lastItem);
-                }
-
-                return result;
+                // Parse as JSON array
+                List<Object> parsed = OBJECT_MAPPER.readValue(jsonString, List.class);
+                return parsed.stream()
+                        .filter(obj -> obj != null)
+                        .map(Object::toString)
+                        .filter(str -> !str.trim().isEmpty())
+                        .distinct() // Remove duplicates
+                        .toList();
+            } else {
+                // Single item, return as list if it's not empty
+                String trimmed = jsonString.trim();
+                return trimmed.isEmpty() ? List.of() : List.of(trimmed);
             }
+        } catch (JsonProcessingException e) {
+            log.warn("Failed to parse JSON array: {}", jsonString, e);
+            // Fallback: return as single item list if it's not empty
+            String trimmed = jsonString.trim();
+            return trimmed.isEmpty() ? List.of() : List.of(trimmed);
         } catch (Exception e) {
-            // If parsing fails, return as single item list
+            log.error("Unexpected error parsing JSON array: {}", jsonString, e);
+            return List.of();
         }
-        return List.of(jsonString);
     }
 
     /**
-     * Parse JSON string to Map<String, Object>
+     * Parse JSON string to Map<String, Object> using Jackson
      */
     @SuppressWarnings("unchecked")
     private static Map<String, Object> parseJsonObject(String jsonString) {
@@ -231,20 +242,30 @@ public class PaperSummaryResponseDto {
             return null;
         }
         try {
-            // Simple parsing for common JSON object patterns
             if (jsonString.startsWith("{") && jsonString.endsWith("}")) {
-                // For now, return a simple map with the raw JSON
-                // In production, you might want to use a proper JSON parser
-                return Map.of("rawJson", jsonString);
+                // Parse as JSON object
+                Map<String, Object> parsed = OBJECT_MAPPER.readValue(jsonString, Map.class);
+                // Filter out null values and empty strings
+                return parsed.entrySet().stream()
+                        .filter(entry -> entry.getValue() != null)
+                        .filter(entry -> !(entry.getValue() instanceof String)
+                                || !((String) entry.getValue()).trim().isEmpty())
+                        .collect(java.util.stream.Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue,
+                                (existing, replacement) -> existing,
+                                java.util.LinkedHashMap::new));
             }
+        } catch (JsonProcessingException e) {
+            log.warn("Failed to parse JSON object: {}", jsonString, e);
         } catch (Exception e) {
-            // If parsing fails, return null
+            log.error("Unexpected error parsing JSON object: {}", jsonString, e);
         }
         return null;
     }
 
     /**
-     * Parse JSON string to List<Map<String, Object>>
+     * Parse JSON string to List<Map<String, Object>> using Jackson
      */
     @SuppressWarnings("unchecked")
     private static List<Map<String, Object>> parseJsonArrayToMap(String jsonString) {
@@ -252,14 +273,29 @@ public class PaperSummaryResponseDto {
             return null;
         }
         try {
-            // Simple parsing for common JSON array patterns
             if (jsonString.startsWith("[") && jsonString.endsWith("]")) {
-                // For now, return a list with the raw JSON
-                // In production, you might want to use a proper JSON parser
-                return List.of(Map.of("rawJson", jsonString));
+                // Parse as JSON array of objects
+                List<Map<String, Object>> parsed = OBJECT_MAPPER.readValue(jsonString, List.class);
+                // Filter out null maps and maps with only null/empty values
+                return parsed.stream()
+                        .filter(map -> map != null)
+                        .map(map -> map.entrySet().stream()
+                                .filter(entry -> entry.getValue() != null)
+                                .filter(entry -> !(entry.getValue() instanceof String)
+                                        || !((String) entry.getValue()).trim().isEmpty())
+                                .collect(java.util.stream.Collectors.toMap(
+                                        Map.Entry::getKey,
+                                        Map.Entry::getValue,
+                                        (existing, replacement) -> existing,
+                                        java.util.HashMap::new)))
+                        .filter(map -> !map.isEmpty())
+                        .<Map<String, Object>>map(map -> (Map<String, Object>) map)
+                        .toList();
             }
+        } catch (JsonProcessingException e) {
+            log.warn("Failed to parse JSON array to map: {}", jsonString, e);
         } catch (Exception e) {
-            // If parsing fails, return null
+            log.error("Unexpected error parsing JSON array to map: {}", jsonString, e);
         }
         return null;
     }
