@@ -1,5 +1,6 @@
 package org.solace.scholar_ai.project_service.model.paper;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -73,6 +74,7 @@ public class Paper {
 
     // Relationships
     @OneToMany(mappedBy = "paper", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JsonManagedReference("paper-authors")
     @Builder.Default
     private List<PaperAuthor> paperAuthors = new ArrayList<>();
 

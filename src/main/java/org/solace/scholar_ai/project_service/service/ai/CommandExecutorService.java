@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class CommandExecutorService {
     private final TodoService todoService;
-    private final GeminiService geminiService;
+    private final GeminiGeneralService geminiGeneralService;
 
     public Map<String, Object> executeCommand(ParsedCommand command, String userId) {
         Map<String, Object> result = new HashMap<>();
@@ -136,7 +136,7 @@ public class CommandExecutorService {
                                 "- %s (Priority: %s, Status: %s)",
                                 todo.getTitle(), todo.getPriority(), todo.getStatus()))
                         .reduce("", (a, b) -> a + "\n" + b));
-        String summary = geminiService.generateContent(summaryPrompt);
+        String summary = geminiGeneralService.generateContent(summaryPrompt);
 
         return Map.of(
                 "todos", todos,
@@ -153,7 +153,7 @@ public class CommandExecutorService {
     }
 
     private Map<String, Object> handleGeneralQuestion(String question) {
-        String response = geminiService.generateContent(question);
+        String response = geminiGeneralService.generateContent(question);
         return Map.of("response", response);
     }
 }

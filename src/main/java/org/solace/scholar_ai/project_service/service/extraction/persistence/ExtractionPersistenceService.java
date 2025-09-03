@@ -138,8 +138,7 @@ public class ExtractionPersistenceService {
         if (extractionMethodsNode != null && extractionMethodsNode.isArray()) {
             StringBuilder methods = new StringBuilder();
             for (JsonNode method : extractionMethodsNode) {
-                if (methods.length() > 0)
-                    methods.append(", ");
+                if (methods.length() > 0) methods.append(", ");
                 methods.append(method.asText());
             }
             extraction.setExtractionMethods(methods.toString());
@@ -156,8 +155,7 @@ public class ExtractionPersistenceService {
         if (errorsNode != null && errorsNode.isArray()) {
             StringBuilder errors = new StringBuilder();
             for (JsonNode error : errorsNode) {
-                if (errors.length() > 0)
-                    errors.append("; ");
+                if (errors.length() > 0) errors.append("; ");
                 errors.append(error.asText());
             }
             extraction.setErrors(errors.toString());
@@ -167,8 +165,7 @@ public class ExtractionPersistenceService {
         if (warningsNode != null && warningsNode.isArray()) {
             StringBuilder warnings = new StringBuilder();
             for (JsonNode warning : warningsNode) {
-                if (warnings.length() > 0)
-                    warnings.append("; ");
+                if (warnings.length() > 0) warnings.append("; ");
                 warnings.append(warning.asText());
             }
             extraction.setWarnings(warnings.toString());
@@ -178,8 +175,7 @@ public class ExtractionPersistenceService {
     }
 
     private void processExtractedSections(PaperExtraction paperExtraction, JsonNode sectionsNode) {
-        if (sectionsNode == null || !sectionsNode.isArray())
-            return;
+        if (sectionsNode == null || !sectionsNode.isArray()) return;
 
         int orderIndex = 0;
         for (JsonNode sectionNode : sectionsNode) {
@@ -241,8 +237,7 @@ public class ExtractionPersistenceService {
     }
 
     private void processExtractedFigures(PaperExtraction paperExtraction, JsonNode figuresNode) {
-        if (figuresNode == null || !figuresNode.isArray())
-            return;
+        if (figuresNode == null || !figuresNode.isArray()) return;
 
         int orderIndex = 0;
         for (JsonNode figureNode : figuresNode) {
@@ -287,8 +282,7 @@ public class ExtractionPersistenceService {
     }
 
     private void processExtractedTables(PaperExtraction paperExtraction, JsonNode tablesNode) {
-        if (tablesNode == null || !tablesNode.isArray())
-            return;
+        if (tablesNode == null || !tablesNode.isArray()) return;
 
         int orderIndex = 0;
         for (JsonNode tableNode : tablesNode) {
@@ -345,8 +339,7 @@ public class ExtractionPersistenceService {
     }
 
     private void processExtractedEquations(PaperExtraction paperExtraction, JsonNode equationsNode) {
-        if (equationsNode == null || !equationsNode.isArray())
-            return;
+        if (equationsNode == null || !equationsNode.isArray()) return;
 
         int orderIndex = 0;
         for (JsonNode equationNode : equationsNode) {
@@ -381,8 +374,7 @@ public class ExtractionPersistenceService {
     }
 
     private void processExtractedCodeBlocks(PaperExtraction paperExtraction, JsonNode codeBlocksNode) {
-        if (codeBlocksNode == null || !codeBlocksNode.isArray())
-            return;
+        if (codeBlocksNode == null || !codeBlocksNode.isArray()) return;
 
         int orderIndex = 0;
         for (JsonNode codeBlockNode : codeBlocksNode) {
@@ -417,8 +409,7 @@ public class ExtractionPersistenceService {
     }
 
     private void processExtractedReferences(PaperExtraction paperExtraction, JsonNode referencesNode) {
-        if (referencesNode == null || !referencesNode.isArray())
-            return;
+        if (referencesNode == null || !referencesNode.isArray()) return;
 
         int orderIndex = 0;
         for (JsonNode referenceNode : referencesNode) {
@@ -469,8 +460,7 @@ public class ExtractionPersistenceService {
         if (citedBySectionsNode != null && citedBySectionsNode.isArray()) {
             StringBuilder sections = new StringBuilder();
             for (JsonNode section : citedBySectionsNode) {
-                if (sections.length() > 0)
-                    sections.append(", ");
+                if (sections.length() > 0) sections.append(", ");
                 sections.append(section.asText());
             }
             reference.setCitedBySections(sections.toString());
@@ -480,8 +470,7 @@ public class ExtractionPersistenceService {
     }
 
     private void processExtractedEntities(PaperExtraction paperExtraction, JsonNode entitiesNode) {
-        if (entitiesNode == null || !entitiesNode.isArray())
-            return;
+        if (entitiesNode == null || !entitiesNode.isArray()) return;
 
         int orderIndex = 0;
         for (JsonNode entityNode : entitiesNode) {

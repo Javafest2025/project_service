@@ -1,5 +1,6 @@
 package org.solace.scholar_ai.project_service.model.paper;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
@@ -20,6 +21,7 @@ public class PaperAuthor {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "paper_id", nullable = false)
+    @JsonBackReference("paper-authors")
     private Paper paper;
 
     @ManyToOne(fetch = FetchType.LAZY)
