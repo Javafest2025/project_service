@@ -69,21 +69,26 @@ public class PaperSummaryGenerationService {
                         + paper.getExtractionStatus() + ". Please wait for extraction to complete.");
             }
 
-            // 4. Fetch extraction data
+            // 4. Set summarization status to PROCESSING
+            paper.setSummarizationStatus("PROCESSING");
+            paper.setSummarizationStartedAt(Instant.now());
+            paperRepository.save(paper);
+
+            // 5. Fetch extraction data
             PaperExtraction extraction = extractionRepository
                     .findByPaperId(paperId)
                     .orElseThrow(() -> new RuntimeException("No extraction found for paper: " + paperId));
 
-            // 3. Build extraction context
+            // 6. Build extraction context
             ExtractionContext context = buildExtractionContext(extraction);
 
-            // 4. Generate summary using parallel processing for different sections
+            // 7. Generate summary using parallel processing for different sections
             PaperSummaryDto summaryDTO = generateSummaryWithGemini(context, extraction);
 
-            // 5. Calculate quality metrics
+            // 8. Calculate quality metrics
             enrichSummaryWithMetrics(summaryDTO, context);
 
-            // 6. Save to database
+            // 9. Save to database and update paper status
             PaperSummary summary = saveSummary(summaryDTO, extraction.getPaper(), startTime);
 
             log.info(
@@ -98,7 +103,18 @@ public class PaperSummaryGenerationService {
             throw e;
         } catch (Exception e) {
             log.error("Error generating summary for paper: {}", paperId, e);
-            throw new RuntimeException("Summary generation failed", e);
+            // Update paper status to FAILED
+            try {
+                Paper paper = paperRepository.findById(paperId).orElse(null);
+                if (paper != null) {
+                    paper.setSummarizationStatus("FAILED");
+                    paper.setSummarizationError(e.getMessage());
+                    paperRepository.save(paper);
+                }
+            } catch (Exception saveError) {
+                log.error("Failed to update paper summarization status to FAILED", saveError);
+            }
+            throw e;
         }
     }
 
@@ -610,7 +626,15 @@ public class PaperSummaryGenerationService {
                     .validationStatus(PaperSummary.ValidationStatus.PENDING)
                     .build();
 
-            return summaryRepository.save(summary);
+            summaryRepository.save(summary);
+
+            // Update paper status to COMPLETED
+            paper.setSummarizationStatus("COMPLETED");
+            paper.setSummarizationCompletedAt(Instant.now());
+            paper.setIsSummarized(true);
+            paperRepository.save(paper);
+
+            return summary;
 
         } catch (Exception e) {
             log.error("Failed to save summary", e);

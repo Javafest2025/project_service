@@ -6,9 +6,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solace.scholar_ai.project_service.dto.request.extraction.ExtractionRequest;
+import org.solace.scholar_ai.project_service.dto.response.extraction.ExtractedFigureResponse;
+import org.solace.scholar_ai.project_service.dto.response.extraction.ExtractedTableResponse;
 import org.solace.scholar_ai.project_service.dto.response.extraction.ExtractionResponse;
 import org.solace.scholar_ai.project_service.service.extraction.ExtractionService;
 import org.springframework.http.ResponseEntity;
@@ -124,5 +127,49 @@ public class ExtractionController {
         Boolean isExtracted = extractionService.isPaperExtracted(paperId);
 
         return ResponseEntity.ok(isExtracted);
+    }
+
+    @Operation(
+            summary = "Get extracted figures for a paper",
+            description = "Retrieves all extracted figures for a paper including image path, caption, and page number")
+    @ApiResponses(
+            value = {
+                @ApiResponse(responseCode = "200", description = "Figures retrieved successfully"),
+                @ApiResponse(responseCode = "404", description = "Paper or extraction not found"),
+                @ApiResponse(responseCode = "500", description = "Internal server error")
+            })
+    @GetMapping("/figures/{paperId}")
+    public ResponseEntity<List<ExtractedFigureResponse>> getExtractedFigures(
+            @Parameter(description = "Paper ID", required = true) @PathVariable String paperId) {
+
+        log.info("Received request for extracted figures for paper ID: {}", paperId);
+
+        List<ExtractedFigureResponse> figures = extractionService.getExtractedFigures(paperId);
+
+        log.info("Retrieved {} figures for paper ID: {}", figures.size(), paperId);
+
+        return ResponseEntity.ok(figures);
+    }
+
+    @Operation(
+            summary = "Get extracted tables for a paper",
+            description = "Retrieves all extracted tables for a paper including CSV path, caption, and page number")
+    @ApiResponses(
+            value = {
+                @ApiResponse(responseCode = "200", description = "Tables retrieved successfully"),
+                @ApiResponse(responseCode = "404", description = "Paper or extraction not found"),
+                @ApiResponse(responseCode = "500", description = "Internal server error")
+            })
+    @GetMapping("/tables/{paperId}")
+    public ResponseEntity<List<ExtractedTableResponse>> getExtractedTables(
+            @Parameter(description = "Paper ID", required = true) @PathVariable String paperId) {
+
+        log.info("Received request for extracted tables for paper ID: {}", paperId);
+
+        List<ExtractedTableResponse> tables = extractionService.getExtractedTables(paperId);
+
+        log.info("Retrieved {} tables for paper ID: {}", tables.size(), paperId);
+
+        return ResponseEntity.ok(tables);
     }
 }

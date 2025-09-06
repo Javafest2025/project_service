@@ -2,11 +2,15 @@ package org.solace.scholar_ai.project_service.controller.summary;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solace.scholar_ai.project_service.dto.summary.PaperSummaryResponseDto;
+import org.solace.scholar_ai.project_service.model.paper.Paper;
 import org.solace.scholar_ai.project_service.model.summary.PaperSummary;
+import org.solace.scholar_ai.project_service.repository.paper.PaperRepository;
 import org.solace.scholar_ai.project_service.repository.summary.PaperSummaryRepository;
 import org.solace.scholar_ai.project_service.service.summary.PaperSummaryGenerationService;
 import org.springframework.http.HttpStatus;
@@ -22,6 +26,7 @@ public class PaperSummaryController {
 
     private final PaperSummaryGenerationService summaryGenerationService;
     private final PaperSummaryRepository summaryRepository;
+    private final PaperRepository paperRepository;
 
     @Operation(summary = "Generate summary for a paper")
     @PostMapping("/generate")
@@ -76,5 +81,31 @@ public class PaperSummaryController {
                     return ResponseEntity.ok(summaryRepository.save(summary));
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @Operation(summary = "Check if paper is summarized")
+    @GetMapping("/status")
+    public ResponseEntity<Map<String, Object>> getSummarizationStatus(@PathVariable UUID paperId) {
+        log.info("Checking summarization status for paper: {}", paperId);
+
+        try {
+            Paper paper = paperRepository
+                    .findById(paperId)
+                    .orElseThrow(() -> new RuntimeException("Paper not found: " + paperId));
+
+            Map<String, Object> status = new HashMap<>();
+            status.put("paperId", paperId);
+            status.put("isSummarized", paper.getIsSummarized());
+            status.put("summarizationStatus", paper.getSummarizationStatus());
+            status.put("summarizationStartedAt", paper.getSummarizationStartedAt());
+            status.put("summarizationCompletedAt", paper.getSummarizationCompletedAt());
+            status.put("summarizationError", paper.getSummarizationError());
+
+            return ResponseEntity.ok(status);
+        } catch (Exception e) {
+            log.error("Error checking summarization status for paper: {}", paperId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to check summarization status: " + e.getMessage()));
+        }
     }
 }
