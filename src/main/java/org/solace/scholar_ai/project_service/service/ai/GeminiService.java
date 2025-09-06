@@ -40,12 +40,14 @@ public class GeminiService {
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
             log.info("📤 Request body: {}", requestBody);
 
+            @SuppressWarnings("rawtypes")
             ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
             log.info("📥 Response status: {}", response.getStatusCode());
             log.info("📥 Response body: {}", response.getBody());
 
             // Extract text from response
-            String extractedText = extractTextFromResponse(response.getBody());
+            @SuppressWarnings("unchecked")
+            String extractedText = extractTextFromResponse((Map<String, Object>) response.getBody());
             log.info("📄 Extracted text: {}", extractedText);
 
             return extractedText;
@@ -55,13 +57,68 @@ public class GeminiService {
         }
     }
 
-    private String extractTextFromResponse(Map responseBody) {
+    /**
+     * Generate response for paper context chat with temperature and max tokens configuration
+     */
+    public String generateResponse(String prompt, Double temperature, Integer maxTokens) {
+        log.info("🚀 Calling Gemini API for chat response with prompt: {}", prompt);
+
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            Map<String, Object> requestBody = new HashMap<>();
+            Map<String, Object> content = new HashMap<>();
+            content.put("parts", List.of(Map.of("text", prompt)));
+            requestBody.put("contents", List.of(content));
+
+            // Add generation config with temperature and token limits
+            Map<String, Object> generationConfig = new HashMap<>();
+            if (temperature != null) {
+                generationConfig.put("temperature", temperature);
+            }
+            if (maxTokens != null) {
+                generationConfig.put("maxOutputTokens", maxTokens);
+            }
+            // Add safety settings for academic content
+            generationConfig.put("candidateCount", 1);
+            generationConfig.put("topP", 0.8);
+            generationConfig.put("topK", 40);
+
+            if (!generationConfig.isEmpty()) {
+                requestBody.put("generationConfig", generationConfig);
+            }
+
+            String url = geminiConfig.getApiUrl() + "?key=" + geminiConfig.getApiKey();
+            log.info("🌐 Gemini API URL: {}", url.replace(geminiConfig.getApiKey(), "***HIDDEN***"));
+            log.info("🎛️ Generation config: temperature={}, maxTokens={}", temperature, maxTokens);
+
+            HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
+
+            @SuppressWarnings("rawtypes")
+            ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
+            log.info("📥 Response status: {}", response.getStatusCode());
+
+            // Extract text from response
+            String extractedText = extractTextFromResponse(response.getBody());
+            log.info("📄 Extracted text length: {} characters", extractedText.length());
+
+            return extractedText;
+        } catch (Exception e) {
+            log.error("❌ Error generating chat response with Gemini: {}", e.getMessage(), e);
+            return "I apologize, but I'm having trouble processing your request right now. Please try again later.";
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private String extractTextFromResponse(Map<String, Object> responseBody) {
         try {
             // Parse Gemini response structure
-            List<Map> candidates = (List<Map>) responseBody.get("candidates");
+            List<Map<String, Object>> candidates = (List<Map<String, Object>>) responseBody.get("candidates");
             if (candidates != null && !candidates.isEmpty()) {
-                Map content = (Map) candidates.get(0).get("content");
-                List<Map> parts = (List<Map>) content.get("parts");
+                Map<String, Object> content =
+                        (Map<String, Object>) candidates.get(0).get("content");
+                List<Map<String, Object>> parts = (List<Map<String, Object>>) content.get("parts");
                 if (parts != null && !parts.isEmpty()) {
                     return (String) parts.get(0).get("text");
                 }

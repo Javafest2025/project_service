@@ -185,12 +185,13 @@ public class PaperPersistenceService {
     public PaperMetadataDto toggleLatexContext(UUID paperId, boolean isLatexContext) {
         log.info("Toggling LaTeX context status for paper {} to {}", paperId, isLatexContext);
 
-        Paper paper = paperRepository.findById(paperId)
+        Paper paper = paperRepository
+                .findById(paperId)
                 .orElseThrow(() -> new RuntimeException("Paper not found with id: " + paperId));
 
         paper.setIsLatexContext(isLatexContext);
         Paper savedPaper = paperRepository.save(paper);
-        
+
         log.info("Updated LaTeX context status for paper {}: {}", paperId, isLatexContext);
         return paperMapper.toMetadataDto(savedPaper);
     }

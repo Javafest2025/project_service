@@ -52,11 +52,10 @@ public class LatexContextController {
 
             List<PaperMetadataDto> contextPapers = paperPersistenceService.findLatexContextPapersByProjectId(projectId);
 
-            return ResponseEntity.ok(
-                    APIResponse.success(
-                            HttpStatus.OK.value(),
-                            String.format("Retrieved %d LaTeX context papers for project", contextPapers.size()),
-                            contextPapers));
+            return ResponseEntity.ok(APIResponse.success(
+                    HttpStatus.OK.value(),
+                    String.format("Retrieved %d LaTeX context papers for project", contextPapers.size()),
+                    contextPapers));
         } catch (Exception e) {
             log.error("Error retrieving LaTeX context papers for project {}: {}", projectId, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -90,21 +89,16 @@ public class LatexContextController {
         try {
             log.info("Toggling LaTeX context status for paper {} to {}", paperId, request.isLatexContext());
 
-            PaperMetadataDto updatedPaper = paperPersistenceService.toggleLatexContext(paperId, request.isLatexContext());
+            PaperMetadataDto updatedPaper =
+                    paperPersistenceService.toggleLatexContext(paperId, request.isLatexContext());
 
             String action = request.isLatexContext() ? "added to" : "removed from";
-            return ResponseEntity.ok(
-                    APIResponse.success(
-                            HttpStatus.OK.value(),
-                            String.format("Paper successfully %s LaTeX context", action),
-                            updatedPaper));
+            return ResponseEntity.ok(APIResponse.success(
+                    HttpStatus.OK.value(), String.format("Paper successfully %s LaTeX context", action), updatedPaper));
         } catch (RuntimeException e) {
             log.error("Error toggling LaTeX context for paper {}: {}", paperId, e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(APIResponse.error(
-                            HttpStatus.NOT_FOUND.value(),
-                            e.getMessage(),
-                            null));
+                    .body(APIResponse.error(HttpStatus.NOT_FOUND.value(), e.getMessage(), null));
         } catch (Exception e) {
             log.error("Unexpected error toggling LaTeX context for paper {}: {}", paperId, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -121,5 +115,5 @@ public class LatexContextController {
     @Schema(description = "Request to toggle LaTeX context status for a paper")
     public record ToggleLatexContextRequest(
             @Schema(description = "Whether to include this paper in LaTeX context", example = "true")
-            boolean isLatexContext) {}
+                    boolean isLatexContext) {}
 }
