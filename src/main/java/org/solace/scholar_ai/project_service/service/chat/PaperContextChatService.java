@@ -52,9 +52,10 @@ public class PaperContextChatService {
     @Transactional
     public PaperChatResponse chatWithPaper(UUID paperId, PaperChatRequest request) {
         log.info(
-                "Processing chat request for paper: {} with message: '{}'",
+                "Processing chat request for paper: {} with message: '{}', selectedText: '{}'",
                 paperId,
-                truncateMessage(request.getMessage()));
+                truncateMessage(request.getMessage()),
+                request.getSelectedText() != null ? truncateMessage(request.getSelectedText()) : "None");
 
         try {
             // 1. Validate paper and extraction
@@ -66,25 +67,34 @@ public class PaperContextChatService {
             // 3. Store user message
             storeUserMessage(session, request.getMessage());
 
-            // 4. Retrieve relevant content using RAG
-            List<ContentChunk> relevantChunks =
-                    retrieveRelevantContent(paper.getPaperExtraction(), request.getMessage());
+            // 4. Retrieve relevant content using enhanced RAG
+            List<ContentChunk> relevantChunks = retrieveRelevantContent(
+                    paper.getPaperExtraction(),
+                    request.getMessage(),
+                    request.getSelectedText(),
+                    request.getSelectionContext());
 
             // 5. Get recent conversation history
             List<ChatMessage> recentHistory = getRecentChatHistory(session.getId());
 
-            // 6. Build optimized prompt for Gemini
-            String prompt = buildOptimizedPrompt(
-                    paper.getPaperExtraction(), relevantChunks, recentHistory, request.getMessage());
+            // 6. Build comprehensive prompt for Gemini
+            String prompt = buildComprehensivePrompt(
+                    paper.getPaperExtraction(),
+                    relevantChunks,
+                    recentHistory,
+                    request.getMessage(),
+                    request.getSelectedText());
 
-            // 7. Generate response using Gemini
-            String aiResponse = geminiService.generateResponse(prompt, 0.7, 2000);
+            // 7. Generate detailed response using Gemini
+            String aiResponse =
+                    geminiService.generateResponse(prompt, 0.3, 3000); // Lower temperature, higher token limit
 
             // 8. Store assistant response
             ChatMessage assistantMessage = storeAssistantMessage(session, aiResponse);
 
-            // 9. Build and return response
-            return buildChatResponse(session, assistantMessage, relevantChunks, paper.getPaperExtraction());
+            // 9. Build and return comprehensive response
+            return buildComprehensiveChatResponse(
+                    session, assistantMessage, relevantChunks, paper.getPaperExtraction());
 
         } catch (Exception e) {
             log.error("Error generating chat response for paper: {}", paperId, e);
@@ -186,27 +196,59 @@ public class PaperContextChatService {
     }
 
     /**
-     * Retrieve relevant content chunks using RAG approach
+     * Retrieve relevant content chunks using enhanced RAG approach with selected text context
      */
-    private List<ContentChunk> retrieveRelevantContent(PaperExtraction extraction, String question) {
-        log.debug("Retrieving relevant content for question: {}", truncateMessage(question));
+    private List<ContentChunk> retrieveRelevantContent(
+            PaperExtraction extraction,
+            String question,
+            String selectedText,
+            PaperChatRequest.SelectionContext selectionContext) {
+        log.debug(
+                "Retrieving relevant content for question: {}, selectedText: {}",
+                truncateMessage(question),
+                selectedText != null ? truncateMessage(selectedText) : "None");
 
-        // Extract keywords from question
+        // Extract keywords from question and selected text
         Set<String> questionKeywords = extractKeywords(question.toLowerCase());
+        Set<String> selectionKeywords =
+                selectedText != null ? extractKeywords(selectedText.toLowerCase()) : new HashSet<>();
+
+        // Combine keywords for better matching
+        Set<String> allKeywords = new HashSet<>(questionKeywords);
+        allKeywords.addAll(selectionKeywords);
 
         // Check for specific references (pages, figures, sections)
         SpecificReferences specificRefs = extractSpecificReferences(question);
 
+        // If we have selection context, add it to specific references
+        if (selectionContext != null && selectionContext.getPageNumber() != null) {
+            specificRefs.pages.add(selectionContext.getPageNumber());
+        }
+
         List<ContentChunk> allChunks = new ArrayList<>();
 
-        // 1. Add specific references first (highest priority)
+        // 1. HIGHEST PRIORITY: Selected text context if provided
+        if (selectedText != null && !selectedText.trim().isEmpty()) {
+            allChunks.add(ContentChunk.builder()
+                    .content("SELECTED TEXT CONTEXT: " + selectedText)
+                    .source("User-selected text"
+                            + (selectionContext != null && selectionContext.getPageNumber() != null
+                                    ? " (Page " + selectionContext.getPageNumber() + ")"
+                                    : ""))
+                    .type("selected_text")
+                    .relevanceScore(1.0) // Highest priority
+                    .pageNumber(selectionContext != null ? selectionContext.getPageNumber() : null)
+                    .build());
+        }
+
+        // 2. Add specific references (high priority)
         allChunks.addAll(getSpecificReferences(extraction, specificRefs));
 
-        // 2. Retrieve relevant sections based on keywords
+        // 3. Retrieve relevant sections based on enhanced keyword matching
         extraction.getSections().forEach(section -> {
             String sectionContent = extractSectionContent(section);
             if (sectionContent != null && !sectionContent.isEmpty()) {
-                double relevance = calculateRelevanceScore(sectionContent, questionKeywords);
+                double relevance = calculateEnhancedRelevanceScore(sectionContent, allKeywords, selectedText);
                 if (relevance > RELEVANCE_THRESHOLD) {
                     allChunks.add(ContentChunk.builder()
                             .content(sectionContent)
@@ -219,13 +261,14 @@ public class PaperContextChatService {
             }
         });
 
-        // 3. Process figures
+        // 4. Process figures with enhanced relevance
         extraction.getFigures().forEach(figure -> {
             String figureText = buildFigureText(figure);
-            double relevance = calculateRelevanceScore(figureText, questionKeywords);
-            if (relevance > RELEVANCE_THRESHOLD) {
+            double relevance = calculateEnhancedRelevanceScore(figureText, allKeywords, selectedText);
+            if (relevance > RELEVANCE_THRESHOLD || hasSpecificFigureReference(question, figure)) {
                 allChunks.add(ContentChunk.builder()
-                        .content("Figure " + figure.getLabel() + ": " + figure.getCaption())
+                        .content("Figure " + figure.getLabel() + ": " + figure.getCaption()
+                                + (figure.getOcrText() != null ? "\nOCR Text: " + figure.getOcrText() : ""))
                         .source("Figure " + figure.getLabel() + " (Page " + figure.getPage() + ")")
                         .type("figure")
                         .relevanceScore(relevance)
@@ -234,15 +277,15 @@ public class PaperContextChatService {
             }
         });
 
-        // 4. Process tables
+        // 5. Process tables with enhanced relevance
         extraction.getTables().forEach(table -> {
             String tableText = buildTableText(table);
-            double relevance = calculateRelevanceScore(tableText, questionKeywords);
-            if (relevance > RELEVANCE_THRESHOLD) {
+            double relevance = calculateEnhancedRelevanceScore(tableText, allKeywords, selectedText);
+            if (relevance > RELEVANCE_THRESHOLD || hasSpecificTableReference(question, table)) {
                 allChunks.add(ContentChunk.builder()
                         .content("Table " + table.getLabel() + ": " + table.getCaption()
                                 + (table.getHeaders() != null ? "\nHeaders: " + table.getHeaders() : "")
-                                + (table.getRows() != null ? "\nData: " + truncateText(table.getRows(), 300) : ""))
+                                + (table.getRows() != null ? "\nData: " + truncateText(table.getRows(), 500) : ""))
                         .source("Table " + table.getLabel() + " (Page " + table.getPage() + ")")
                         .type("table")
                         .relevanceScore(relevance)
@@ -251,13 +294,35 @@ public class PaperContextChatService {
             }
         });
 
-        // 5. Sort by relevance and return top chunks
+        // 6. Process equations if relevant
+        extraction.getEquations().forEach(equation -> {
+            if (equation.getLatex() != null || equation.getLabel() != null) {
+                String equationText = (equation.getLabel() != null ? equation.getLabel() : "")
+                        + (equation.getLatex() != null ? " LaTeX: " + equation.getLatex() : "");
+                double relevance = calculateEnhancedRelevanceScore(equationText, allKeywords, selectedText);
+                if (relevance > RELEVANCE_THRESHOLD
+                        || questionContainsKeywords(question, "equation", "formula", "math")) {
+                    allChunks.add(ContentChunk.builder()
+                            .content("Equation " + equation.getEquationId() + ": " + equationText)
+                            .source("Equation " + equation.getEquationId() + " (Page " + equation.getPage() + ")")
+                            .type("equation")
+                            .relevanceScore(relevance)
+                            .pageNumber(equation.getPage())
+                            .build());
+                }
+            }
+        });
+
+        // 7. Sort by relevance and limit results (selected text always first)
         List<ContentChunk> topChunks = allChunks.stream()
                 .sorted((a, b) -> Double.compare(b.getRelevanceScore(), a.getRelevanceScore()))
                 .limit(MAX_CONTEXT_CHUNKS)
                 .collect(Collectors.toList());
 
-        log.debug("Selected {} relevant content chunks", topChunks.size());
+        log.debug(
+                "Selected {} relevant content chunks (including {} with selected text)",
+                topChunks.size(),
+                selectedText != null ? 1 : 0);
         return topChunks;
     }
 
@@ -336,6 +401,97 @@ public class PaperContextChatService {
         // Normalize by content length and keyword count
         double score = (double) matchCount / Math.max(questionKeywords.size(), 1);
         return Math.min(score, 1.0); // Cap at 1.0
+    }
+
+    /**
+     * Calculate enhanced relevance score with selected text context
+     */
+    private double calculateEnhancedRelevanceScore(String content, Set<String> keywords, String selectedText) {
+        if (content == null || content.isEmpty()) return 0.0;
+
+        String contentLower = content.toLowerCase();
+        double score = 0.0;
+
+        // Basic keyword matching
+        for (String keyword : keywords) {
+            if (contentLower.contains(keyword)) {
+                score += 1.0;
+            }
+        }
+
+        // Boost score if content is similar to selected text
+        if (selectedText != null && !selectedText.trim().isEmpty()) {
+            String selectedLower = selectedText.toLowerCase();
+
+            // Check for common words/phrases
+            Set<String> selectedWords = extractKeywords(selectedLower);
+            Set<String> contentWords = extractKeywords(contentLower);
+
+            int commonWords = 0;
+            for (String word : selectedWords) {
+                if (contentWords.contains(word)) {
+                    commonWords++;
+                }
+            }
+
+            // Calculate similarity boost
+            if (!selectedWords.isEmpty()) {
+                double similarity = (double) commonWords / selectedWords.size();
+                score += similarity * 3.0; // Boost for similarity to selected text
+            }
+
+            // Additional boost for exact phrase matches
+            String[] selectedPhrases = selectedLower.split("[.!?]");
+            for (String phrase : selectedPhrases) {
+                phrase = phrase.trim();
+                if (phrase.length() > 10 && contentLower.contains(phrase)) {
+                    score += 2.0; // High boost for phrase matches
+                }
+            }
+        }
+
+        // Normalize score
+        return Math.min(score / Math.max(keywords.size(), 1), 10.0);
+    }
+
+    /**
+     * Check if question contains specific keywords
+     */
+    private boolean questionContainsKeywords(String question, String... keywords) {
+        String questionLower = question.toLowerCase();
+        for (String keyword : keywords) {
+            if (questionLower.contains(keyword.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check for specific figure references in question
+     */
+    private boolean hasSpecificFigureReference(String question, ExtractedFigure figure) {
+        String questionLower = question.toLowerCase();
+        return questionLower.contains("figure " + figure.getLabel())
+                || questionLower.contains("fig " + figure.getLabel())
+                || questionLower.contains("figure" + figure.getLabel())
+                || (figure.getCaption() != null
+                        && extractKeywords(questionLower).stream()
+                                .anyMatch(keyword ->
+                                        figure.getCaption().toLowerCase().contains(keyword)));
+    }
+
+    /**
+     * Check for specific table references in question
+     */
+    private boolean hasSpecificTableReference(String question, ExtractedTable table) {
+        String questionLower = question.toLowerCase();
+        return questionLower.contains("table " + table.getLabel())
+                || questionLower.contains("table" + table.getLabel())
+                || (table.getCaption() != null
+                        && extractKeywords(questionLower).stream()
+                                .anyMatch(keyword ->
+                                        table.getCaption().toLowerCase().contains(keyword)));
     }
 
     private long countOccurrences(String text, String word) {
@@ -590,6 +746,176 @@ public class PaperContextChatService {
         private String type;
         private double relevanceScore;
         private Integer pageNumber;
+    }
+
+    /**
+     * Build comprehensive chat response with enhanced context metadata
+     */
+    private PaperChatResponse buildComprehensiveChatResponse(
+            ChatSession session,
+            ChatMessage assistantMessage,
+            List<ContentChunk> relevantChunks,
+            PaperExtraction extraction) {
+
+        // Separate content sources by type for better organization
+        List<String> sectionsUsed = relevantChunks.stream()
+                .filter(chunk -> "section".equals(chunk.getType()))
+                .map(ContentChunk::getSource)
+                .collect(Collectors.toList());
+
+        List<String> figuresReferenced = relevantChunks.stream()
+                .filter(chunk -> "figure".equals(chunk.getType()))
+                .map(ContentChunk::getSource)
+                .collect(Collectors.toList());
+
+        List<String> tablesReferenced = relevantChunks.stream()
+                .filter(chunk -> "table".equals(chunk.getType()))
+                .map(ContentChunk::getSource)
+                .collect(Collectors.toList());
+
+        List<String> equationsReferenced = relevantChunks.stream()
+                .filter(chunk -> "equation".equals(chunk.getType()))
+                .map(ContentChunk::getSource)
+                .collect(Collectors.toList());
+
+        // Check if selected text was used
+        boolean selectedTextUsed = relevantChunks.stream().anyMatch(chunk -> "selected_text".equals(chunk.getType()));
+
+        // Build comprehensive content sources
+        List<String> contentSources = new ArrayList<>();
+
+        // Add selected text source if present
+        relevantChunks.stream()
+                .filter(chunk -> "selected_text".equals(chunk.getType()))
+                .findFirst()
+                .ifPresent(chunk -> contentSources.add(chunk.getSource()));
+
+        // Add other content sources
+        relevantChunks.stream()
+                .filter(chunk -> !"selected_text".equals(chunk.getType()))
+                .forEach(chunk -> contentSources.add(chunk.getSource()));
+
+        PaperChatResponse.ContextMetadata contextMetadata = PaperChatResponse.ContextMetadata.builder()
+                .sectionsUsed(sectionsUsed)
+                .figuresReferenced(figuresReferenced)
+                .tablesReferenced(tablesReferenced)
+                .equationsUsed(equationsReferenced)
+                .pagesReferenced(relevantChunks.stream()
+                        .map(ContentChunk::getPageNumber)
+                        .filter(Objects::nonNull)
+                        .distinct()
+                        .sorted()
+                        .collect(Collectors.toList()))
+                .contentSources(contentSources)
+                .confidenceScore(calculateConfidenceScore(relevantChunks))
+                .build();
+
+        return PaperChatResponse.builder()
+                .sessionId(session.getId())
+                .response(assistantMessage.getContent())
+                .context(contextMetadata)
+                .timestamp(assistantMessage.getTimestamp())
+                .success(true)
+                .build();
+    }
+
+    /**
+     * Build comprehensive prompt for enhanced AI responses with selected text context
+     */
+    private String buildComprehensivePrompt(
+            PaperExtraction extraction,
+            List<ContentChunk> relevantChunks,
+            List<ChatMessage> recentHistory,
+            String currentQuestion,
+            String selectedText) {
+
+        StringBuilder prompt = new StringBuilder();
+
+        // System context and instructions
+        prompt.append("You are an advanced AI research assistant specializing in academic paper analysis. ");
+        prompt.append(
+                "Your task is to provide comprehensive, detailed, and well-structured responses based on the provided paper content.\n\n");
+
+        // Response guidelines
+        prompt.append("RESPONSE GUIDELINES:\n");
+        prompt.append(
+                "1. Provide detailed, comprehensive explanations that are at least 200-300 words when explaining concepts\n");
+        prompt.append("2. Use clear structure with headings, bullet points, and numbered lists when appropriate\n");
+        prompt.append("3. Reference specific sections, figures, tables, or equations when relevant\n");
+        prompt.append("4. If explaining a concept, provide context, methodology, and implications\n");
+        prompt.append("5. When discussing figures or tables, describe what they show and their significance\n");
+        prompt.append("6. Always maintain academic tone while being accessible\n");
+        prompt.append(
+                "7. If information is insufficient, clearly state what cannot be determined from the provided content\n\n");
+
+        // Paper metadata
+        prompt.append("PAPER INFORMATION:\n");
+        prompt.append("Title: ").append(extraction.getPaper().getTitle()).append("\n");
+        if (extraction.getPaper().getAuthors() != null) {
+            prompt.append("Authors: ")
+                    .append(extraction.getPaper().getAuthors())
+                    .append("\n");
+        }
+        prompt.append("\n");
+
+        // Selected text context (highest priority)
+        if (selectedText != null && !selectedText.trim().isEmpty()) {
+            prompt.append("SELECTED TEXT CONTEXT (User highlighted this specific text for discussion):\n");
+            prompt.append("\"").append(selectedText).append("\"\n\n");
+            prompt.append("IMPORTANT: The user has specifically selected the above text. ");
+            prompt.append("Please focus your response on this selected content and provide detailed explanation, ");
+            prompt.append("context, and analysis of this specific section.\n\n");
+        }
+
+        // Conversation history context
+        if (recentHistory != null && !recentHistory.isEmpty()) {
+            prompt.append("RECENT CONVERSATION HISTORY:\n");
+            for (ChatMessage message : recentHistory) {
+                String role = message.getRole() == ChatMessage.Role.USER ? "User" : "Assistant";
+                prompt.append(role)
+                        .append(": ")
+                        .append(truncateText(message.getContent(), 200))
+                        .append("\n");
+            }
+            prompt.append("\n");
+        }
+
+        // Relevant content chunks
+        prompt.append("RELEVANT PAPER CONTENT:\n");
+        for (int i = 0; i < relevantChunks.size(); i++) {
+            ContentChunk chunk = relevantChunks.get(i);
+            prompt.append("--- Content ")
+                    .append(i + 1)
+                    .append(" (")
+                    .append(chunk.getSource())
+                    .append(") ---\n");
+            prompt.append(chunk.getContent()).append("\n\n");
+        }
+
+        // Current question
+        prompt.append("CURRENT QUESTION:\n");
+        prompt.append(currentQuestion).append("\n\n");
+
+        // Final instructions
+        prompt.append("RESPONSE INSTRUCTIONS:\n");
+        if (selectedText != null && !selectedText.trim().isEmpty()) {
+            prompt.append("- PRIORITY: Focus primarily on the selected text provided above\n");
+            prompt.append("- Provide a comprehensive explanation of the selected content\n");
+            prompt.append("- Explain the context and significance of the selected text within the paper\n");
+            prompt.append("- Connect the selected text to other relevant parts of the paper if applicable\n");
+        }
+        prompt.append("- Provide a detailed, comprehensive response (aim for 200-300+ words)\n");
+        prompt.append("- Use clear structure with appropriate formatting\n");
+        prompt.append("- Reference specific figures, tables, equations, or sections when relevant\n");
+        prompt.append("- If explaining methodology, include steps and reasoning\n");
+        prompt.append("- If discussing results, include implications and significance\n");
+        prompt.append("- Maintain academic rigor while being accessible\n");
+        prompt.append(
+                "- If the selected text or question refers to specific elements not provided, state what additional information would be needed\n\n");
+
+        prompt.append("Please provide your comprehensive response:\n");
+
+        return prompt.toString();
     }
 
     /**

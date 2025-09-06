@@ -52,6 +52,9 @@ public class PaperChatResponse {
         @Schema(description = "Tables referenced in the response")
         private List<String> tablesReferenced;
 
+        @Schema(description = "Equations referenced in the response")
+        private List<String> equationsUsed;
+
         @Schema(description = "Page numbers referenced")
         private List<Integer> pagesReferenced;
 
@@ -63,5 +66,8 @@ public class PaperChatResponse {
 
         @Schema(description = "Whether specific references were found in the question")
         private Boolean hadSpecificReferences;
+
+        @Schema(description = "Source descriptions for the content used")
+        private List<String> contentSources;
     }
 }

@@ -35,4 +35,31 @@ public class PaperChatRequest {
 
     @Schema(description = "Specific sections to focus on (optional)")
     private java.util.List<String> focusSections;
+
+    @Schema(
+            description = "Selected text from the paper for context",
+            example = "This approach shows significant improvement...")
+    private String selectedText;
+
+    @Schema(description = "Selection context information")
+    private SelectionContext selectionContext;
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(description = "Context information about text selection")
+    public static class SelectionContext {
+        @Schema(description = "Start position of selection")
+        private Integer from;
+
+        @Schema(description = "End position of selection")
+        private Integer to;
+
+        @Schema(description = "Page number where selection was made")
+        private Integer pageNumber;
+
+        @Schema(description = "Section title containing the selection")
+        private String sectionTitle;
+    }
 }
