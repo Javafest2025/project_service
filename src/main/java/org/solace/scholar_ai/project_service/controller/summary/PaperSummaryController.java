@@ -35,11 +35,25 @@ public class PaperSummaryController {
 
         // Check if summary already exists
         if (summaryRepository.findByPaperId(paperId).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null); // Summary already exists
+            log.info("Summary already exists for paper: {}, returning existing summary", paperId);
+            PaperSummary existingSummary = summaryRepository.findByPaperId(paperId).get();
+            return ResponseEntity.ok(PaperSummaryResponseDto.fromEntity(existingSummary));
         }
 
-        PaperSummary summary = summaryGenerationService.generateSummary(paperId);
-        return ResponseEntity.ok(PaperSummaryResponseDto.fromEntity(summary));
+        try {
+            PaperSummary summary = summaryGenerationService.generateSummary(paperId);
+            return ResponseEntity.ok(PaperSummaryResponseDto.fromEntity(summary));
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            // Handle race condition: another process created the summary while we were
+            // generating
+            log.info("Race condition detected for paper: {}, another process created the summary", paperId);
+            if (summaryRepository.findByPaperId(paperId).isPresent()) {
+                PaperSummary existingSummary = summaryRepository.findByPaperId(paperId).get();
+                return ResponseEntity.ok(PaperSummaryResponseDto.fromEntity(existingSummary));
+            }
+            // If summary still doesn't exist, re-throw the exception
+            throw e;
+        }
     }
 
     @Operation(summary = "Regenerate summary for a paper")
@@ -106,6 +120,24 @@ public class PaperSummaryController {
             log.error("Error checking summarization status for paper: {}", paperId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to check summarization status: " + e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "Check if paper is summarized")
+    @GetMapping("/summarized")
+    public ResponseEntity<Boolean> isPaperSummarized(@PathVariable UUID paperId) {
+        log.info("Checking if paper is summarized for paper ID: {}", paperId);
+
+        try {
+            Paper paper = paperRepository
+                    .findById(paperId)
+                    .orElseThrow(() -> new RuntimeException("Paper not found: " + paperId));
+
+            Boolean isSummarized = paper.getIsSummarized();
+            return ResponseEntity.ok(isSummarized != null ? isSummarized : false);
+        } catch (Exception e) {
+            log.error("Error checking if paper is summarized for paper: {}", paperId, e);
+            return ResponseEntity.ok(false);
         }
     }
 }
