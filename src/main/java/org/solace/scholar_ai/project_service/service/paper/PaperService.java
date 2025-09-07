@@ -1,9 +1,13 @@
 package org.solace.scholar_ai.project_service.service.paper;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solace.scholar_ai.project_service.dto.paper.CreatePaperDto;
@@ -129,5 +133,48 @@ public class PaperService {
         log.info("Fetching papers by venue: {}", venue);
         List<Paper> papers = paperRepository.findByVenueNameContainingIgnoreCase(venue);
         return paperMapper.toDtoList(papers);
+    }
+
+    public Map<String, Object> getStructuredFacts(UUID paperId) {
+        log.info("📄 Getting structured facts for paper: {}", paperId);
+
+        Optional<Paper> paperOptional = paperRepository.findById(paperId);
+
+        if (paperOptional.isEmpty()) {
+            log.warn("❌ Paper not found: {}", paperId);
+            throw new RuntimeException("Paper not found");
+        }
+
+        Paper paper = paperOptional.get();
+
+        // Extract authors
+        List<String> authors = paper.getPaperAuthors().stream()
+                .map(paperAuthor -> {
+                    if (paperAuthor.getAuthor() != null) {
+                        return paperAuthor.getAuthor().getName();
+                    } else {
+                        // If no author entity is available, return a placeholder
+                        return "Unknown Author";
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        // Create response structure
+        Map<String, Object> data = new HashMap<>();
+        data.put("title", paper.getTitle());
+        data.put("authors", authors);
+        data.put("abstract", paper.getAbstractText());
+        data.put("doi", paper.getDoi());
+        data.put("publicationDate", paper.getPublicationDate());
+        data.put("source", paper.getSource());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", data);
+        response.put("status", "success");
+
+        log.info("✅ Retrieved structured facts for paper '{}' with {} authors", paper.getTitle(), authors.size());
+
+        return response;
     }
 }

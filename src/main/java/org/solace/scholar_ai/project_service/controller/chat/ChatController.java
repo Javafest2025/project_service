@@ -40,7 +40,7 @@ public class ChatController {
                     .message(message)
                     .data(executionResult)
                     .commandType(parsedCommand.getCommandType().toString())
-                    .timestamp(LocalDateTime.now())
+                    .timestamp(LocalDateTime.now().toString())
                     .build();
 
             return ResponseEntity.ok(response);
@@ -51,7 +51,7 @@ public class ChatController {
                     .message("I encountered an error processing your request. Please try again.")
                     .data(Map.of("error", e.getMessage()))
                     .commandType("ERROR")
-                    .timestamp(LocalDateTime.now())
+                    .timestamp(LocalDateTime.now().toString())
                     .build();
 
             return ResponseEntity.ok(errorResponse);

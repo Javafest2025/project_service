@@ -122,4 +122,9 @@ public class Author {
     // Many-to-many relationship with papers through PaperAuthor
     @OneToMany(mappedBy = "author", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<PaperAuthor> paperAuthors = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        return name != null ? name : "Unknown Author";
+    }
 }

@@ -20,8 +20,8 @@ import org.solace.scholar_ai.project_service.repository.chat.ChatMessageReposito
 import org.solace.scholar_ai.project_service.repository.chat.ChatSessionRepository;
 import org.solace.scholar_ai.project_service.repository.paper.PaperAuthorRepository;
 import org.solace.scholar_ai.project_service.repository.paper.PaperRepository;
-import org.solace.scholar_ai.project_service.service.ai.GeminiService;
 import org.solace.scholar_ai.project_service.service.chat.QueryRequirementAnalysisService.DataRequirement;
+import org.solace.scholar_ai.project_service.service.summary.GeminiService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -104,7 +104,12 @@ public class EnhancedPaperContextChatService {
             // 9. Generate AI response with standard parameters
             String aiResponse;
             try {
-                aiResponse = geminiService.generateContent(optimizedPrompt);
+                aiResponse = geminiService.generate(
+                        optimizedPrompt,
+                        org.solace.scholar_ai.project_service.service.summary.GeminiService.GenerationConfig.builder()
+                                .temperature(0.3)
+                                .maxOutputTokens(2000)
+                                .build());
                 if (aiResponse == null || aiResponse.trim().isEmpty()) {
                     throw new RuntimeException("AI service returned empty response");
                 }

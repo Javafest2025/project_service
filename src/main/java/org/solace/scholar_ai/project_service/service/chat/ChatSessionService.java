@@ -22,7 +22,7 @@ import org.solace.scholar_ai.project_service.model.chat.ChatSession;
 import org.solace.scholar_ai.project_service.repository.chat.ChatMessageRepository;
 import org.solace.scholar_ai.project_service.repository.chat.ChatSessionRepository;
 import org.solace.scholar_ai.project_service.repository.paper.PaperRepository;
-import org.solace.scholar_ai.project_service.service.ai.GeminiService;
+import org.solace.scholar_ai.project_service.service.summary.GeminiService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -217,7 +217,12 @@ public class ChatSessionService {
                             + "Return only the title, no quotes or extra text.",
                     truncateMessage(initialMessage), truncateMessage(aiResponse));
 
-            String title = geminiService.generateResponse(prompt, 0.3, 100);
+            String title = geminiService.generate(
+                    prompt,
+                    org.solace.scholar_ai.project_service.service.summary.GeminiService.GenerationConfig.builder()
+                            .temperature(0.3)
+                            .maxOutputTokens(100)
+                            .build());
 
             // Clean and validate title
             title = title.trim().replaceAll("^[\"']|[\"']$", ""); // Remove quotes
@@ -324,5 +329,185 @@ public class ChatSessionService {
      */
     private String truncateMessage(String message) {
         return message != null && message.length() > 100 ? message.substring(0, 97) + "..." : message;
+    }
+
+    // ============ NEW METHODS FOR CONTROLLER INTEGRATION ============
+
+    /**
+     * Create a new chat session from ChatRequest
+     */
+    @Transactional
+    public org.solace.scholar_ai.project_service.dto.chat.ChatSession createSession(
+            String paperId, org.solace.scholar_ai.project_service.dto.chat.ChatRequest request) {
+        try {
+            UUID paperUuid = UUID.fromString(paperId);
+
+            CreateChatSessionRequest sessionRequest = CreateChatSessionRequest.builder()
+                    .userId(request.getUserId() != null ? request.getUserId() : "anonymous")
+                    .initialMessage(request.getMessage())
+                    .customTitle(request.getSessionTitle())
+                    .selectedText(request.getSelectedText())
+                    .selectionContext(
+                            request.getSelectionContext() != null
+                                    ? org.solace.scholar_ai.project_service.dto.request.chat.PaperChatRequest
+                                            .SelectionContext.builder()
+                                            .from(request.getSelectionContext().getFrom())
+                                            .to(request.getSelectionContext().getTo())
+                                            .pageNumber(request.getSelectionContext()
+                                                    .getPageNumber())
+                                            .sectionTitle(request.getSelectionContext()
+                                                    .getSectionTitle())
+                                            .build()
+                                    : null)
+                    .build();
+
+            ChatSessionResponse response = createChatSession(paperUuid, sessionRequest);
+
+            return org.solace.scholar_ai.project_service.dto.chat.ChatSession.builder()
+                    .sessionId(response.getSessionId().toString())
+                    .paperId(paperId)
+                    .title(response.getTitle())
+                    .createdAt(response.getCreatedAt().toString())
+                    .lastMessageAt(response.getLastMessageAt().toString())
+                    .messageCount(response.getMessageCount())
+                    .build();
+
+        } catch (Exception e) {
+            log.error("Error creating session for paper {}: {}", paperId, e.getMessage(), e);
+            // Return a basic session structure
+            return org.solace.scholar_ai.project_service.dto.chat.ChatSession.builder()
+                    .sessionId(UUID.randomUUID().toString())
+                    .paperId(paperId)
+                    .title(request.getSessionTitle() != null ? request.getSessionTitle() : "New Chat Session")
+                    .createdAt(java.time.LocalDateTime.now().toString())
+                    .lastMessageAt(java.time.LocalDateTime.now().toString())
+                    .messageCount(0)
+                    .build();
+        }
+    }
+
+    /**
+     * Send a message to an existing session
+     */
+    @Transactional
+    public org.solace.scholar_ai.project_service.dto.chat.ChatResponse sendMessage(
+            String paperId, String sessionId, org.solace.scholar_ai.project_service.dto.chat.ChatRequest request) {
+        try {
+            UUID paperUuid = UUID.fromString(paperId);
+            UUID sessionUuid = UUID.fromString(sessionId);
+
+            PaperChatRequest chatRequest = PaperChatRequest.builder()
+                    .sessionId(sessionUuid)
+                    .message(request.getMessage())
+                    .selectedText(request.getSelectedText())
+                    .selectionContext(
+                            request.getSelectionContext() != null
+                                    ? org.solace.scholar_ai.project_service.dto.request.chat.PaperChatRequest
+                                            .SelectionContext.builder()
+                                            .from(request.getSelectionContext().getFrom())
+                                            .to(request.getSelectionContext().getTo())
+                                            .pageNumber(request.getSelectionContext()
+                                                    .getPageNumber())
+                                            .sectionTitle(request.getSelectionContext()
+                                                    .getSectionTitle())
+                                            .build()
+                                    : null)
+                    .build();
+
+            PaperChatResponse response = paperContextChatService.chatWithPaper(paperUuid, chatRequest);
+
+            return org.solace.scholar_ai.project_service.dto.chat.ChatResponse.builder()
+                    .sessionId(sessionId)
+                    .response(response.getResponse())
+                    .timestamp(java.time.LocalDateTime.now().toString())
+                    .success(true)
+                    .build();
+
+        } catch (Exception e) {
+            log.error("Error sending message to session {} for paper {}: {}", sessionId, paperId, e.getMessage(), e);
+
+            return org.solace.scholar_ai.project_service.dto.chat.ChatResponse.builder()
+                    .sessionId(sessionId)
+                    .response("I'm sorry, I encountered an error processing your request. Please try again.")
+                    .timestamp(java.time.LocalDateTime.now().toString())
+                    .success(false)
+                    .error(e.getMessage())
+                    .build();
+        }
+    }
+
+    /**
+     * Get all chat sessions for a paper
+     */
+    public java.util.List<org.solace.scholar_ai.project_service.dto.chat.ChatSession> getChatSessions(String paperId) {
+        try {
+            UUID paperUuid = UUID.fromString(paperId);
+            List<ChatSessionResponse> sessions = getChatSessionsForPaper(paperUuid);
+
+            return sessions.stream()
+                    .map(session -> org.solace.scholar_ai.project_service.dto.chat.ChatSession.builder()
+                            .sessionId(session.getSessionId().toString())
+                            .paperId(paperId)
+                            .title(session.getTitle())
+                            .createdAt(session.getCreatedAt().toString())
+                            .lastMessageAt(session.getLastMessageAt().toString())
+                            .messageCount(session.getMessageCount())
+                            .build())
+                    .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            log.error("Error getting sessions for paper {}: {}", paperId, e.getMessage(), e);
+            return List.of();
+        }
+    }
+
+    /**
+     * Get a specific chat session with message history
+     */
+    public java.util.Map<String, Object> getChatSession(String paperId, String sessionId) {
+        try {
+            UUID paperUuid = UUID.fromString(paperId);
+            UUID sessionUuid = UUID.fromString(sessionId);
+
+            ChatSessionHistoryResponse sessionHistory = getChatSessionHistory(sessionUuid);
+
+            List<org.solace.scholar_ai.project_service.dto.chat.ChatMessage> messages =
+                    sessionHistory.getMessages().stream()
+                            .map(msg -> org.solace.scholar_ai.project_service.dto.chat.ChatMessage.builder()
+                                    .id(msg.getMessageId().toString())
+                                    .role(msg.getRole().toString())
+                                    .content(msg.getContent())
+                                    .timestamp(msg.getTimestamp().toString())
+                                    .build())
+                            .collect(Collectors.toList());
+
+            return java.util.Map.of(
+                    "sessionId", sessionId,
+                    "paperId", paperId,
+                    "title", sessionHistory.getTitle(),
+                    "messages", messages,
+                    "createdAt", sessionHistory.getCreatedAt().toString(),
+                    "lastMessageAt", sessionHistory.getLastMessageAt().toString(),
+                    "messageCount", sessionHistory.getMessageCount());
+
+        } catch (Exception e) {
+            log.error("Error getting session {} for paper {}: {}", sessionId, paperId, e.getMessage(), e);
+
+            return java.util.Map.of(
+                    "sessionId",
+                    sessionId,
+                    "paperId",
+                    paperId,
+                    "title",
+                    "Chat Session",
+                    "messages",
+                    List.of(),
+                    "createdAt",
+                    java.time.LocalDateTime.now().toString(),
+                    "lastMessageAt",
+                    java.time.LocalDateTime.now().toString(),
+                    "messageCount",
+                    0);
+        }
     }
 }
