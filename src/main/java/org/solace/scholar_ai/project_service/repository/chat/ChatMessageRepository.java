@@ -23,6 +23,11 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, UUID> 
     List<ChatMessage> findBySessionIdOrderByTimestampDesc(UUID sessionId);
 
     /**
+     * Find the most recent message in a session
+     */
+    java.util.Optional<ChatMessage> findFirstBySessionIdOrderByTimestampDesc(UUID sessionId);
+
+    /**
      * Find messages within a time range
      */
     @Query(

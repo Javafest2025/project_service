@@ -25,17 +25,20 @@ public class ChatSession {
     private UUID paperId;
 
     @Column(name = "user_id")
-    private UUID userId; // Optional for authenticated users
+    private String userId; // Changed to String to match common user ID formats
 
-    @Column(name = "title", length = 200)
+    @Column(name = "title", length = 500)
     private String title;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private Instant createdAt;
 
-    @Column(name = "last_active")
-    private Instant lastActive;
+    @Column(name = "updated_at")
+    private Instant updatedAt;
+
+    @Column(name = "last_message_at")
+    private Instant lastMessageAt;
 
     @Column(name = "message_count")
     @Builder.Default
@@ -54,8 +57,16 @@ public class ChatSession {
         if (createdAt == null) {
             createdAt = Instant.now();
         }
-        if (lastActive == null) {
-            lastActive = Instant.now();
+        if (updatedAt == null) {
+            updatedAt = Instant.now();
         }
+        if (lastMessageAt == null) {
+            lastMessageAt = Instant.now();
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = Instant.now();
     }
 }

@@ -141,7 +141,8 @@ public class PaperContextChatServiceFixed {
                 .paperId(paperId)
                 .title(sessionTitle != null ? sessionTitle : "New Chat")
                 .createdAt(Instant.now())
-                .lastActive(Instant.now())
+                .lastMessageAt(Instant.now())
+                .updatedAt(Instant.now())
                 .messageCount(0)
                 .build();
 
@@ -179,7 +180,8 @@ public class PaperContextChatServiceFixed {
                 .build();
 
         session.setMessageCount(session.getMessageCount() + 1);
-        session.setLastActive(Instant.now());
+        session.setLastMessageAt(Instant.now());
+        session.setUpdatedAt(Instant.now());
         chatSessionRepository.save(session);
 
         return chatMessageRepository.save(assistantMessage);

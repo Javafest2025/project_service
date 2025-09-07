@@ -16,17 +16,17 @@ public interface ChatSessionRepository extends JpaRepository<ChatSession, UUID> 
     /**
      * Find active sessions for a specific paper
      */
-    List<ChatSession> findByPaperIdAndIsActiveTrueOrderByLastActiveDesc(UUID paperId);
+    List<ChatSession> findByPaperIdAndIsActiveTrueOrderByLastMessageAtDesc(UUID paperId);
 
     /**
      * Find sessions by user ID (if authentication is implemented)
      */
-    List<ChatSession> findByUserIdAndIsActiveTrueOrderByLastActiveDesc(UUID userId);
+    List<ChatSession> findByUserIdAndIsActiveTrueOrderByLastMessageAtDesc(String userId);
 
     /**
      * Find the most recent session for a paper
      */
-    Optional<ChatSession> findFirstByPaperIdAndIsActiveTrueOrderByLastActiveDesc(UUID paperId);
+    Optional<ChatSession> findFirstByPaperIdAndIsActiveTrueOrderByLastMessageAtDesc(UUID paperId);
 
     /**
      * Count active sessions for a paper
@@ -37,12 +37,13 @@ public interface ChatSessionRepository extends JpaRepository<ChatSession, UUID> 
     /**
      * Find sessions that haven't been active for a certain period (for cleanup)
      */
-    @Query("SELECT cs FROM ChatSession cs WHERE cs.lastActive < :cutoffTime AND cs.isActive = true")
+    @Query("SELECT cs FROM ChatSession cs WHERE cs.lastMessageAt < :cutoffTime AND cs.isActive = true")
     List<ChatSession> findInactiveSessions(@Param("cutoffTime") Instant cutoffTime);
 
     /**
-     * Update last active timestamp
+     * Update last message timestamp
      */
-    @Query("UPDATE ChatSession cs SET cs.lastActive = :timestamp WHERE cs.id = :sessionId")
-    void updateLastActive(@Param("sessionId") UUID sessionId, @Param("timestamp") Instant timestamp);
+    @Query(
+            "UPDATE ChatSession cs SET cs.lastMessageAt = :timestamp, cs.updatedAt = :timestamp WHERE cs.id = :sessionId")
+    void updateLastMessageAt(@Param("sessionId") UUID sessionId, @Param("timestamp") Instant timestamp);
 }

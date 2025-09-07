@@ -42,7 +42,6 @@ public class PaperContextChatService {
 
     // Configuration constants
     private static final int MAX_CONTEXT_CHUNKS = 8;
-    private static final int MAX_CHUNK_LENGTH = 1000;
     private static final int MAX_CONVERSATION_HISTORY = 3;
     private static final double RELEVANCE_THRESHOLD = 0.1;
 
@@ -151,7 +150,8 @@ public class PaperContextChatService {
                 .paperId(paperId)
                 .title(sessionTitle != null ? sessionTitle : "New Chat")
                 .createdAt(Instant.now())
-                .lastActive(Instant.now())
+                .lastMessageAt(Instant.now())
+                .updatedAt(Instant.now())
                 .messageCount(0)
                 .build();
 
@@ -189,7 +189,8 @@ public class PaperContextChatService {
                 .build();
 
         session.setMessageCount(session.getMessageCount() + 1);
-        session.setLastActive(Instant.now());
+        session.setLastMessageAt(Instant.now());
+        session.setUpdatedAt(Instant.now());
         chatSessionRepository.save(session);
 
         return chatMessageRepository.save(assistantMessage);
@@ -388,22 +389,6 @@ public class PaperContextChatService {
     }
 
     /**
-     * Calculate relevance score between content and question keywords
-     */
-    private double calculateRelevanceScore(String content, Set<String> questionKeywords) {
-        if (questionKeywords.isEmpty()) return 0.0;
-
-        String contentLower = content.toLowerCase();
-        long matchCount = questionKeywords.stream()
-                .mapToLong(keyword -> countOccurrences(contentLower, keyword))
-                .sum();
-
-        // Normalize by content length and keyword count
-        double score = (double) matchCount / Math.max(questionKeywords.size(), 1);
-        return Math.min(score, 1.0); // Cap at 1.0
-    }
-
-    /**
      * Calculate enhanced relevance score with selected text context
      */
     private double calculateEnhancedRelevanceScore(String content, Set<String> keywords, String selectedText) {
@@ -492,10 +477,6 @@ public class PaperContextChatService {
                         && extractKeywords(questionLower).stream()
                                 .anyMatch(keyword ->
                                         table.getCaption().toLowerCase().contains(keyword)));
-    }
-
-    private long countOccurrences(String text, String word) {
-        return Arrays.stream(text.split("\\W+")).filter(w -> w.equals(word)).count();
     }
 
     /**
@@ -605,105 +586,6 @@ public class PaperContextChatService {
     }
 
     /**
-     * Build optimized prompt for Gemini API
-     */
-    private String buildOptimizedPrompt(
-            PaperExtraction extraction,
-            List<ContentChunk> relevantChunks,
-            List<ChatMessage> recentHistory,
-            String currentQuestion) {
-        StringBuilder prompt = new StringBuilder();
-
-        // System instructions
-        prompt.append(
-                "You are a helpful academic research assistant. Answer questions about the research paper using ONLY the provided excerpts. ");
-        prompt.append("Be accurate, concise, and cite sources (page numbers/sections) when relevant. ");
-        prompt.append("If the answer isn't in the provided content, say so clearly.\n\n");
-
-        // Paper context
-        prompt.append("PAPER INFORMATION:\n");
-        prompt.append("Title: ").append(extraction.getTitle()).append("\n");
-        if (extraction.getAbstractText() != null) {
-            prompt.append("Abstract: ")
-                    .append(truncateText(extraction.getAbstractText(), 300))
-                    .append("\n");
-        }
-        prompt.append("Pages: ").append(extraction.getPageCount()).append("\n\n");
-
-        // Relevant content chunks
-        prompt.append("RELEVANT CONTENT:\n");
-        for (int i = 0; i < relevantChunks.size(); i++) {
-            ContentChunk chunk = relevantChunks.get(i);
-            prompt.append("[")
-                    .append(i + 1)
-                    .append("] ")
-                    .append(chunk.getSource())
-                    .append(":\n");
-            prompt.append(truncateText(chunk.getContent(), MAX_CHUNK_LENGTH)).append("\n\n");
-        }
-
-        // Recent conversation history
-        if (!recentHistory.isEmpty()) {
-            prompt.append("CONVERSATION HISTORY:\n");
-            for (int i = recentHistory.size() - 1; i >= 0; i--) {
-                ChatMessage msg = recentHistory.get(i);
-                String role = msg.getRole() == ChatMessage.Role.USER ? "User" : "Assistant";
-                prompt.append(role)
-                        .append(": ")
-                        .append(truncateText(msg.getContent(), 200))
-                        .append("\n");
-            }
-            prompt.append("\n");
-        }
-
-        // Current question
-        prompt.append("CURRENT QUESTION: ").append(currentQuestion).append("\n\n");
-        prompt.append("Please provide a helpful answer based on the information above:");
-
-        return prompt.toString();
-    }
-
-    /**
-     * Build the final chat response
-     */
-    private PaperChatResponse buildChatResponse(
-            ChatSession session,
-            ChatMessage assistantMessage,
-            List<ContentChunk> relevantChunks,
-            PaperExtraction extraction) {
-
-        PaperChatResponse.ContextMetadata contextMetadata = PaperChatResponse.ContextMetadata.builder()
-                .sectionsUsed(relevantChunks.stream()
-                        .filter(chunk -> "section".equals(chunk.getType()))
-                        .map(ContentChunk::getSource)
-                        .collect(Collectors.toList()))
-                .figuresReferenced(relevantChunks.stream()
-                        .filter(chunk -> "figure".equals(chunk.getType()))
-                        .map(ContentChunk::getSource)
-                        .collect(Collectors.toList()))
-                .tablesReferenced(relevantChunks.stream()
-                        .filter(chunk -> "table".equals(chunk.getType()))
-                        .map(ContentChunk::getSource)
-                        .collect(Collectors.toList()))
-                .pagesReferenced(relevantChunks.stream()
-                        .map(ContentChunk::getPageNumber)
-                        .filter(Objects::nonNull)
-                        .distinct()
-                        .sorted()
-                        .collect(Collectors.toList()))
-                .confidenceScore(calculateConfidenceScore(relevantChunks))
-                .build();
-
-        return PaperChatResponse.builder()
-                .sessionId(session.getId())
-                .response(assistantMessage.getContent())
-                .context(contextMetadata)
-                .timestamp(assistantMessage.getTimestamp())
-                .success(true)
-                .build();
-    }
-
-    /**
      * Calculate confidence score based on relevance of retrieved chunks
      */
     private Double calculateConfidenceScore(List<ContentChunk> chunks) {
@@ -777,9 +659,6 @@ public class PaperContextChatService {
                 .filter(chunk -> "equation".equals(chunk.getType()))
                 .map(ContentChunk::getSource)
                 .collect(Collectors.toList());
-
-        // Check if selected text was used
-        boolean selectedTextUsed = relevantChunks.stream().anyMatch(chunk -> "selected_text".equals(chunk.getType()));
 
         // Build comprehensive content sources
         List<String> contentSources = new ArrayList<>();

@@ -134,7 +134,8 @@ public class PaperContextChatServiceV2 {
                 .paperId(paperId)
                 .title("New Chat")
                 .createdAt(Instant.now())
-                .lastActive(Instant.now())
+                .lastMessageAt(Instant.now())
+                .updatedAt(Instant.now())
                 .messageCount(0)
                 .build();
 
@@ -172,7 +173,7 @@ public class PaperContextChatServiceV2 {
                 .build();
 
         session.setMessageCount(session.getMessageCount() + 1);
-        session.setLastActive(Instant.now());
+        session.setLastMessageAt(Instant.now());
         chatSessionRepository.save(session);
 
         return chatMessageRepository.save(assistantMessage);
@@ -190,7 +191,8 @@ public class PaperContextChatServiceV2 {
         Set<String> questionKeywords = extractKeywords(question.toLowerCase());
 
         // Check for specific references (pages, figures, sections)
-        SpecificReferences specificRefs = extractSpecificReferences(question);
+        // Extract specific references (currently unused - part of legacy functionality)
+        // SpecificReferences specificRefs = extractSpecificReferences(question);
 
         // 1. Process sections with content from paragraphs
         extraction.getSections().forEach(section -> {
@@ -352,6 +354,8 @@ public class PaperContextChatServiceV2 {
     /**
      * Extract specific references from question
      */
+    // Legacy method - currently unused but kept for backwards compatibility
+    @SuppressWarnings("unused")
     private SpecificReferences extractSpecificReferences(String question) {
         SpecificReferences refs = new SpecificReferences();
 

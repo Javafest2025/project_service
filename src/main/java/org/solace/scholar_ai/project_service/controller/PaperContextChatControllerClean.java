@@ -21,11 +21,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/papers")
+@RequestMapping("/api/papers/legacy")
 @RequiredArgsConstructor
 @Slf4j
 @Validated
-@Tag(name = "Paper Context Chat", description = "AI-powered contextual Q&A for research papers")
+@Tag(name = "Paper Context Chat (Legacy)", description = "Legacy AI-powered contextual Q&A for research papers")
 public class PaperContextChatControllerClean {
 
     private final PaperContextChatService paperContextChatService;
