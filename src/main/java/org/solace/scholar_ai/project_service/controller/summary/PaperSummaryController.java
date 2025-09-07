@@ -140,4 +140,26 @@ public class PaperSummaryController {
             return ResponseEntity.ok(false);
         }
     }
+
+    @Operation(summary = "Get summarization status only")
+    @GetMapping("/status-only")
+    public ResponseEntity<Map<String, String>> getSummarizationStatusOnly(@PathVariable UUID paperId) {
+        log.info("Getting summarization status only for paper ID: {}", paperId);
+
+        try {
+            Paper paper = paperRepository
+                    .findById(paperId)
+                    .orElseThrow(() -> new RuntimeException("Paper not found: " + paperId));
+
+            String status = paper.getSummarizationStatus();
+            Map<String, String> response = new HashMap<>();
+            response.put("status", status != null ? status : "UNKNOWN");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Error getting summarization status for paper: {}", paperId, e);
+            Map<String, String> response = new HashMap<>();
+            response.put("status", "UNKNOWN");
+            return ResponseEntity.ok(response);
+        }
+    }
 }

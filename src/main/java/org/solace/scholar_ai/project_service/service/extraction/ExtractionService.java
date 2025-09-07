@@ -255,6 +255,24 @@ public class ExtractionService {
     }
 
     /**
+     * Get extraction status only for a paper
+     *
+     * @param paperId The paper ID
+     * @return String with current extraction status
+     */
+    @Transactional(readOnly = true)
+    public String getExtractionStatusOnly(String paperId) {
+        log.info("Getting extraction status only for paper ID: {}", paperId);
+
+        Paper paper = paperRepository
+                .findById(UUID.fromString(paperId))
+                .orElseThrow(() -> new CustomException(
+                        "Paper not found with ID: " + paperId, HttpStatus.NOT_FOUND, ErrorCode.RESOURCE_NOT_FOUND));
+
+        return paper.getExtractionStatus() != null ? paper.getExtractionStatus() : "UNKNOWN";
+    }
+
+    /**
      * Check if a paper has been successfully extracted
      *
      * @param paperId The paper ID
