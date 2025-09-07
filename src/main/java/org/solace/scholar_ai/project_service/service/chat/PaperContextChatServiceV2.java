@@ -18,7 +18,7 @@ import org.solace.scholar_ai.project_service.model.paper.Paper;
 import org.solace.scholar_ai.project_service.repository.chat.ChatMessageRepository;
 import org.solace.scholar_ai.project_service.repository.chat.ChatSessionRepository;
 import org.solace.scholar_ai.project_service.repository.paper.PaperRepository;
-import org.solace.scholar_ai.project_service.service.ai.GeminiService;
+import org.solace.scholar_ai.project_service.service.ai.GeminiGeneralService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +35,7 @@ public class PaperContextChatServiceV2 {
     private final PaperRepository paperRepository;
     private final ChatSessionRepository chatSessionRepository;
     private final ChatMessageRepository chatMessageRepository;
-    private final GeminiService geminiService;
+    private final GeminiGeneralService geminiService;
 
     // Constants for RAG optimization
     private static final int MAX_CONTEXT_CHUNKS = 5;

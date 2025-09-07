@@ -130,28 +130,28 @@ public class PaperSummaryGenerationService {
         List<ExtractionContext.SectionContent> sections = processSections(extraction.getSections());
 
         // Process figures
-        List<ExtractionContext.FigureContent> figures = extraction.getFigures().stream().map(this::mapFigure)
-                .collect(Collectors.toList());
+        List<ExtractionContext.FigureContent> figures =
+                extraction.getFigures().stream().map(this::mapFigure).collect(Collectors.toList());
 
         // Process tables
-        List<ExtractionContext.TableContent> tables = extraction.getTables().stream().map(this::mapTable)
-                .collect(Collectors.toList());
+        List<ExtractionContext.TableContent> tables =
+                extraction.getTables().stream().map(this::mapTable).collect(Collectors.toList());
 
         // Process equations
-        List<ExtractionContext.EquationContent> equations = extraction.getEquations().stream().map(this::mapEquation)
-                .collect(Collectors.toList());
+        List<ExtractionContext.EquationContent> equations =
+                extraction.getEquations().stream().map(this::mapEquation).collect(Collectors.toList());
 
         // Process code blocks
-        List<ExtractionContext.CodeBlockContent> codeBlocks = extraction.getCodeBlocks().stream()
-                .map(this::mapCodeBlock).collect(Collectors.toList());
+        List<ExtractionContext.CodeBlockContent> codeBlocks =
+                extraction.getCodeBlocks().stream().map(this::mapCodeBlock).collect(Collectors.toList());
 
         // Process references
-        List<ExtractionContext.ReferenceContent> references = extraction.getReferences().stream()
-                .map(this::mapReference).collect(Collectors.toList());
+        List<ExtractionContext.ReferenceContent> references =
+                extraction.getReferences().stream().map(this::mapReference).collect(Collectors.toList());
 
         // Process entities
-        List<ExtractionContext.EntityContent> entities = extraction.getEntities().stream().map(this::mapEntity)
-                .collect(Collectors.toList());
+        List<ExtractionContext.EntityContent> entities =
+                extraction.getEntities().stream().map(this::mapEntity).collect(Collectors.toList());
 
         return ExtractionContext.builder()
                 .title(extraction.getTitle())
@@ -175,20 +175,20 @@ public class PaperSummaryGenerationService {
         log.debug("Generating summary with Gemini for paper: {}", extraction.getTitle());
 
         // Create parallel tasks for different aspects
-        CompletableFuture<Map<String, Object>> quickTakeFuture = CompletableFuture
-                .supplyAsync(() -> generateQuickTake(context), executorService);
+        CompletableFuture<Map<String, Object>> quickTakeFuture =
+                CompletableFuture.supplyAsync(() -> generateQuickTake(context), executorService);
 
-        CompletableFuture<Map<String, Object>> methodsFuture = CompletableFuture
-                .supplyAsync(() -> generateMethodsAndData(context), executorService);
+        CompletableFuture<Map<String, Object>> methodsFuture =
+                CompletableFuture.supplyAsync(() -> generateMethodsAndData(context), executorService);
 
-        CompletableFuture<Map<String, Object>> reproducibilityFuture = CompletableFuture
-                .supplyAsync(() -> generateReproducibility(context), executorService);
+        CompletableFuture<Map<String, Object>> reproducibilityFuture =
+                CompletableFuture.supplyAsync(() -> generateReproducibility(context), executorService);
 
-        CompletableFuture<Map<String, Object>> ethicsFuture = CompletableFuture
-                .supplyAsync(() -> generateEthicsAndCompliance(context), executorService);
+        CompletableFuture<Map<String, Object>> ethicsFuture =
+                CompletableFuture.supplyAsync(() -> generateEthicsAndCompliance(context), executorService);
 
-        CompletableFuture<Map<String, Object>> contextImpactFuture = CompletableFuture
-                .supplyAsync(() -> generateContextAndImpact(context), executorService);
+        CompletableFuture<Map<String, Object>> contextImpactFuture =
+                CompletableFuture.supplyAsync(() -> generateContextAndImpact(context), executorService);
 
         // Wait for all tasks and combine results
         CompletableFuture<Void> allFutures = CompletableFuture.allOf(
@@ -647,7 +647,8 @@ public class PaperSummaryGenerationService {
             // generating
             log.info("Race condition detected during save for paper: {}, checking for existing summary", paper.getId());
             if (summaryRepository.findByPaperId(paper.getId()).isPresent()) {
-                PaperSummary existingSummary = summaryRepository.findByPaperId(paper.getId()).get();
+                PaperSummary existingSummary =
+                        summaryRepository.findByPaperId(paper.getId()).get();
                 log.info("Found existing summary for paper: {}, returning it", paper.getId());
                 return existingSummary;
             }
@@ -723,15 +724,15 @@ public class PaperSummaryGenerationService {
         if (obj instanceof List) {
             return ((List<Map<String, Object>>) obj)
                     .stream()
-                    .map(map -> PaperSummaryDto.Finding.builder()
-                            .task(convertToString(map.get("task")))
-                            .metric(convertToString(map.get("metric")))
-                            .value(convertToString(map.get("value")))
-                            .comparator(convertToString(map.get("comparator")))
-                            .delta(convertToString(map.get("delta")))
-                            .significance(convertToString(map.get("significance")))
-                            .build())
-                    .collect(Collectors.toList());
+                            .map(map -> PaperSummaryDto.Finding.builder()
+                                    .task(convertToString(map.get("task")))
+                                    .metric(convertToString(map.get("metric")))
+                                    .value(convertToString(map.get("value")))
+                                    .comparator(convertToString(map.get("comparator")))
+                                    .delta(convertToString(map.get("delta")))
+                                    .significance(convertToString(map.get("significance")))
+                                    .build())
+                            .collect(Collectors.toList());
         }
         return new ArrayList<>();
     }
@@ -742,16 +743,16 @@ public class PaperSummaryGenerationService {
         if (obj instanceof List) {
             return ((List<Map<String, Object>>) obj)
                     .stream()
-                    .map(map -> PaperSummaryDto.DatasetInfo.builder()
-                            .name(convertToString(map.get("name")))
-                            .domain(convertToString(map.get("domain")))
-                            .size(convertToString(map.get("size")))
-                            .splitInfo(convertToString(map.get("split_info")))
-                            .license(convertToString(map.get("license")))
-                            .url(convertToString(map.get("url")))
-                            .description(convertToString(map.get("description")))
-                            .build())
-                    .collect(Collectors.toList());
+                            .map(map -> PaperSummaryDto.DatasetInfo.builder()
+                                    .name(convertToString(map.get("name")))
+                                    .domain(convertToString(map.get("domain")))
+                                    .size(convertToString(map.get("size")))
+                                    .splitInfo(convertToString(map.get("split_info")))
+                                    .license(convertToString(map.get("license")))
+                                    .url(convertToString(map.get("url")))
+                                    .description(convertToString(map.get("description")))
+                                    .build())
+                            .collect(Collectors.toList());
         }
         return new ArrayList<>();
     }
@@ -777,13 +778,13 @@ public class PaperSummaryGenerationService {
         if (obj instanceof List) {
             return ((List<Map<String, Object>>) obj)
                     .stream()
-                    .map(map -> PaperSummaryDto.MetricInfo.builder()
-                            .name(convertToString(map.get("name")))
-                            .definition(convertToString(map.get("definition")))
-                            .formula(convertToString(map.get("formula")))
-                            .interpretation(convertToString(map.get("interpretation")))
-                            .build())
-                    .collect(Collectors.toList());
+                            .map(map -> PaperSummaryDto.MetricInfo.builder()
+                                    .name(convertToString(map.get("name")))
+                                    .definition(convertToString(map.get("definition")))
+                                    .formula(convertToString(map.get("formula")))
+                                    .interpretation(convertToString(map.get("interpretation")))
+                                    .build())
+                            .collect(Collectors.toList());
         }
         return new ArrayList<>();
     }
@@ -856,13 +857,13 @@ public class PaperSummaryGenerationService {
         if (obj instanceof List) {
             return ((List<Map<String, Object>>) obj)
                     .stream()
-                    .map(map -> PaperSummaryDto.RelatedWork.builder()
-                            .citation((String) map.get("citation"))
-                            .relation((String) map.get("relation"))
-                            .description((String) map.get("description"))
-                            .year(convertToString(map.get("year")))
-                            .build())
-                    .collect(Collectors.toList());
+                            .map(map -> PaperSummaryDto.RelatedWork.builder()
+                                    .citation((String) map.get("citation"))
+                                    .relation((String) map.get("relation"))
+                                    .description((String) map.get("description"))
+                                    .year(convertToString(map.get("year")))
+                                    .build())
+                            .collect(Collectors.toList());
         }
         return new ArrayList<>();
     }

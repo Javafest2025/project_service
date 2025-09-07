@@ -36,7 +36,8 @@ public class PaperSummaryController {
         // Check if summary already exists
         if (summaryRepository.findByPaperId(paperId).isPresent()) {
             log.info("Summary already exists for paper: {}, returning existing summary", paperId);
-            PaperSummary existingSummary = summaryRepository.findByPaperId(paperId).get();
+            PaperSummary existingSummary =
+                    summaryRepository.findByPaperId(paperId).get();
             return ResponseEntity.ok(PaperSummaryResponseDto.fromEntity(existingSummary));
         }
 
@@ -48,7 +49,8 @@ public class PaperSummaryController {
             // generating
             log.info("Race condition detected for paper: {}, another process created the summary", paperId);
             if (summaryRepository.findByPaperId(paperId).isPresent()) {
-                PaperSummary existingSummary = summaryRepository.findByPaperId(paperId).get();
+                PaperSummary existingSummary =
+                        summaryRepository.findByPaperId(paperId).get();
                 return ResponseEntity.ok(PaperSummaryResponseDto.fromEntity(existingSummary));
             }
             // If summary still doesn't exist, re-throw the exception
