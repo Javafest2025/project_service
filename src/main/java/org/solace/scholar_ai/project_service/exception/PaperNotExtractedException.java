@@ -4,7 +4,8 @@ import java.util.UUID;
 import lombok.Getter;
 
 /**
- * Exception thrown when trying to chat with a paper that hasn't been extracted yet
+ * Exception thrown when attempting to generate a summary for a paper that
+ * hasn't been extracted yet
  */
 @Getter
 public class PaperNotExtractedException extends RuntimeException {

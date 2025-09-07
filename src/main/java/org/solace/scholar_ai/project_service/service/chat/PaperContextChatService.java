@@ -22,7 +22,7 @@ import org.solace.scholar_ai.project_service.model.paper.Paper;
 import org.solace.scholar_ai.project_service.repository.chat.ChatMessageRepository;
 import org.solace.scholar_ai.project_service.repository.chat.ChatSessionRepository;
 import org.solace.scholar_ai.project_service.repository.paper.PaperRepository;
-import org.solace.scholar_ai.project_service.service.ai.GeminiService;
+import org.solace.scholar_ai.project_service.service.ai.GeminiGeneralService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +38,7 @@ public class PaperContextChatService {
     private final PaperRepository paperRepository;
     private final ChatSessionRepository chatSessionRepository;
     private final ChatMessageRepository chatMessageRepository;
-    private final GeminiService geminiService;
+    private final GeminiGeneralService geminiService;
 
     // Configuration constants
     private static final int MAX_CONTEXT_CHUNKS = 8;
@@ -85,8 +85,8 @@ public class PaperContextChatService {
                     request.getSelectedText());
 
             // 7. Generate detailed response using Gemini
-            String aiResponse =
-                    geminiService.generateResponse(prompt, 0.3, 3000); // Lower temperature, higher token limit
+            String aiResponse = geminiService.generateResponse(prompt, 0.3, 3000); // Lower temperature, higher token
+            // limit
 
             // 8. Store assistant response
             ChatMessage assistantMessage = storeAssistantMessage(session, aiResponse);
@@ -197,7 +197,8 @@ public class PaperContextChatService {
     }
 
     /**
-     * Retrieve relevant content chunks using enhanced RAG approach with selected text context
+     * Retrieve relevant content chunks using enhanced RAG approach with selected
+     * text context
      */
     private List<ContentChunk> retrieveRelevantContent(
             PaperExtraction extraction,
@@ -699,7 +700,8 @@ public class PaperContextChatService {
     }
 
     /**
-     * Build comprehensive prompt for enhanced AI responses with selected text context
+     * Build comprehensive prompt for enhanced AI responses with selected text
+     * context
      */
     private String buildComprehensivePrompt(
             PaperExtraction extraction,

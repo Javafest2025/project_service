@@ -15,6 +15,23 @@ import org.springframework.stereotype.Repository;
 public interface PaperExtractionRepository extends JpaRepository<PaperExtraction, UUID> {
 
     /**
+     * Find extraction by paper ID with all related data eagerly loaded
+     *
+     * @param paperId The paper ID
+     * @return Optional PaperExtraction with all related entities loaded
+     */
+    @Query("SELECT pe FROM PaperExtraction pe " + "LEFT JOIN FETCH pe.sections s "
+            + "LEFT JOIN FETCH s.paragraphs "
+            + "LEFT JOIN FETCH pe.figures "
+            + "LEFT JOIN FETCH pe.tables "
+            + "LEFT JOIN FETCH pe.equations "
+            + "LEFT JOIN FETCH pe.codeBlocks "
+            + "LEFT JOIN FETCH pe.references "
+            + "LEFT JOIN FETCH pe.entities "
+            + "WHERE pe.paper.id = :paperId")
+    Optional<PaperExtraction> findByPaperIdWithAllData(@Param("paperId") UUID paperId);
+
+    /**
      * Find extraction by paper ID
      *
      * @param paperId The paper ID

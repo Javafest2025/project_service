@@ -1,5 +1,6 @@
 package org.solace.scholar_ai.project_service.model.paper;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -73,6 +74,7 @@ public class Paper {
 
     // Relationships
     @OneToMany(mappedBy = "paper", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JsonManagedReference("paper-authors")
     @Builder.Default
     private List<PaperAuthor> paperAuthors = new ArrayList<>();
 
@@ -109,11 +111,29 @@ public class Paper {
     @Column(name = "extraction_coverage")
     private Double extractionCoverage; // 0-100%
 
+    // Summarization-related fields
+    @Column(name = "is_summarized")
+    @Builder.Default
+    private Boolean isSummarized = false;
+
+    @Column(name = "summarization_status", length = 50)
+    private String summarizationStatus; // PENDING, PROCESSING, COMPLETED, FAILED
+
+    @Column(name = "summarization_started_at")
+    private java.time.Instant summarizationStartedAt;
+
+    @Column(name = "summarization_completed_at")
+    private java.time.Instant summarizationCompletedAt;
+
+    @Column(name = "summarization_error", columnDefinition = "TEXT")
+    private String summarizationError;
+
     // One-to-one relationship with paper extraction details
     @OneToOne(mappedBy = "paper", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private PaperExtraction paperExtraction;
 
-    // LaTeX Context field - indicates if paper is added to LaTeX context for a project
+    // LaTeX Context field - indicates if paper is added to LaTeX context for a
+    // project
     @Column(name = "is_latex_context")
     @Builder.Default
     private Boolean isLatexContext = false;

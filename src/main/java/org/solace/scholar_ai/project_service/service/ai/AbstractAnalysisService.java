@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class AbstractAnalysisService {
 
-    private final GeminiService geminiService;
+    private final GeminiGeneralService geminiGeneralService;
     private final ObjectMapper objectMapper;
     private final AbstractAnalysisRepository abstractAnalysisRepository;
 
@@ -92,7 +92,7 @@ public class AbstractAnalysisService {
                 abstractText);
 
         try {
-            String response = geminiService.generateContent(prompt);
+            String response = geminiGeneralService.generateContent(prompt);
             log.info("📥 Gemini response for highlights: {}", response);
 
             // Extract JSON from markdown code blocks if present
@@ -156,7 +156,7 @@ public class AbstractAnalysisService {
                 abstractText);
 
         try {
-            String response = geminiService.generateContent(prompt);
+            String response = geminiGeneralService.generateContent(prompt);
             log.info("📥 Gemini response for insights: {}", response);
 
             // Extract JSON from markdown code blocks if present

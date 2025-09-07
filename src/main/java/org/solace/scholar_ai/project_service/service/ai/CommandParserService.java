@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class CommandParserService {
-    private final GeminiService geminiService;
+    private final GeminiGeneralService geminiGeneralService;
     private final ObjectMapper objectMapper;
 
     public ParsedCommand parseCommand(String userInput) {
@@ -24,7 +24,7 @@ public class CommandParserService {
             String prompt = buildParsingPrompt(userInput);
             log.info("📝 Generated prompt: {}", prompt);
 
-            String geminiResponse = geminiService.generateContent(prompt);
+            String geminiResponse = geminiGeneralService.generateContent(prompt);
             log.info("🤖 Gemini response: {}", geminiResponse);
 
             // Parse JSON response from Gemini
@@ -64,7 +64,7 @@ public class CommandParserService {
             log.info("🔄 Falling back to general question handler");
 
             // Fallback to general question if parsing fails
-            String fallbackResponse = geminiService.generateContent(userInput);
+            String fallbackResponse = geminiGeneralService.generateContent(userInput);
             log.info("🔄 Fallback response: {}", fallbackResponse);
 
             return ParsedCommand.builder()
