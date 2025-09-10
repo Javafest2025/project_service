@@ -31,7 +31,14 @@ public enum ErrorCode {
     CONFIGURATION_ERROR("Please check the application configuration for any issues."),
     // Author-specific errors
     AUTHOR_NOT_FOUND("The requested author could not be found. Please check the author name or ID."),
-    DATA_CONVERSION_ERROR("Error processing data. Please verify the data format and try again.");
+    DATA_CONVERSION_ERROR("Error processing data. Please verify the data format and try again."),
+    // Paper-specific errors
+    PAPER_NOT_FOUND("The requested paper could not be found. Please check the paper ID."),
+    PAPER_NOT_EXTRACTED("The paper has not been extracted yet. Please extract the paper first."),
+    // Gap analysis specific errors
+    GAP_ANALYSIS_NOT_FOUND("The requested gap analysis could not be found. Please check the gap analysis ID."),
+    GAP_ANALYSIS_REQUEST_FAILED("Failed to initiate gap analysis. Please try again later."),
+    INVALID_OPERATION("The requested operation is not valid for the current state of the resource.");
 
     private final String suggestion;
 

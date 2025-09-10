@@ -49,6 +49,12 @@ scholarai:
       routing-key: scholarai.extraction
       completed-queue: scholarai.extraction.completed.queue
       completed-routing-key: scholarai.extraction.completed
+    gap-analysis:
+      request-queue: gap_analysis_requests
+      request-routing-key: gap.analysis.request
+      response-queue: gap_analysis_responses
+      response-exchange: gap_analysis_responses
+      response-routing-key: gap.analysis.response
 
 server:
   port: ${SERVER_PORT:8083}
