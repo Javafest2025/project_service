@@ -1,0 +1,90 @@
+package org.solace.scholar_ai.project_service.model.latex;
+
+import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "latex_ai_chat_sessions")
+@EntityListeners(AuditingEntityListener.class)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@ToString
+public class LatexAiChatSession {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "document_id", nullable = false)
+    private Long documentId;
+
+    @Column(name = "project_id", nullable = false)
+    private Long projectId;
+
+    @Column(name = "session_title", nullable = false)
+    @Builder.Default
+    private String sessionTitle = "LaTeX AI Chat";
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "is_active")
+    @Builder.Default
+    private Boolean isActive = true;
+
+    // Relationships
+    @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OrderBy("createdAt ASC")
+    @Builder.Default
+    private List<LatexAiChatMessage> messages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OrderBy("createdAt DESC")
+    @Builder.Default
+    private List<LatexDocumentCheckpoint> checkpoints = new ArrayList<>();
+
+    // Helper methods
+    public void addMessage(LatexAiChatMessage message) {
+        messages.add(message);
+        message.setSession(this);
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void addCheckpoint(LatexDocumentCheckpoint checkpoint) {
+        checkpoints.add(checkpoint);
+        checkpoint.setSession(this);
+    }
+
+    public LatexDocumentCheckpoint getCurrentCheckpoint() {
+        return checkpoints.stream()
+                .filter(LatexDocumentCheckpoint::getIsCurrent)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public long getMessageCount() {
+        return messages.size();
+    }
+
+    public LocalDateTime getLastMessageTime() {
+        return messages.stream()
+                .map(LatexAiChatMessage::getCreatedAt)
+                .max(LocalDateTime::compareTo)
+                .orElse(createdAt);
+    }
+}
