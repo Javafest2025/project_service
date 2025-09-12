@@ -48,6 +48,22 @@ public class RabbitMQConfig {
     @Value("${scholarai.rabbitmq.extraction.completed-routing-key}")
     private String extractionCompletedRoutingKey;
 
+    // Gap analysis queue properties
+    @Value("${scholarai.rabbitmq.gap-analysis.request-queue}")
+    private String gapAnalysisRequestQueue;
+
+    @Value("${scholarai.rabbitmq.gap-analysis.request-routing-key}")
+    private String gapAnalysisRequestRoutingKey;
+
+    @Value("${scholarai.rabbitmq.gap-analysis.response-queue}")
+    private String gapAnalysisResponseQueue;
+
+    @Value("${scholarai.rabbitmq.gap-analysis.response-exchange}")
+    private String gapAnalysisResponseExchange;
+
+    @Value("${scholarai.rabbitmq.gap-analysis.response-routing-key}")
+    private String gapAnalysisResponseRoutingKey;
+
     /**
      * Creates a durable topic exchange for the application.
      * Topic exchanges route messages based on wildcard matches between the routing
@@ -158,6 +174,69 @@ public class RabbitMQConfig {
     @Bean
     public Binding bindExtractionCompleted(Queue extractionCompletedQueue, TopicExchange appExchange) {
         return BindingBuilder.bind(extractionCompletedQueue).to(appExchange).with(extractionCompletedRoutingKey);
+    }
+
+    /**
+     * Creates a durable queue for gap analysis requests.
+     * Note: Queue configuration matches existing queue to avoid PRECONDITION_FAILED
+     * errors.
+     *
+     * @return The configured Queue for gap analysis requests.
+     */
+    @Bean
+    public Queue gapAnalysisRequestQueue() {
+        return QueueBuilder.durable(gapAnalysisRequestQueue).build();
+    }
+
+    /**
+     * Creates a durable queue for gap analysis responses.
+     *
+     * @return The configured Queue for gap analysis responses.
+     */
+    @Bean
+    public Queue gapAnalysisResponseQueue() {
+        return QueueBuilder.durable(gapAnalysisResponseQueue).build();
+    }
+
+    /**
+     * Creates a durable topic exchange for gap analysis responses.
+     * This exchange is used specifically for gap analysis response messages.
+     *
+     * @return The configured TopicExchange for gap analysis responses.
+     */
+    @Bean
+    public TopicExchange gapAnalysisResponseExchange() {
+        return ExchangeBuilder.topicExchange(gapAnalysisResponseExchange)
+                .durable(true)
+                .build();
+    }
+
+    /**
+     * Binds the gap analysis request queue to the application exchange using its
+     * specific routing key.
+     *
+     * @param gapAnalysisRequestQueue The queue for gap analysis requests.
+     * @param appExchange             The main application topic exchange.
+     * @return The Binding definition.
+     */
+    @Bean
+    public Binding bindGapAnalysisRequest(Queue gapAnalysisRequestQueue, TopicExchange appExchange) {
+        return BindingBuilder.bind(gapAnalysisRequestQueue).to(appExchange).with(gapAnalysisRequestRoutingKey);
+    }
+
+    /**
+     * Binds the gap analysis response queue to the gap analysis response exchange
+     * using its specific routing key.
+     *
+     * @param gapAnalysisResponseQueue    The queue for gap analysis responses.
+     * @param gapAnalysisResponseExchange The gap analysis response topic exchange.
+     * @return The Binding definition.
+     */
+    @Bean
+    public Binding bindGapAnalysisResponse(Queue gapAnalysisResponseQueue, TopicExchange gapAnalysisResponseExchange) {
+        return BindingBuilder.bind(gapAnalysisResponseQueue)
+                .to(gapAnalysisResponseExchange)
+                .with(gapAnalysisResponseRoutingKey);
     }
 
     /**

@@ -21,4 +21,8 @@ public interface AbstractAnalysisRepository extends JpaRepository<AbstractAnalys
 
     @Query("SELECT COUNT(aa) > 0 FROM AbstractAnalysis aa WHERE aa.paperId = :paperId AND aa.isActive = true")
     boolean existsByPaperId(@Param("paperId") String paperId);
+
+    @Query(
+            "SELECT aa FROM AbstractAnalysis aa LEFT JOIN FETCH aa.highlights WHERE aa.paperId = :paperId AND aa.isActive = true ORDER BY aa.updatedAt DESC")
+    Optional<AbstractAnalysis> findLatestByPaperIdWithHighlights(@Param("paperId") String paperId);
 }

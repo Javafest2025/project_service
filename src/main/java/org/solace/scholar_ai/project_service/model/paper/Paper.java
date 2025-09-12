@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.solace.scholar_ai.project_service.model.author.Author;
 import org.solace.scholar_ai.project_service.model.extraction.PaperExtraction;
+import org.solace.scholar_ai.project_service.model.gap.GapAnalysis;
 
 @Getter
 @Setter
@@ -131,6 +132,11 @@ public class Paper {
     // One-to-one relationship with paper extraction details
     @OneToOne(mappedBy = "paper", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private PaperExtraction paperExtraction;
+
+    // One-to-many relationship with gap analyses
+    @OneToMany(mappedBy = "paper", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<GapAnalysis> gapAnalyses = new ArrayList<>();
 
     // LaTeX Context field - indicates if paper is added to LaTeX context for a
     // project

@@ -191,7 +191,8 @@ public class PaperSummary {
         TOOLING,
         META_ANALYSIS,
         CASE_STUDY,
-        MIXED_METHODS
+        MIXED_METHODS,
+        UNKNOWN
     }
 
     public enum NoveltyType {
@@ -202,7 +203,8 @@ public class PaperSummary {
         SYNTHESIS,
         REPLICATION,
         NEGATIVE_RESULTS,
-        POSITION_PAPER
+        POSITION_PAPER,
+        UNKNOWN
     }
 
     public enum ValidationStatus {

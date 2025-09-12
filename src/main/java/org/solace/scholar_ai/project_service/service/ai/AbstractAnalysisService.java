@@ -333,8 +333,9 @@ public class AbstractAnalysisService {
     /**
      * Get highlights from database
      */
+    @Transactional(readOnly = true)
     public AbstractHighlightDto getHighlightsFromDb(String paperId) {
-        Optional<AbstractAnalysis> analysis = abstractAnalysisRepository.findLatestByPaperId(paperId);
+        Optional<AbstractAnalysis> analysis = abstractAnalysisRepository.findLatestByPaperIdWithHighlights(paperId);
 
         if (analysis.isPresent() && analysis.get().getHighlights() != null) {
             List<AbstractHighlightDto.Highlight> highlights = analysis.get().getHighlights().stream()
