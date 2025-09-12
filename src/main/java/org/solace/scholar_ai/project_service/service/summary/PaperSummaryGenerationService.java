@@ -591,7 +591,7 @@ public class PaperSummaryGenerationService {
                     .mainFindings(objectMapper.writeValueAsString(dto.getMainFindings()))
                     .limitations(objectMapper.writeValueAsString(dto.getLimitations()))
                     .applicability(objectMapper.writeValueAsString(dto.getApplicability()))
-                    .studyType(PaperSummary.StudyType.valueOf(dto.getStudyType().toUpperCase()))
+                    .studyType(parseStudyType(dto.getStudyType()))
                     .researchQuestions(objectMapper.writeValueAsString(dto.getResearchQuestions()))
                     .datasets(objectMapper.writeValueAsString(dto.getDatasets()))
                     .participants(objectMapper.writeValueAsString(dto.getParticipants()))
@@ -608,8 +608,7 @@ public class PaperSummaryGenerationService {
                     .biasAndFairness(objectMapper.writeValueAsString(dto.getBiasAndFairness()))
                     .risksAndMisuse(objectMapper.writeValueAsString(dto.getRisksAndMisuse()))
                     .dataRights(dto.getDataRights())
-                    .noveltyType(PaperSummary.NoveltyType.valueOf(
-                            dto.getNoveltyType().toUpperCase()))
+                    .noveltyType(parseNoveltyType(dto.getNoveltyType()))
                     .positioning(objectMapper.writeValueAsString(dto.getPositioning()))
                     .relatedWorksKey(objectMapper.writeValueAsString(dto.getRelatedWorksKey()))
                     .impactNotes(dto.getImpactNotes())
@@ -866,5 +865,35 @@ public class PaperSummaryGenerationService {
                             .collect(Collectors.toList());
         }
         return new ArrayList<>();
+    }
+
+    /**
+     * Safely parse StudyType enum from string, defaulting to UNKNOWN if invalid
+     */
+    private PaperSummary.StudyType parseStudyType(String studyType) {
+        if (studyType == null || studyType.trim().isEmpty()) {
+            return PaperSummary.StudyType.UNKNOWN;
+        }
+        try {
+            return PaperSummary.StudyType.valueOf(studyType.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            log.warn("Invalid study type '{}', defaulting to UNKNOWN", studyType);
+            return PaperSummary.StudyType.UNKNOWN;
+        }
+    }
+
+    /**
+     * Safely parse NoveltyType enum from string, defaulting to UNKNOWN if invalid
+     */
+    private PaperSummary.NoveltyType parseNoveltyType(String noveltyType) {
+        if (noveltyType == null || noveltyType.trim().isEmpty()) {
+            return PaperSummary.NoveltyType.UNKNOWN;
+        }
+        try {
+            return PaperSummary.NoveltyType.valueOf(noveltyType.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            log.warn("Invalid novelty type '{}', defaulting to UNKNOWN", noveltyType);
+            return PaperSummary.NoveltyType.UNKNOWN;
+        }
     }
 }
