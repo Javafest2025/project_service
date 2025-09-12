@@ -1,14 +1,13 @@
 package org.solace.scholar_ai.project_service.repository.latex;
 
+import java.util.List;
+import java.util.Optional;
 import org.solace.scholar_ai.project_service.model.latex.LatexDocumentCheckpoint;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface LatexDocumentCheckpointRepository extends JpaRepository<LatexDocumentCheckpoint, Long> {
@@ -31,8 +30,7 @@ public interface LatexDocumentCheckpointRepository extends JpaRepository<LatexDo
     /**
      * Find checkpoints by document and session
      */
-    List<LatexDocumentCheckpoint> findByDocumentIdAndSessionIdOrderByCreatedAtDesc(
-            Long documentId, Long sessionId);
+    List<LatexDocumentCheckpoint> findByDocumentIdAndSessionIdOrderByCreatedAtDesc(Long documentId, Long sessionId);
 
     /**
      * Clear current checkpoint flag for a document (before setting a new one)
@@ -56,16 +54,17 @@ public interface LatexDocumentCheckpointRepository extends JpaRepository<LatexDo
     /**
      * Find recent checkpoints (last N checkpoints)
      */
-    @Query("SELECT c FROM LatexDocumentCheckpoint c WHERE c.documentId = :documentId " +
-           "ORDER BY c.createdAt DESC LIMIT :limit")
-    List<LatexDocumentCheckpoint> findRecentCheckpoints(@Param("documentId") Long documentId, @Param("limit") int limit);
+    @Query("SELECT c FROM LatexDocumentCheckpoint c WHERE c.documentId = :documentId "
+            + "ORDER BY c.createdAt DESC LIMIT :limit")
+    List<LatexDocumentCheckpoint> findRecentCheckpoints(
+            @Param("documentId") Long documentId, @Param("limit") int limit);
 
     /**
      * Delete old checkpoints, keeping only the most recent N
      */
     @Modifying
-    @Query("DELETE FROM LatexDocumentCheckpoint c WHERE c.documentId = :documentId " +
-           "AND c.id NOT IN (SELECT c2.id FROM LatexDocumentCheckpoint c2 " +
-           "WHERE c2.documentId = :documentId ORDER BY c2.createdAt DESC LIMIT :keepCount)")
+    @Query("DELETE FROM LatexDocumentCheckpoint c WHERE c.documentId = :documentId "
+            + "AND c.id NOT IN (SELECT c2.id FROM LatexDocumentCheckpoint c2 "
+            + "WHERE c2.documentId = :documentId ORDER BY c2.createdAt DESC LIMIT :keepCount)")
     void deleteOldCheckpoints(@Param("documentId") Long documentId, @Param("keepCount") int keepCount);
 }

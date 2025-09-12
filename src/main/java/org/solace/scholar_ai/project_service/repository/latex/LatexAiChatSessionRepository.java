@@ -1,13 +1,12 @@
 package org.solace.scholar_ai.project_service.repository.latex;
 
+import java.util.List;
+import java.util.Optional;
 import org.solace.scholar_ai.project_service.model.latex.LatexAiChatSession;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface LatexAiChatSessionRepository extends JpaRepository<LatexAiChatSession, Long> {
@@ -41,10 +40,9 @@ public interface LatexAiChatSessionRepository extends JpaRepository<LatexAiChatS
     /**
      * Get chat session with messages and checkpoints loaded
      */
-    @Query("SELECT s FROM LatexAiChatSession s " +
-           "LEFT JOIN FETCH s.messages m " +
-           "LEFT JOIN FETCH s.checkpoints c " +
-           "WHERE s.documentId = :documentId")
+    @Query("SELECT s FROM LatexAiChatSession s " + "LEFT JOIN FETCH s.messages m "
+            + "LEFT JOIN FETCH s.checkpoints c "
+            + "WHERE s.documentId = :documentId")
     Optional<LatexAiChatSession> findByDocumentIdWithMessagesAndCheckpoints(@Param("documentId") Long documentId);
 
     /**
