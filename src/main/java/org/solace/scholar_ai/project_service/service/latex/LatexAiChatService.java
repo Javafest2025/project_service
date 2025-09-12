@@ -1,5 +1,10 @@
 package org.solace.scholar_ai.project_service.service.latex;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import lombok.Builder;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solace.scholar_ai.project_service.dto.latex.*;
@@ -7,11 +12,6 @@ import org.solace.scholar_ai.project_service.model.latex.*;
 import org.solace.scholar_ai.project_service.repository.latex.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,14 +29,15 @@ public class LatexAiChatService {
      */
     public LatexAiChatSessionDto getOrCreateChatSession(Long documentId, Long projectId) {
         log.info("Getting or creating chat session for document: {}, project: {}", documentId, projectId);
-        
-        Optional<LatexAiChatSession> existingSession = sessionRepository.findByDocumentIdWithMessagesAndCheckpoints(documentId);
-        
+
+        Optional<LatexAiChatSession> existingSession =
+                sessionRepository.findByDocumentIdWithMessagesAndCheckpoints(documentId);
+
         if (existingSession.isPresent()) {
             log.info("Found existing chat session: {}", existingSession.get().getId());
             return convertToDto(existingSession.get());
         }
-        
+
         // Create new session
         LatexAiChatSession newSession = LatexAiChatSession.builder()
                 .documentId(documentId)
@@ -44,13 +45,13 @@ public class LatexAiChatService {
                 .sessionTitle("LaTeX AI Chat")
                 .isActive(true)
                 .build();
-        
+
         newSession = sessionRepository.save(newSession);
         log.info("Created new chat session: {}", newSession.getId());
-        
+
         // Add welcome message
         createWelcomeMessage(newSession);
-        
+
         return convertToDto(newSession);
     }
 
@@ -59,10 +60,11 @@ public class LatexAiChatService {
      */
     public LatexAiChatMessageDto sendMessage(Long documentId, CreateLatexChatMessageRequest request) {
         log.info("Sending message to chat for document: {}", documentId);
-        
-        LatexAiChatSession session = sessionRepository.findByDocumentId(documentId)
+
+        LatexAiChatSession session = sessionRepository
+                .findByDocumentId(documentId)
                 .orElseThrow(() -> new RuntimeException("Chat session not found for document: " + documentId));
-        
+
         // Create user message
         LatexAiChatMessage userMessage = LatexAiChatMessage.builder()
                 .session(session)
@@ -72,20 +74,19 @@ public class LatexAiChatService {
                 .selectionRangeTo(request.getSelectionRangeTo())
                 .cursorPosition(request.getCursorPosition())
                 .build();
-        
+
         userMessage = messageRepository.save(userMessage);
-        
+
         // Process AI response
         try {
             String aiResponse = aiAssistanceService.processChatRequest(
                     request.getSelectedText() != null ? request.getSelectedText() : "",
                     request.getUserRequest() != null ? request.getUserRequest() : request.getContent(),
-                    request.getFullDocument() != null ? request.getFullDocument() : ""
-            );
-            
+                    request.getFullDocument() != null ? request.getFullDocument() : "");
+
             // Parse AI response to extract LaTeX suggestion and action type
             ParsedAiResponse parsedResponse = parseAiResponse(aiResponse, request);
-            
+
             // Create AI message
             LatexAiChatMessage aiMessage = LatexAiChatMessage.builder()
                     .session(session)
@@ -98,21 +99,27 @@ public class LatexAiChatService {
                     .cursorPosition(request.getCursorPosition())
                     .isApplied(false)
                     .build();
-            
+
             aiMessage = messageRepository.save(aiMessage);
-            
+
             // Create checkpoint before applying AI suggestion
-            if (parsedResponse.getLatexCode() != null && !parsedResponse.getLatexCode().trim().isEmpty()) {
-                createCheckpoint(documentId, session.getId(), aiMessage.getId(), 
-                        "Before AI Suggestion", request.getFullDocument(), null);
+            if (parsedResponse.getLatexCode() != null
+                    && !parsedResponse.getLatexCode().trim().isEmpty()) {
+                createCheckpoint(
+                        documentId,
+                        session.getId(),
+                        aiMessage.getId(),
+                        "Before AI Suggestion",
+                        request.getFullDocument(),
+                        null);
             }
-            
+
             log.info("Created user message: {}, AI message: {}", userMessage.getId(), aiMessage.getId());
             return convertToDto(aiMessage);
-            
+
         } catch (Exception e) {
             log.error("Error processing AI response", e);
-            
+
             // Create error AI message
             LatexAiChatMessage errorMessage = LatexAiChatMessage.builder()
                     .session(session)
@@ -120,7 +127,7 @@ public class LatexAiChatService {
                     .content("I'm sorry, I encountered an error processing your request. Please try again.")
                     .isApplied(false)
                     .build();
-            
+
             errorMessage = messageRepository.save(errorMessage);
             return convertToDto(errorMessage);
         }
@@ -131,15 +138,17 @@ public class LatexAiChatService {
      */
     public void markSuggestionAsApplied(Long messageId, String contentAfter) {
         log.info("Marking message {} as applied", messageId);
-        
-        LatexAiChatMessage message = messageRepository.findById(messageId)
+
+        LatexAiChatMessage message = messageRepository
+                .findById(messageId)
                 .orElseThrow(() -> new RuntimeException("Message not found: " + messageId));
-        
+
         message.setIsApplied(true);
         messageRepository.save(message);
-        
+
         // Update checkpoint with the content after application
-        checkpointRepository.findByDocumentIdAndIsCurrentTrue(message.getSession().getDocumentId())
+        checkpointRepository
+                .findByDocumentIdAndIsCurrentTrue(message.getSession().getDocumentId())
                 .ifPresent(checkpoint -> {
                     checkpoint.setContentAfter(contentAfter);
                     checkpointRepository.save(checkpoint);
@@ -152,30 +161,33 @@ public class LatexAiChatService {
     @Transactional(readOnly = true)
     public List<LatexAiChatMessageDto> getChatHistory(Long documentId) {
         log.info("Getting chat history for document: {}", documentId);
-        
-        LatexAiChatSession session = sessionRepository.findByDocumentId(documentId)
-                .orElse(null);
-        
+
+        LatexAiChatSession session =
+                sessionRepository.findByDocumentId(documentId).orElse(null);
+
         if (session == null) {
             return List.of();
         }
-        
+
         List<LatexAiChatMessage> messages = messageRepository.findBySessionIdOrderByCreatedAtAsc(session.getId());
-        return messages.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
+        return messages.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
     /**
      * Create a document checkpoint
      */
-    public LatexDocumentCheckpointDto createCheckpoint(Long documentId, Long sessionId, Long messageId, 
-                                                      String checkpointName, String contentBefore, String contentAfter) {
+    public LatexDocumentCheckpointDto createCheckpoint(
+            Long documentId,
+            Long sessionId,
+            Long messageId,
+            String checkpointName,
+            String contentBefore,
+            String contentAfter) {
         log.info("Creating checkpoint for document: {}", documentId);
-        
+
         // Clear current checkpoint flag
         checkpointRepository.clearCurrentCheckpointForDocument(documentId);
-        
+
         LatexDocumentCheckpoint checkpoint = LatexDocumentCheckpoint.builder()
                 .documentId(documentId)
                 .session(sessionRepository.getReferenceById(sessionId))
@@ -185,7 +197,7 @@ public class LatexAiChatService {
                 .contentAfter(contentAfter)
                 .isCurrent(true)
                 .build();
-        
+
         checkpoint = checkpointRepository.save(checkpoint);
         return convertToDto(checkpoint);
     }
@@ -195,14 +207,15 @@ public class LatexAiChatService {
      */
     public String restoreToCheckpoint(Long checkpointId) {
         log.info("Restoring to checkpoint: {}", checkpointId);
-        
-        LatexDocumentCheckpoint checkpoint = checkpointRepository.findById(checkpointId)
+
+        LatexDocumentCheckpoint checkpoint = checkpointRepository
+                .findById(checkpointId)
                 .orElseThrow(() -> new RuntimeException("Checkpoint not found: " + checkpointId));
-        
+
         // Clear current checkpoint flag and set this one as current
         checkpointRepository.clearCurrentCheckpointForDocument(checkpoint.getDocumentId());
         checkpointRepository.setCheckpointAsCurrent(checkpointId);
-        
+
         return checkpoint.getContentBefore();
     }
 
@@ -212,11 +225,10 @@ public class LatexAiChatService {
     @Transactional(readOnly = true)
     public List<LatexDocumentCheckpointDto> getCheckpoints(Long documentId) {
         log.info("Getting checkpoints for document: {}", documentId);
-        
-        List<LatexDocumentCheckpoint> checkpoints = checkpointRepository.findByDocumentIdOrderByCreatedAtDesc(documentId);
-        return checkpoints.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
+
+        List<LatexDocumentCheckpoint> checkpoints =
+                checkpointRepository.findByDocumentIdOrderByCreatedAtDesc(documentId);
+        return checkpoints.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
     // Private helper methods
@@ -224,18 +236,18 @@ public class LatexAiChatService {
         LatexAiChatMessage welcomeMessage = LatexAiChatMessage.builder()
                 .session(session)
                 .messageType(LatexAiChatMessage.MessageType.AI)
-                .content("Welcome to **LaTeXAI**! 🚀 I'm your specialized LaTeX assistant for this document.\n\n" +
-                        "**I can help you with:**\n" +
-                        "• Writing and formatting LaTeX documents\n" +
-                        "• Fixing compilation errors and syntax issues\n" +
-                        "• Suggesting mathematical notation and environments\n" +
-                        "• Optimizing document structure and styling\n" +
-                        "• Using packages and custom commands\n" +
-                        "• Converting content to LaTeX format\n\n" +
-                        "Select text in your document and ask me anything about LaTeX!")
+                .content("Welcome to **LaTeXAI**! 🚀 I'm your specialized LaTeX assistant for this document.\n\n"
+                        + "**I can help you with:**\n"
+                        + "• Writing and formatting LaTeX documents\n"
+                        + "• Fixing compilation errors and syntax issues\n"
+                        + "• Suggesting mathematical notation and environments\n"
+                        + "• Optimizing document structure and styling\n"
+                        + "• Using packages and custom commands\n"
+                        + "• Converting content to LaTeX format\n\n"
+                        + "Select text in your document and ask me anything about LaTeX!")
                 .isApplied(false)
                 .build();
-        
+
         messageRepository.save(welcomeMessage);
     }
 
@@ -244,7 +256,7 @@ public class LatexAiChatService {
         String latexCode = extractLatexCode(aiResponse);
         String explanation = extractExplanation(aiResponse);
         LatexAiChatMessage.ActionType actionType = determineActionType(request, aiResponse);
-        
+
         return ParsedAiResponse.builder()
                 .explanation(explanation)
                 .latexCode(latexCode)
@@ -254,19 +266,21 @@ public class LatexAiChatService {
 
     private String extractLatexCode(String response) {
         // Try to extract LaTeX code from ```latex blocks
-        java.util.regex.Pattern latexPattern = java.util.regex.Pattern.compile("```latex\\s*(.*?)\\s*```", java.util.regex.Pattern.DOTALL);
+        java.util.regex.Pattern latexPattern =
+                java.util.regex.Pattern.compile("```latex\\s*(.*?)\\s*```", java.util.regex.Pattern.DOTALL);
         java.util.regex.Matcher matcher = latexPattern.matcher(response);
         if (matcher.find()) {
             return matcher.group(1).trim();
         }
-        
+
         // Try to extract from generic ``` blocks
-        java.util.regex.Pattern codePattern = java.util.regex.Pattern.compile("```\\s*(.*?)\\s*```", java.util.regex.Pattern.DOTALL);
+        java.util.regex.Pattern codePattern =
+                java.util.regex.Pattern.compile("```\\s*(.*?)\\s*```", java.util.regex.Pattern.DOTALL);
         matcher = codePattern.matcher(response);
         if (matcher.find()) {
             return matcher.group(1).trim();
         }
-        
+
         return null;
     }
 
@@ -279,9 +293,10 @@ public class LatexAiChatService {
         return response;
     }
 
-    private LatexAiChatMessage.ActionType determineActionType(CreateLatexChatMessageRequest request, String aiResponse) {
+    private LatexAiChatMessage.ActionType determineActionType(
+            CreateLatexChatMessageRequest request, String aiResponse) {
         String content = request.getContent().toLowerCase();
-        
+
         if (request.getSelectionRangeFrom() != null && request.getSelectionRangeTo() != null) {
             if (content.contains("replace") || content.contains("change") || content.contains("modify")) {
                 return LatexAiChatMessage.ActionType.REPLACE;
@@ -314,8 +329,11 @@ public class LatexAiChatService {
                 .messageCount(session.getMessageCount())
                 .lastMessageTime(session.getLastMessageTime())
                 .messages(session.getMessages().stream().map(this::convertToDto).collect(Collectors.toList()))
-                .checkpoints(session.getCheckpoints().stream().map(this::convertToDto).collect(Collectors.toList()))
-                .currentCheckpoint(session.getCurrentCheckpoint() != null ? convertToDto(session.getCurrentCheckpoint()) : null)
+                .checkpoints(session.getCheckpoints().stream()
+                        .map(this::convertToDto)
+                        .collect(Collectors.toList()))
+                .currentCheckpoint(
+                        session.getCurrentCheckpoint() != null ? convertToDto(session.getCurrentCheckpoint()) : null)
                 .build();
     }
 
@@ -340,7 +358,10 @@ public class LatexAiChatService {
                 .id(checkpoint.getId())
                 .documentId(checkpoint.getDocumentId())
                 .sessionId(checkpoint.getSession().getId())
-                .messageId(checkpoint.getMessage() != null ? checkpoint.getMessage().getId() : null)
+                .messageId(
+                        checkpoint.getMessage() != null
+                                ? checkpoint.getMessage().getId()
+                                : null)
                 .checkpointName(checkpoint.getCheckpointName())
                 .contentBefore(checkpoint.getContentBefore())
                 .contentAfter(checkpoint.getContentAfter())

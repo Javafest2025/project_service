@@ -1,8 +1,7 @@
 package org.solace.scholar_ai.project_service.dto.latex;
 
-import lombok.*;
-
 import java.time.LocalDateTime;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
@@ -25,8 +24,9 @@ public class LatexDocumentCheckpointDto {
     private Boolean hasContentAfter;
 
     public String getDisplayName() {
-        return String.format("%s (%s)", checkpointName, 
-                createdAt != null ? createdAt.toString().substring(0, 16) : "");
+        return String.format(
+                "%s (%s)",
+                checkpointName, createdAt != null ? createdAt.toString().substring(0, 16) : "");
     }
 
     public Long getContentSizeDifference() {
