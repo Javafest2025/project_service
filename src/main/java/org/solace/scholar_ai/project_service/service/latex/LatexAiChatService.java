@@ -3,6 +3,8 @@ package org.solace.scholar_ai.project_service.service.latex;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.Builder;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solace.scholar_ai.project_service.dto.latex.*;
