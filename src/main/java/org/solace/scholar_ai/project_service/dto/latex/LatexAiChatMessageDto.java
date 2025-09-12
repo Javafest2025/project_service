@@ -1,9 +1,8 @@
 package org.solace.scholar_ai.project_service.dto.latex;
 
+import java.time.LocalDateTime;
 import lombok.*;
 import org.solace.scholar_ai.project_service.model.latex.LatexAiChatMessage;
-
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor

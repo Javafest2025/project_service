@@ -1,11 +1,10 @@
 package org.solace.scholar_ai.project_service.model.latex;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "latex_document_checkpoints")
@@ -56,8 +55,7 @@ public class LatexDocumentCheckpoint {
     }
 
     public String getDisplayName() {
-        return String.format("%s (%s)", checkpointName, 
-                createdAt.toString().substring(0, 16));
+        return String.format("%s (%s)", checkpointName, createdAt.toString().substring(0, 16));
     }
 
     public long getContentSizeDifference() {

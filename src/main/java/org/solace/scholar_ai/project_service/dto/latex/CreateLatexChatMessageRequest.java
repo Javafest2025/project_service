@@ -15,7 +15,7 @@ public class CreateLatexChatMessageRequest {
     private Integer selectionRangeFrom;
     private Integer selectionRangeTo;
     private Integer cursorPosition;
-    
+
     // Context information for AI processing
     private String selectedText;
     private String fullDocument;

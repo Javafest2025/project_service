@@ -1,9 +1,8 @@
 package org.solace.scholar_ai.project_service.dto.latex;
 
-import lombok.*;
-
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
