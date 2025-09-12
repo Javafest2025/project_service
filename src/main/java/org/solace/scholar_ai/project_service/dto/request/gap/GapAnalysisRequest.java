@@ -17,7 +17,10 @@ import lombok.NoArgsConstructor;
 @Schema(description = "Request to initiate gap analysis for a paper")
 public class GapAnalysisRequest {
 
-    @Schema(description = "ID of the paper to analyze", example = "8de08615-3c4f-4fc6-bad5-d409aac5ee67", required = true)
+    @Schema(
+            description = "ID of the paper to analyze",
+            example = "8de08615-3c4f-4fc6-bad5-d409aac5ee67",
+            required = true)
     private UUID paperId;
 
     @Schema(description = "Configuration parameters for the gap analysis", required = false)

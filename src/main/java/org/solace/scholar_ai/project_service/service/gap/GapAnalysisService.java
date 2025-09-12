@@ -244,6 +244,16 @@ public class GapAnalysisService {
     }
 
     /**
+     * Get gap analysis request data by paper ID.
+     */
+    @Transactional(readOnly = true)
+    public List<GapAnalysisRequestData> getGapAnalysisRequestDataByPaperId(UUID paperId) {
+        List<GapAnalysis> gapAnalyses = gapAnalysisRepository.findByPaperIdOrderByCreatedAtDesc(paperId);
+
+        return gapAnalyses.stream().map(this::convertToRequestData).collect(Collectors.toList());
+    }
+
+    /**
      * Get gap analysis statistics.
      */
     @Transactional(readOnly = true)
@@ -260,6 +270,42 @@ public class GapAnalysisService {
                 .processingAnalyses(processingAnalyses)
                 .completedAnalyses(completedAnalyses)
                 .failedAnalyses(failedAnalyses)
+                .build();
+    }
+
+    /**
+     * Convert GapAnalysis entity to GapAnalysisRequestData DTO.
+     */
+    private GapAnalysisRequestData convertToRequestData(GapAnalysis gapAnalysis) {
+        org.solace.scholar_ai.project_service.dto.request.gap.GapAnalysisConfigDto config = null;
+
+        if (gapAnalysis.getConfig() != null) {
+            try {
+                config = objectMapper.readValue(
+                        gapAnalysis.getConfig(),
+                        org.solace.scholar_ai.project_service.dto.request.gap.GapAnalysisConfigDto.class);
+            } catch (JsonProcessingException e) {
+                log.error("Failed to parse config JSON for gap analysis: {}", gapAnalysis.getId(), e);
+            }
+        }
+
+        return GapAnalysisRequestData.builder()
+                .gapAnalysisId(gapAnalysis.getId())
+                .paperId(gapAnalysis.getPaper().getId())
+                .paperExtractionId(gapAnalysis.getPaperExtractionId())
+                .correlationId(gapAnalysis.getCorrelationId())
+                .requestId(gapAnalysis.getRequestId())
+                .status(gapAnalysis.getStatus())
+                .config(config)
+                .startedAt(gapAnalysis.getStartedAt())
+                .completedAt(gapAnalysis.getCompletedAt())
+                .errorMessage(gapAnalysis.getErrorMessage())
+                .createdAt(gapAnalysis.getCreatedAt())
+                .updatedAt(gapAnalysis.getUpdatedAt())
+                .totalGapsIdentified(gapAnalysis.getTotalGapsIdentified())
+                .validGapsCount(gapAnalysis.getValidGapsCount())
+                .invalidGapsCount(gapAnalysis.getInvalidGapsCount())
+                .modifiedGapsCount(gapAnalysis.getModifiedGapsCount())
                 .build();
     }
 
@@ -305,5 +351,33 @@ public class GapAnalysisService {
         private long processingAnalyses;
         private long completedAnalyses;
         private long failedAnalyses;
+    }
+
+    /**
+     * Request data DTO for gap analysis.
+     */
+    @lombok.Data
+    @lombok.Builder
+    @lombok.NoArgsConstructor
+    @lombok.AllArgsConstructor
+    public static class GapAnalysisRequestData {
+        private UUID gapAnalysisId;
+        private UUID paperId;
+        private UUID paperExtractionId;
+        private String correlationId;
+        private String requestId;
+        private GapAnalysis.GapStatus status;
+        private org.solace.scholar_ai.project_service.dto.request.gap.GapAnalysisConfigDto config;
+        private Instant startedAt;
+        private Instant completedAt;
+        private String errorMessage;
+        private Instant createdAt;
+        private Instant updatedAt;
+
+        // Gap count statistics
+        private Integer totalGapsIdentified;
+        private Integer validGapsCount;
+        private Integer invalidGapsCount;
+        private Integer modifiedGapsCount;
     }
 }

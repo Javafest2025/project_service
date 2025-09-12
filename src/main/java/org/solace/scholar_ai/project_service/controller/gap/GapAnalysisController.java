@@ -166,6 +166,26 @@ public class GapAnalysisController {
     }
 
     /**
+     * Get gap analysis request data by paper ID.
+     */
+    @GetMapping("/paper/{paperId}/request-data")
+    @Operation(
+            summary = "Get gap analysis request data by paper",
+            description = "Retrieve gap analysis request data and configuration for a paper")
+    @ApiResponses(
+            value = {
+                @ApiResponse(responseCode = "200", description = "Gap analysis request data found"),
+                @ApiResponse(responseCode = "404", description = "No gap analysis found for paper")
+            })
+    public ResponseEntity<List<GapAnalysisService.GapAnalysisRequestData>> getGapAnalysisRequestDataByPaperId(
+            @Parameter(description = "Paper ID") @PathVariable UUID paperId) {
+
+        List<GapAnalysisService.GapAnalysisRequestData> requestData =
+                gapAnalysisService.getGapAnalysisRequestDataByPaperId(paperId);
+        return ResponseEntity.ok(requestData);
+    }
+
+    /**
      * Get gap analysis statistics.
      */
     @GetMapping("/stats")
