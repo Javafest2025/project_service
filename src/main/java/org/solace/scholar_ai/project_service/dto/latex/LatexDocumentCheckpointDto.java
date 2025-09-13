@@ -1,6 +1,7 @@
 package org.solace.scholar_ai.project_service.dto.latex;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.*;
 
 @Data
@@ -9,8 +10,8 @@ import lombok.*;
 @Builder
 public class LatexDocumentCheckpointDto {
     private Long id;
-    private Long documentId;
-    private Long sessionId;
+    private UUID documentId;
+    private UUID sessionId;
     private Long messageId;
     private String checkpointName;
     private String contentBefore;

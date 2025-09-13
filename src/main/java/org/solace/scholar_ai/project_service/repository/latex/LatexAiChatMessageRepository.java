@@ -2,6 +2,7 @@ package org.solace.scholar_ai.project_service.repository.latex;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import org.solace.scholar_ai.project_service.model.latex.LatexAiChatMessage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,13 +15,16 @@ public interface LatexAiChatMessageRepository extends JpaRepository<LatexAiChatM
     /**
      * Find all messages for a session, ordered by creation time
      */
-    List<LatexAiChatMessage> findBySessionIdOrderByCreatedAtAsc(Long sessionId);
+    @Query("SELECT m FROM LatexAiChatMessage m WHERE m.session.id = :sessionId ORDER BY m.createdAt ASC")
+    List<LatexAiChatMessage> findBySessionIdOrderByCreatedAtAsc(@Param("sessionId") UUID sessionId);
 
     /**
      * Find messages by session and message type
      */
+    @Query(
+            "SELECT m FROM LatexAiChatMessage m WHERE m.session.id = :sessionId AND m.messageType = :messageType ORDER BY m.createdAt ASC")
     List<LatexAiChatMessage> findBySessionIdAndMessageTypeOrderByCreatedAtAsc(
-            Long sessionId, LatexAiChatMessage.MessageType messageType);
+            @Param("sessionId") UUID sessionId, @Param("messageType") LatexAiChatMessage.MessageType messageType);
 
     /**
      * Find unapplied AI messages with LaTeX suggestions
@@ -28,25 +32,28 @@ public interface LatexAiChatMessageRepository extends JpaRepository<LatexAiChatM
     @Query("SELECT m FROM LatexAiChatMessage m WHERE m.session.id = :sessionId "
             + "AND m.messageType = 'AI' AND m.latexSuggestion IS NOT NULL "
             + "AND m.isApplied = false ORDER BY m.createdAt ASC")
-    List<LatexAiChatMessage> findUnappliedAiSuggestions(@Param("sessionId") Long sessionId);
+    List<LatexAiChatMessage> findUnappliedAiSuggestions(@Param("sessionId") UUID sessionId);
 
     /**
      * Find recent messages (last N messages)
      */
-    @Query("SELECT m FROM LatexAiChatMessage m WHERE m.session.id = :sessionId "
-            + "ORDER BY m.createdAt DESC LIMIT :limit")
-    List<LatexAiChatMessage> findRecentMessages(@Param("sessionId") Long sessionId, @Param("limit") int limit);
+    @Query("SELECT m FROM LatexAiChatMessage m WHERE m.session.id = :sessionId ORDER BY m.createdAt DESC")
+    List<LatexAiChatMessage> findRecentMessages(
+            @Param("sessionId") UUID sessionId, org.springframework.data.domain.Pageable pageable);
 
     /**
      * Count messages in a session
      */
-    long countBySessionId(Long sessionId);
+    @Query("SELECT COUNT(m) FROM LatexAiChatMessage m WHERE m.session.id = :sessionId")
+    long countBySessionId(@Param("sessionId") UUID sessionId);
 
     /**
      * Find messages created after a specific time
      */
+    @Query(
+            "SELECT m FROM LatexAiChatMessage m WHERE m.session.id = :sessionId AND m.createdAt > :afterTime ORDER BY m.createdAt ASC")
     List<LatexAiChatMessage> findBySessionIdAndCreatedAtAfterOrderByCreatedAtAsc(
-            Long sessionId, LocalDateTime afterTime);
+            @Param("sessionId") UUID sessionId, @Param("afterTime") LocalDateTime afterTime);
 
     /**
      * Find AI messages with suggestions that were applied
@@ -54,5 +61,5 @@ public interface LatexAiChatMessageRepository extends JpaRepository<LatexAiChatM
     @Query("SELECT m FROM LatexAiChatMessage m WHERE m.session.id = :sessionId "
             + "AND m.messageType = 'AI' AND m.latexSuggestion IS NOT NULL "
             + "AND m.isApplied = true ORDER BY m.createdAt DESC")
-    List<LatexAiChatMessage> findAppliedAiSuggestions(@Param("sessionId") Long sessionId);
+    List<LatexAiChatMessage> findAppliedAiSuggestions(@Param("sessionId") UUID sessionId);
 }

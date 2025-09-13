@@ -2,6 +2,7 @@ package org.solace.scholar_ai.project_service.dto.latex;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import lombok.*;
 
 @Data
@@ -9,9 +10,9 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class LatexAiChatSessionDto {
-    private Long id;
-    private Long documentId;
-    private Long projectId;
+    private UUID id;
+    private UUID documentId;
+    private UUID projectId;
     private String sessionTitle;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

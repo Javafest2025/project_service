@@ -2,6 +2,7 @@ package org.solace.scholar_ai.project_service.repository.latex;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.solace.scholar_ai.project_service.model.latex.LatexDocumentCheckpoint;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -15,29 +16,29 @@ public interface LatexDocumentCheckpointRepository extends JpaRepository<LatexDo
     /**
      * Find all checkpoints for a document, ordered by creation time (newest first)
      */
-    List<LatexDocumentCheckpoint> findByDocumentIdOrderByCreatedAtDesc(Long documentId);
+    List<LatexDocumentCheckpoint> findByDocumentIdOrderByCreatedAtDesc(UUID documentId);
 
     /**
      * Find all checkpoints for a session, ordered by creation time (newest first)
      */
-    List<LatexDocumentCheckpoint> findBySessionIdOrderByCreatedAtDesc(Long sessionId);
+    List<LatexDocumentCheckpoint> findBySession_IdOrderByCreatedAtDesc(UUID sessionId);
 
     /**
      * Find the current checkpoint for a document
      */
-    Optional<LatexDocumentCheckpoint> findByDocumentIdAndIsCurrentTrue(Long documentId);
+    Optional<LatexDocumentCheckpoint> findByDocumentIdAndIsCurrentTrue(UUID documentId);
 
     /**
      * Find checkpoints by document and session
      */
-    List<LatexDocumentCheckpoint> findByDocumentIdAndSessionIdOrderByCreatedAtDesc(Long documentId, Long sessionId);
+    List<LatexDocumentCheckpoint> findByDocumentIdAndSession_IdOrderByCreatedAtDesc(UUID documentId, UUID sessionId);
 
     /**
      * Clear current checkpoint flag for a document (before setting a new one)
      */
     @Modifying
     @Query("UPDATE LatexDocumentCheckpoint c SET c.isCurrent = false WHERE c.documentId = :documentId")
-    void clearCurrentCheckpointForDocument(@Param("documentId") Long documentId);
+    void clearCurrentCheckpointForDocument(@Param("documentId") UUID documentId);
 
     /**
      * Set a checkpoint as current
@@ -49,22 +50,22 @@ public interface LatexDocumentCheckpointRepository extends JpaRepository<LatexDo
     /**
      * Count checkpoints for a document
      */
-    long countByDocumentId(Long documentId);
+    long countByDocumentId(UUID documentId);
 
     /**
      * Find recent checkpoints (last N checkpoints)
      */
-    @Query("SELECT c FROM LatexDocumentCheckpoint c WHERE c.documentId = :documentId "
-            + "ORDER BY c.createdAt DESC LIMIT :limit")
+    @Query("SELECT c FROM LatexDocumentCheckpoint c WHERE c.documentId = :documentId ORDER BY c.createdAt DESC")
     List<LatexDocumentCheckpoint> findRecentCheckpoints(
-            @Param("documentId") Long documentId, @Param("limit") int limit);
+            @Param("documentId") UUID documentId, org.springframework.data.domain.Pageable pageable);
 
     /**
      * Delete old checkpoints, keeping only the most recent N
      */
     @Modifying
-    @Query("DELETE FROM LatexDocumentCheckpoint c WHERE c.documentId = :documentId "
-            + "AND c.id NOT IN (SELECT c2.id FROM LatexDocumentCheckpoint c2 "
-            + "WHERE c2.documentId = :documentId ORDER BY c2.createdAt DESC LIMIT :keepCount)")
-    void deleteOldCheckpoints(@Param("documentId") Long documentId, @Param("keepCount") int keepCount);
+    @Query(
+            value =
+                    "DELETE FROM latex_document_checkpoints c WHERE c.document_id = :documentId AND c.id NOT IN (SELECT id FROM latex_document_checkpoints WHERE document_id = :documentId ORDER BY created_at DESC LIMIT :keepCount)",
+            nativeQuery = true)
+    void deleteOldCheckpoints(@Param("documentId") UUID documentId, @Param("keepCount") int keepCount);
 }

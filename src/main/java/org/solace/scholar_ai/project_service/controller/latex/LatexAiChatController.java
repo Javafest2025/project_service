@@ -1,6 +1,7 @@
 package org.solace.scholar_ai.project_service.controller.latex;
 
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solace.scholar_ai.project_service.dto.latex.*;
@@ -22,7 +23,7 @@ public class LatexAiChatController {
      */
     @GetMapping("/session/{documentId}")
     public ResponseEntity<APIResponse<LatexAiChatSessionDto>> getChatSession(
-            @PathVariable Long documentId, @RequestParam Long projectId) {
+            @PathVariable UUID documentId, @RequestParam UUID projectId) {
 
         log.info("Getting chat session for document: {}, project: {}", documentId, projectId);
 
@@ -49,7 +50,7 @@ public class LatexAiChatController {
      */
     @PostMapping("/session/{documentId}/message")
     public ResponseEntity<APIResponse<LatexAiChatMessageDto>> sendMessage(
-            @PathVariable Long documentId, @RequestBody CreateLatexChatMessageRequest request) {
+            @PathVariable UUID documentId, @RequestBody CreateLatexChatMessageRequest request) {
 
         log.info("Sending message to chat for document: {}", documentId);
 
@@ -75,7 +76,7 @@ public class LatexAiChatController {
      * Get chat history for a document
      */
     @GetMapping("/session/{documentId}/messages")
-    public ResponseEntity<APIResponse<List<LatexAiChatMessageDto>>> getChatHistory(@PathVariable Long documentId) {
+    public ResponseEntity<APIResponse<List<LatexAiChatMessageDto>>> getChatHistory(@PathVariable UUID documentId) {
 
         log.info("Getting chat history for document: {}", documentId);
 
@@ -129,7 +130,7 @@ public class LatexAiChatController {
      */
     @PostMapping("/document/{documentId}/checkpoint")
     public ResponseEntity<APIResponse<LatexDocumentCheckpointDto>> createCheckpoint(
-            @PathVariable Long documentId, @RequestParam Long sessionId, @RequestBody CreateCheckpointRequest request) {
+            @PathVariable UUID documentId, @RequestParam UUID sessionId, @RequestBody CreateCheckpointRequest request) {
 
         log.info("Creating checkpoint for document: {}", documentId);
 
@@ -187,7 +188,7 @@ public class LatexAiChatController {
      * Get checkpoints for a document
      */
     @GetMapping("/document/{documentId}/checkpoints")
-    public ResponseEntity<APIResponse<List<LatexDocumentCheckpointDto>>> getCheckpoints(@PathVariable Long documentId) {
+    public ResponseEntity<APIResponse<List<LatexDocumentCheckpointDto>>> getCheckpoints(@PathVariable UUID documentId) {
 
         log.info("Getting checkpoints for document: {}", documentId);
 
