@@ -7,10 +7,10 @@ services:
     env_file:
       - .env
     ports:
-      - "${SERVER_PORT:-8083}:${SERVER_PORT:-8083}"
+      - "8083:8083"
     environment:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILE}
-      - SERVER_PORT=${SERVER_PORT:-8083}
+      - SERVER_PORT=8083
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://service-registry:8761/eureka/
       - PROJECT_DB_PORT=${PROJECT_DB_PORT}
       - PROJECT_DB_USER=${PROJECT_DB_USER}
@@ -49,7 +49,7 @@ services:
 
     # Keep your original curl healthcheck
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${SERVER_PORT:-8083}/actuator/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 3
