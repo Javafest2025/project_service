@@ -30,8 +30,8 @@ public class LatexAiChatService {
     public LatexAiChatSessionDto getOrCreateChatSession(Long documentId, Long projectId) {
         log.info("Getting or creating chat session for document: {}, project: {}", documentId, projectId);
 
-        Optional<LatexAiChatSession> existingSession =
-                sessionRepository.findByDocumentIdWithMessagesAndCheckpoints(documentId);
+        Optional<LatexAiChatSession> existingSession = sessionRepository
+                .findByDocumentIdWithMessagesAndCheckpoints(documentId);
 
         if (existingSession.isPresent()) {
             log.info("Found existing chat session: {}", existingSession.get().getId());
@@ -162,8 +162,7 @@ public class LatexAiChatService {
     public List<LatexAiChatMessageDto> getChatHistory(Long documentId) {
         log.info("Getting chat history for document: {}", documentId);
 
-        LatexAiChatSession session =
-                sessionRepository.findByDocumentId(documentId).orElse(null);
+        LatexAiChatSession session = sessionRepository.findByDocumentId(documentId).orElse(null);
 
         if (session == null) {
             return List.of();
@@ -226,8 +225,8 @@ public class LatexAiChatService {
     public List<LatexDocumentCheckpointDto> getCheckpoints(Long documentId) {
         log.info("Getting checkpoints for document: {}", documentId);
 
-        List<LatexDocumentCheckpoint> checkpoints =
-                checkpointRepository.findByDocumentIdOrderByCreatedAtDesc(documentId);
+        List<LatexDocumentCheckpoint> checkpoints = checkpointRepository
+                .findByDocumentIdOrderByCreatedAtDesc(documentId);
         return checkpoints.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
@@ -266,16 +265,16 @@ public class LatexAiChatService {
 
     private String extractLatexCode(String response) {
         // Try to extract LaTeX code from ```latex blocks
-        java.util.regex.Pattern latexPattern =
-                java.util.regex.Pattern.compile("```latex\\s*(.*?)\\s*```", java.util.regex.Pattern.DOTALL);
+        java.util.regex.Pattern latexPattern = java.util.regex.Pattern.compile("```latex\\s*(.*?)\\s*```",
+                java.util.regex.Pattern.DOTALL);
         java.util.regex.Matcher matcher = latexPattern.matcher(response);
         if (matcher.find()) {
             return matcher.group(1).trim();
         }
 
         // Try to extract from generic ``` blocks
-        java.util.regex.Pattern codePattern =
-                java.util.regex.Pattern.compile("```\\s*(.*?)\\s*```", java.util.regex.Pattern.DOTALL);
+        java.util.regex.Pattern codePattern = java.util.regex.Pattern.compile("```\\s*(.*?)\\s*```",
+                java.util.regex.Pattern.DOTALL);
         matcher = codePattern.matcher(response);
         if (matcher.find()) {
             return matcher.group(1).trim();
