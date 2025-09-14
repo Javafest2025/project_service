@@ -16,7 +16,7 @@ services:
     ports:
       - "8083:8083"
     environment:
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILE:prod}
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILE:-prod}
       - SERVER_PORT=8083
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://service-registry:8761/eureka/
       - RABBITMQ_HOST=user-rabbitmq
