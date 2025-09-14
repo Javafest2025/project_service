@@ -35,8 +35,8 @@ spring:
 
 scholarai:
   fastapi:
-    papersearch-url: ${FASTAPI_PAPERSEARCH_URL:http://localhost:8001}
-    extractor-url: ${FASTAPI_EXTRACTOR_URL:http://localhost:8002}
+    papersearch-url: ${FASTAPI_PAPERSEARCH_URL:http://scholar-paper-search:8001}
+    extractor-url: ${FASTAPI_EXTRACTOR_URL:http://scholar-extractor:8002}
   rabbitmq:
     exchange: scholarai.exchange
     web-search:
@@ -155,7 +155,7 @@ resilience4j:
         maxWaitDuration: 2s               # Cap maximum wait time at 2 seconds
         retryExceptions:
           - org.springframework.web.client.HttpServerErrorException$ServiceUnavailable
-          - org.springframework.web.client.HttpClientErrorException$InternalServerError
+          - org.springframework.web.client.HttpServerErrorException$InternalServerError
           - org.springframework.web.client.ResourceAccessException
           - org.springframework.web.client.HttpClientErrorException$TooManyRequests
           - java.net.SocketTimeoutException
@@ -166,7 +166,7 @@ resilience4j:
         slidingWindowSize: 5                    # Smaller window for faster detection
         minimumNumberOfCalls: 3                 # Fewer calls needed to trigger
         failureRateThreshold: 60                # Higher threshold (60% failures before opening)
-        waitDurationInOpenState: 10s            # Faster recovery (10s vs 10s)
+        waitDurationInOpenState: 10s            # Faster recovery (10s vs 30s)
         permittedNumberOfCallsInHalfOpenState: 2 # Fewer test calls
   ratelimiter:
     instances:
