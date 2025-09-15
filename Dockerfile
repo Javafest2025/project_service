@@ -28,9 +28,11 @@ RUN ./mvnw clean package -DskipTests
 # Stage 2: Runtime image
 FROM eclipse-temurin:21-jre
 
-# Install curl for health checks (minimal installation)
+# Install curl for health checks and comprehensive LaTeX (TeX Live) for PDF compilation
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl && \
+    apt-get install -y --no-install-recommends \
+        curl \
+        texlive-full && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
