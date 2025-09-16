@@ -316,28 +316,6 @@ public class ProjectController {
     }
 
     /**
-     * Get project notes
-     */
-    @GetMapping("/{projectId}/notes")
-    public ResponseEntity<APIResponse<List<Object>>> getProjectNotes(
-            @PathVariable UUID projectId, @RequestParam UUID userId) {
-        try {
-            log.info("Get project notes endpoint hit for project: {} and user: {}", projectId, userId);
-
-            // For now, return empty list until notes functionality is implemented
-            List<Object> notes = List.of();
-
-            return ResponseEntity.ok(
-                    APIResponse.success(HttpStatus.OK.value(), "Project notes retrieved successfully", notes));
-        } catch (Exception e) {
-            log.error("Unexpected error retrieving project notes {}: {}", projectId, e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(APIResponse.error(
-                            HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to retrieve project notes", null));
-        }
-    }
-
-    /**
      * Get reading list statistics for a project
      */
     @GetMapping("/{projectId}/reading-list/stats")
