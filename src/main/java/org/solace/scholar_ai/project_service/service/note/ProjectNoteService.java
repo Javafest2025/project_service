@@ -23,6 +23,7 @@ public class ProjectNoteService {
 
     private final ProjectNoteRepository projectNoteRepository;
     private final ProjectNoteMapper projectNoteMapper;
+    private final NoteImageService noteImageService;
 
     /**
      * Get all notes for a project
@@ -58,6 +59,14 @@ public class ProjectNoteService {
         ProjectNote note = projectNoteMapper.fromCreateDto(createNoteDto, projectId);
         ProjectNote savedNote = projectNoteRepository.save(note);
 
+        // Associate any orphaned images with this note
+        try {
+            noteImageService.associateOrphanedImagesWithNote(projectId, savedNote.getId());
+        } catch (Exception e) {
+            log.warn("Failed to associate orphaned images with note {}: {}", savedNote.getId(), e.getMessage());
+            // Continue with note creation even if image association fails
+        }
+
         log.info("Note created successfully with ID: {}", savedNote.getId());
         return projectNoteMapper.toDto(savedNote);
     }
@@ -85,6 +94,15 @@ public class ProjectNoteService {
 
         ProjectNote savedNote = projectNoteRepository.save(existingNote);
 
+        // Associate any orphaned images with this note (in case new images were
+        // uploaded)
+        try {
+            noteImageService.associateOrphanedImagesWithNote(projectId, savedNote.getId());
+        } catch (Exception e) {
+            log.warn("Failed to associate orphaned images with note {}: {}", savedNote.getId(), e.getMessage());
+            // Continue with note update even if image association fails
+        }
+
         log.info("Note updated successfully with ID: {}", savedNote.getId());
         return projectNoteMapper.toDto(savedNote);
     }
@@ -99,6 +117,16 @@ public class ProjectNoteService {
                 .findByIdAndProjectId(noteId, projectId)
                 .orElseThrow(() -> new RuntimeException(NOTE_NOT_FOUND_MESSAGE));
 
+        // Delete associated images first
+        try {
+            noteImageService.deleteImagesByNoteId(noteId);
+            log.info("Deleted associated images for note: {}", noteId);
+        } catch (Exception e) {
+            log.warn("Failed to delete some images for note {}: {}", noteId, e.getMessage());
+            // Continue with note deletion even if image cleanup fails
+        }
+
+        // Delete the note
         projectNoteRepository.delete(note);
 
         log.info("Note deleted successfully with ID: {}", noteId);
@@ -128,8 +156,8 @@ public class ProjectNoteService {
     public List<NoteDto> getFavoriteNotesByProjectId(UUID projectId, UUID userId) {
         log.info("Fetching favorite notes for project: {} for user: {}", projectId, userId);
 
-        List<ProjectNote> notes =
-                projectNoteRepository.findByProjectIdAndIsFavoriteOrderByUpdatedAtDesc(projectId, true);
+        List<ProjectNote> notes = projectNoteRepository.findByProjectIdAndIsFavoriteOrderByUpdatedAtDesc(projectId,
+                true);
         return notes.stream().map(projectNoteMapper::toDto).toList();
     }
 

@@ -1,18 +1,30 @@
 package org.solace.scholar_ai.project_service.controller.note;
 
 import jakarta.validation.Valid;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solace.scholar_ai.project_service.dto.note.CreateNoteDto;
+import org.solace.scholar_ai.project_service.dto.note.ImageUploadDto;
 import org.solace.scholar_ai.project_service.dto.note.NoteDto;
 import org.solace.scholar_ai.project_service.dto.note.UpdateNoteDto;
 import org.solace.scholar_ai.project_service.dto.response.APIResponse;
+import org.solace.scholar_ai.project_service.model.note.NoteImage;
+import org.solace.scholar_ai.project_service.service.note.NoteImageService;
 import org.solace.scholar_ai.project_service.service.note.ProjectNoteService;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController
@@ -21,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 public class ProjectNoteController {
 
     private final ProjectNoteService projectNoteService;
+    private final NoteImageService noteImageService;
 
     /**
      * Get all notes for a project
@@ -236,6 +249,127 @@ public class ProjectNoteController {
                     "Unexpected error searching notes by content {} for project {}: {}", q, projectId, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(APIResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to search notes", null));
+        }
+    }
+
+    /**
+     * Upload an image for notes
+     */
+    @PostMapping("/images")
+    public ResponseEntity<APIResponse<ImageUploadDto>> uploadImage(
+            @PathVariable UUID projectId, @RequestParam("file") MultipartFile file) {
+        try {
+            log.info("Upload image for project {} endpoint hit", projectId);
+
+            ImageUploadDto uploadedImage = noteImageService.uploadImage(projectId, file);
+
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(APIResponse.success(
+                            HttpStatus.CREATED.value(), "Image uploaded successfully", uploadedImage));
+        } catch (RuntimeException e) {
+            log.error("Error uploading image for project {}: {}", projectId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(APIResponse.error(HttpStatus.BAD_REQUEST.value(), e.getMessage(), null));
+        } catch (Exception e) {
+            log.error("Unexpected error uploading image for project {}: {}", projectId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(APIResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to upload image", null));
+        }
+    }
+
+    /**
+     * Get image by ID
+     */
+    @GetMapping("/images/{imageId}")
+    public ResponseEntity<Resource> getImage(@PathVariable UUID projectId, @PathVariable UUID imageId) {
+        try {
+            log.info("Get image {} for project {} endpoint hit", imageId, projectId);
+
+            NoteImage image = noteImageService.getImageById(imageId);
+
+            // Verify the image belongs to the project
+            if (!image.getProjectId().equals(projectId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
+            Path imagePath = Paths.get(image.getFilePath());
+            if (!Files.exists(imagePath)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+
+            byte[] imageBytes = Files.readAllBytes(imagePath);
+            ByteArrayResource resource = new ByteArrayResource(imageBytes);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType(image.getMimeType()));
+            headers.setContentLength(imageBytes.length);
+            headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + image.getOriginalFilename() + "\"");
+
+            return ResponseEntity.ok().headers(headers).body(resource);
+
+        } catch (IOException e) {
+            log.error("Error reading image file {} for project {}: {}", imageId, projectId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (RuntimeException e) {
+            log.error("Error retrieving image {} for project {}: {}", imageId, projectId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            log.error("Unexpected error retrieving image {} for project {}: {}", imageId, projectId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Get all images for a project
+     */
+    @GetMapping("/images")
+    public ResponseEntity<APIResponse<List<ImageUploadDto>>> getImages(@PathVariable UUID projectId) {
+        try {
+            log.info("Get images for project {} endpoint hit", projectId);
+
+            List<ImageUploadDto> images = noteImageService.getImagesByProjectId(projectId);
+
+            return ResponseEntity.ok(
+                    APIResponse.success(HttpStatus.OK.value(), "Images retrieved successfully", images));
+        } catch (RuntimeException e) {
+            log.error("Error retrieving images for project {}: {}", projectId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(APIResponse.error(HttpStatus.NOT_FOUND.value(), e.getMessage(), null));
+        } catch (Exception e) {
+            log.error("Unexpected error retrieving images for project {}: {}", projectId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(APIResponse.error(
+                            HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to retrieve images", null));
+        }
+    }
+
+    /**
+     * Delete an image
+     */
+    @DeleteMapping("/images/{imageId}")
+    public ResponseEntity<APIResponse<String>> deleteImage(@PathVariable UUID projectId, @PathVariable UUID imageId) {
+        try {
+            log.info("Delete image {} for project {} endpoint hit", imageId, projectId);
+
+            NoteImage image = noteImageService.getImageById(imageId);
+
+            // Verify the image belongs to the project
+            if (!image.getProjectId().equals(projectId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(APIResponse.error(HttpStatus.FORBIDDEN.value(), "Image not found in project", null));
+            }
+
+            noteImageService.deleteImage(imageId);
+
+            return ResponseEntity.ok(APIResponse.success(HttpStatus.OK.value(), "Image deleted successfully", null));
+        } catch (RuntimeException e) {
+            log.error("Error deleting image {} for project {}: {}", imageId, projectId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(APIResponse.error(HttpStatus.NOT_FOUND.value(), e.getMessage(), null));
+        } catch (Exception e) {
+            log.error("Unexpected error deleting image {} for project {}: {}", imageId, projectId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(APIResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to delete image", null));
         }
     }
 }
