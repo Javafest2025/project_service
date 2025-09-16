@@ -26,7 +26,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/latex/context/extraction")
 @RequiredArgsConstructor
-@Tag(name = "📝 LaTeX Context Extraction", description = "Batch trigger extraction for papers used in LaTeX editor context")
+@Tag(
+        name = "📝 LaTeX Context Extraction",
+        description = "Batch trigger extraction for papers used in LaTeX editor context")
 public class LatexExtractionController {
 
     private final ExtractionService extractionService;
@@ -90,8 +92,13 @@ public class LatexExtractionController {
         BatchExtractionResponse body = BatchExtractionResponse.from(results);
         return ResponseEntity.ok(APIResponse.success(
                 HttpStatus.OK.value(),
-                String.format("Batch processed: %d total, %d triggered, %d skipped (extracted), %d in-progress, %d errors",
-                        body.total(), body.triggered(), body.skippedAlreadyExtracted(), body.skippedInProgress(), body.errors()),
+                String.format(
+                        "Batch processed: %d total, %d triggered, %d skipped (extracted), %d in-progress, %d errors",
+                        body.total(),
+                        body.triggered(),
+                        body.skippedAlreadyExtracted(),
+                        body.skippedInProgress(),
+                        body.errors()),
                 body));
     }
 
@@ -110,11 +117,13 @@ public class LatexExtractionController {
             String jobId,
             String message) {
         public static BatchExtractionItemResult skippedAlreadyExtracted(String paperId) {
-            return new BatchExtractionItemResult(paperId, "SKIPPED_ALREADY_EXTRACTED", "COMPLETED", null, "Already extracted");
+            return new BatchExtractionItemResult(
+                    paperId, "SKIPPED_ALREADY_EXTRACTED", "COMPLETED", null, "Already extracted");
         }
 
         public static BatchExtractionItemResult skippedInProgress(String paperId, String status) {
-            return new BatchExtractionItemResult(paperId, "SKIPPED_IN_PROGRESS", status, null, "Extraction already in progress");
+            return new BatchExtractionItemResult(
+                    paperId, "SKIPPED_IN_PROGRESS", status, null, "Extraction already in progress");
         }
 
         public static BatchExtractionItemResult triggered(String paperId, String jobId, String status, String message) {
@@ -146,7 +155,8 @@ public class LatexExtractionController {
                 else if ("SKIPPED_IN_PROGRESS".equals(i.action())) skippedInProgress++;
                 else if ("ERROR".equals(i.action())) errors++;
             }
-            return new BatchExtractionResponse(items.size(), triggered, skippedExtracted, skippedInProgress, errors, items);
+            return new BatchExtractionResponse(
+                    items.size(), triggered, skippedExtracted, skippedInProgress, errors, items);
         }
     }
 }
