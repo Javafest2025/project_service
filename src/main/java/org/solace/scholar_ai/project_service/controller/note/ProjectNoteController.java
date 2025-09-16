@@ -12,10 +12,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.solace.scholar_ai.project_service.dto.note.CreateNoteDto;
 import org.solace.scholar_ai.project_service.dto.note.ImageUploadDto;
 import org.solace.scholar_ai.project_service.dto.note.NoteDto;
+import org.solace.scholar_ai.project_service.dto.note.PaperSuggestionDto;
 import org.solace.scholar_ai.project_service.dto.note.UpdateNoteDto;
 import org.solace.scholar_ai.project_service.dto.response.APIResponse;
 import org.solace.scholar_ai.project_service.model.note.NoteImage;
 import org.solace.scholar_ai.project_service.service.note.NoteImageService;
+import org.solace.scholar_ai.project_service.service.note.PaperMentionService;
 import org.solace.scholar_ai.project_service.service.note.ProjectNoteService;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -34,6 +36,7 @@ public class ProjectNoteController {
 
     private final ProjectNoteService projectNoteService;
     private final NoteImageService noteImageService;
+    private final PaperMentionService paperMentionService;
 
     /**
      * Get all notes for a project
@@ -370,6 +373,30 @@ public class ProjectNoteController {
             log.error("Unexpected error deleting image {} for project {}: {}", imageId, projectId, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(APIResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to delete image", null));
+        }
+    }
+
+    /**
+     * Search papers for @ mention suggestions
+     */
+    @GetMapping("/papers/search")
+    public ResponseEntity<APIResponse<List<PaperSuggestionDto>>> searchPapersForMention(
+            @PathVariable UUID projectId, @RequestParam String q) {
+        try {
+            log.info("Search papers for mention in project {} with query: {}", projectId, q);
+
+            List<PaperSuggestionDto> suggestions = paperMentionService.searchPapersForMention(projectId, q);
+
+            return ResponseEntity.ok(APIResponse.success(
+                    HttpStatus.OK.value(), "Paper suggestions retrieved successfully", suggestions));
+        } catch (RuntimeException e) {
+            log.error("Error searching papers for mention in project {}: {}", projectId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(APIResponse.error(HttpStatus.NOT_FOUND.value(), e.getMessage(), null));
+        } catch (Exception e) {
+            log.error("Unexpected error searching papers for mention in project {}: {}", projectId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(APIResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to search papers", null));
         }
     }
 }

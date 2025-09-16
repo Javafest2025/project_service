@@ -24,6 +24,7 @@ public class ProjectNoteService {
     private final ProjectNoteRepository projectNoteRepository;
     private final ProjectNoteMapper projectNoteMapper;
     private final NoteImageService noteImageService;
+    private final PaperMentionService paperMentionService;
 
     /**
      * Get all notes for a project
@@ -67,6 +68,14 @@ public class ProjectNoteService {
             // Continue with note creation even if image association fails
         }
 
+        // Extract and save paper mentions
+        try {
+            paperMentionService.extractAndSaveMentions(projectId, savedNote.getId(), savedNote.getContent());
+        } catch (Exception e) {
+            log.warn("Failed to extract paper mentions from note {}: {}", savedNote.getId(), e.getMessage());
+            // Continue with note creation even if mention extraction fails
+        }
+
         log.info("Note created successfully with ID: {}", savedNote.getId());
         return projectNoteMapper.toDto(savedNote);
     }
@@ -103,6 +112,14 @@ public class ProjectNoteService {
             // Continue with note update even if image association fails
         }
 
+        // Extract and save paper mentions (in case content was updated)
+        try {
+            paperMentionService.extractAndSaveMentions(projectId, savedNote.getId(), savedNote.getContent());
+        } catch (Exception e) {
+            log.warn("Failed to extract paper mentions from note {}: {}", savedNote.getId(), e.getMessage());
+            // Continue with note update even if mention extraction fails
+        }
+
         log.info("Note updated successfully with ID: {}", savedNote.getId());
         return projectNoteMapper.toDto(savedNote);
     }
@@ -124,6 +141,15 @@ public class ProjectNoteService {
         } catch (Exception e) {
             log.warn("Failed to delete some images for note {}: {}", noteId, e.getMessage());
             // Continue with note deletion even if image cleanup fails
+        }
+
+        // Delete associated paper mentions
+        try {
+            paperMentionService.deleteMentionsByNoteId(noteId);
+            log.info("Deleted associated paper mentions for note: {}", noteId);
+        } catch (Exception e) {
+            log.warn("Failed to delete some paper mentions for note {}: {}", noteId, e.getMessage());
+            // Continue with note deletion even if mention cleanup fails
         }
 
         // Delete the note
@@ -156,8 +182,8 @@ public class ProjectNoteService {
     public List<NoteDto> getFavoriteNotesByProjectId(UUID projectId, UUID userId) {
         log.info("Fetching favorite notes for project: {} for user: {}", projectId, userId);
 
-        List<ProjectNote> notes = projectNoteRepository.findByProjectIdAndIsFavoriteOrderByUpdatedAtDesc(projectId,
-                true);
+        List<ProjectNote> notes =
+                projectNoteRepository.findByProjectIdAndIsFavoriteOrderByUpdatedAtDesc(projectId, true);
         return notes.stream().map(projectNoteMapper::toDto).toList();
     }
 

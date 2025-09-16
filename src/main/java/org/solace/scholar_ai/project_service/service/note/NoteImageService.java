@@ -118,8 +118,7 @@ public class NoteImageService {
      * specific note
      */
     public void associateOrphanedImagesWithNote(UUID projectId, UUID noteId) {
-        List<NoteImage> orphanedImages = noteImageRepository.findByProjectIdOrderByUploadedAtDesc(projectId)
-                .stream()
+        List<NoteImage> orphanedImages = noteImageRepository.findByProjectIdOrderByUploadedAtDesc(projectId).stream()
                 .filter(image -> image.getNoteId() == null)
                 .toList();
 
@@ -194,8 +193,8 @@ public class NoteImageService {
 
                 log.info("Deleted image {} for project {}", image.getId(), projectId);
             } catch (IOException e) {
-                log.error("Failed to delete image file {} for project {}: {}", image.getId(), projectId,
-                        e.getMessage());
+                log.error(
+                        "Failed to delete image file {} for project {}: {}", image.getId(), projectId, e.getMessage());
                 // Still delete from database even if file deletion fails
                 noteImageRepository.delete(image);
             }
@@ -227,15 +226,19 @@ public class NoteImageService {
         Instant cutoffTime = Instant.now().minus(hoursOld, java.time.temporal.ChronoUnit.HOURS);
 
         List<NoteImage> oldOrphanedImages = noteImageRepository.findByProjectIdOrderByUploadedAtDesc(projectId).stream()
-                .filter(image -> image.getNoteId() == null && image.getUploadedAt().isBefore(cutoffTime))
+                .filter(image ->
+                        image.getNoteId() == null && image.getUploadedAt().isBefore(cutoffTime))
                 .toList();
 
         for (NoteImage image : oldOrphanedImages) {
             deleteImage(image.getId());
         }
 
-        log.info("Cleaned up {} old orphaned images (older than {} hours) for project {}",
-                oldOrphanedImages.size(), hoursOld, projectId);
+        log.info(
+                "Cleaned up {} old orphaned images (older than {} hours) for project {}",
+                oldOrphanedImages.size(),
+                hoursOld,
+                projectId);
     }
 
     /**
@@ -256,7 +259,7 @@ public class NoteImageService {
         }
 
         // Check for common image types
-        String[] allowedTypes = { "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp" };
+        String[] allowedTypes = {"image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"};
         boolean isValidType = false;
         for (String allowedType : allowedTypes) {
             if (contentType.equals(allowedType)) {
