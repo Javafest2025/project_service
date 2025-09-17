@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.solace.scholar_ai.project_service.dto.note.AIContentRequestDto;
+import org.solace.scholar_ai.project_service.dto.note.AIContentResponseDto;
 import org.solace.scholar_ai.project_service.dto.note.CreateNoteDto;
 import org.solace.scholar_ai.project_service.dto.note.ImageUploadDto;
 import org.solace.scholar_ai.project_service.dto.note.NoteDto;
@@ -16,6 +18,7 @@ import org.solace.scholar_ai.project_service.dto.note.PaperSuggestionDto;
 import org.solace.scholar_ai.project_service.dto.note.UpdateNoteDto;
 import org.solace.scholar_ai.project_service.dto.response.APIResponse;
 import org.solace.scholar_ai.project_service.model.note.NoteImage;
+import org.solace.scholar_ai.project_service.service.ai.AIContentService;
 import org.solace.scholar_ai.project_service.service.note.NoteImageService;
 import org.solace.scholar_ai.project_service.service.note.PaperMentionService;
 import org.solace.scholar_ai.project_service.service.note.ProjectNoteService;
@@ -37,6 +40,7 @@ public class ProjectNoteController {
     private final ProjectNoteService projectNoteService;
     private final NoteImageService noteImageService;
     private final PaperMentionService paperMentionService;
+    private final AIContentService aiContentService;
 
     /**
      * Get all notes for a project
@@ -397,6 +401,37 @@ public class ProjectNoteController {
             log.error("Unexpected error searching papers for mention in project {}: {}", projectId, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(APIResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to search papers", null));
+        }
+    }
+
+    /**
+     * Generate AI content for notes
+     */
+    @PostMapping("/ai/generate")
+    public ResponseEntity<APIResponse<AIContentResponseDto>> generateAIContent(
+            @PathVariable UUID projectId, @Valid @RequestBody AIContentRequestDto request) {
+        try {
+            log.info("Generate AI content for project {} with prompt: {}", projectId, request.prompt());
+
+            String generatedContent =
+                    aiContentService.generateNoteContent(request.prompt(), request.context(), projectId);
+
+            AIContentResponseDto response = new AIContentResponseDto(generatedContent, "success", null);
+
+            return ResponseEntity.ok(
+                    APIResponse.success(HttpStatus.OK.value(), "AI content generated successfully", response));
+        } catch (RuntimeException e) {
+            log.error("Error generating AI content for project {}: {}", projectId, e.getMessage());
+            AIContentResponseDto errorResponse = new AIContentResponseDto(null, "error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(APIResponse.error(HttpStatus.BAD_REQUEST.value(), e.getMessage(), errorResponse));
+        } catch (Exception e) {
+            log.error("Unexpected error generating AI content for project {}: {}", projectId, e.getMessage());
+            AIContentResponseDto errorResponse =
+                    new AIContentResponseDto(null, "error", "Failed to generate AI content");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(APIResponse.error(
+                            HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to generate AI content", errorResponse));
         }
     }
 }
