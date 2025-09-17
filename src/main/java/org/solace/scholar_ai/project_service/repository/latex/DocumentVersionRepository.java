@@ -23,4 +23,9 @@ public interface DocumentVersionRepository extends JpaRepository<DocumentVersion
     long countByDocumentId(@Param("documentId") UUID documentId);
 
     List<DocumentVersion> findByDocumentIdAndIsAutoSaveFalseOrderByVersionNumberDesc(UUID documentId);
+
+    /**
+     * Delete document versions by document IDs
+     */
+    void deleteByDocumentIdIn(List<UUID> documentIds);
 }

@@ -53,4 +53,15 @@ public interface PaperRepository extends JpaRepository<Paper, UUID> {
 
     // LaTeX Context methods
     List<Paper> findByCorrelationIdInAndIsLatexContext(List<String> correlationIds, Boolean isLatexContext);
+
+    /**
+     * Find paper IDs by project ID
+     */
+    @Query("SELECT p.id FROM Paper p WHERE p.correlationId IN (SELECT wso.correlationId FROM WebSearchOperation wso WHERE wso.projectId = :projectId)")
+    List<UUID> findIdsByProjectId(@Param("projectId") UUID projectId);
+
+    /**
+     * Delete papers by IDs
+     */
+    void deleteByIdIn(List<UUID> paperIds);
 }

@@ -28,4 +28,15 @@ public interface DocumentRepository extends JpaRepository<Document, UUID> {
 
     @Query("SELECT COUNT(d) FROM Document d WHERE d.projectId = :projectId")
     long countByProjectId(@Param("projectId") UUID projectId);
+
+    /**
+     * Find document IDs by project ID
+     */
+    @Query("SELECT d.id FROM Document d WHERE d.projectId = :projectId")
+    List<UUID> findIdsByProjectId(@Param("projectId") UUID projectId);
+
+    /**
+     * Delete documents by project ID
+     */
+    void deleteByProjectId(UUID projectId);
 }

@@ -43,7 +43,17 @@ public interface ChatSessionRepository extends JpaRepository<ChatSession, UUID> 
     /**
      * Update last message timestamp
      */
-    @Query(
-            "UPDATE ChatSession cs SET cs.lastMessageAt = :timestamp, cs.updatedAt = :timestamp WHERE cs.id = :sessionId")
+    @Query("UPDATE ChatSession cs SET cs.lastMessageAt = :timestamp, cs.updatedAt = :timestamp WHERE cs.id = :sessionId")
     void updateLastMessageAt(@Param("sessionId") UUID sessionId, @Param("timestamp") Instant timestamp);
+
+    /**
+     * Find chat session IDs by project ID
+     */
+    @Query("SELECT cs.id FROM ChatSession cs WHERE cs.projectId = :projectId")
+    List<UUID> findIdsByProjectId(@Param("projectId") UUID projectId);
+
+    /**
+     * Delete chat sessions by project ID
+     */
+    void deleteByProjectId(UUID projectId);
 }

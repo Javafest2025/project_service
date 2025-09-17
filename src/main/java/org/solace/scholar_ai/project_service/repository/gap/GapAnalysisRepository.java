@@ -74,4 +74,22 @@ public interface GapAnalysisRepository extends JpaRepository<GapAnalysis, UUID> 
      */
     @Query("SELECT ga FROM GapAnalysis ga WHERE ga.status = 'PROCESSING' AND ga.startedAt < :cutoffTime")
     List<GapAnalysis> findStuckAnalyses(@Param("cutoffTime") java.time.Instant cutoffTime);
+
+    /**
+     * Find gap analysis IDs by paper IDs
+     */
+    @Query("SELECT ga.id FROM GapAnalysis ga WHERE ga.paper.id IN :paperIds")
+    List<UUID> findIdsByPaperIdIn(@Param("paperIds") List<UUID> paperIds);
+
+    /**
+     * Count gap analyses by paper IDs
+     */
+    @Query("SELECT COUNT(ga) FROM GapAnalysis ga WHERE ga.paper.id IN :paperIds")
+    long countByPaperIdIn(@Param("paperIds") List<UUID> paperIds);
+
+    /**
+     * Delete gap analyses by paper IDs
+     */
+    @Query("DELETE FROM GapAnalysis ga WHERE ga.paper.id IN :paperIds")
+    void deleteByPaperIdIn(@Param("paperIds") List<UUID> paperIds);
 }
