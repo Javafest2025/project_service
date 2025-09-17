@@ -20,9 +20,7 @@ public interface PaperExtractionRepository extends JpaRepository<PaperExtraction
      * @param paperId The paper ID
      * @return Optional PaperExtraction with sections loaded
      */
-    @Query("SELECT pe FROM PaperExtraction pe " 
-            + "LEFT JOIN FETCH pe.sections "
-            + "WHERE pe.paper.id = :paperId")
+    @Query("SELECT pe FROM PaperExtraction pe " + "LEFT JOIN FETCH pe.sections " + "WHERE pe.paper.id = :paperId")
     Optional<PaperExtraction> findByPaperIdWithSections(@Param("paperId") UUID paperId);
 
     /**
@@ -31,9 +29,7 @@ public interface PaperExtractionRepository extends JpaRepository<PaperExtraction
      * @param paperId The paper ID
      * @return Optional PaperExtraction with references loaded
      */
-    @Query("SELECT pe FROM PaperExtraction pe " 
-            + "LEFT JOIN FETCH pe.references "
-            + "WHERE pe.paper.id = :paperId")
+    @Query("SELECT pe FROM PaperExtraction pe " + "LEFT JOIN FETCH pe.references " + "WHERE pe.paper.id = :paperId")
     Optional<PaperExtraction> findByPaperIdWithReferences(@Param("paperId") UUID paperId);
 
     /**

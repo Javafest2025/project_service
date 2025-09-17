@@ -35,7 +35,7 @@ public class CitationCheckResponseDto {
 
     private LocalDateTime completedAt;
 
-    private Map<String, Object> summary; // JSON summary of results
+    private CitationSummaryDto summary; // Normalized summary
 
     private List<CitationIssueDto> issues; // Issues found (if completed)
 
@@ -47,13 +47,19 @@ public class CitationCheckResponseDto {
 
         private UUID id;
 
+        private UUID projectId; // NEW - for frontend convenience
+
+        private UUID documentId; // NEW - for frontend convenience
+
+        private String filename; // NEW - for frontend convenience
+
         private String issueType; // missing-citation, weak-citation, etc.
 
-        private String severity; // ERROR, WARNING, INFO
+        private String severity; // low, medium, high
 
-        private String citationText; // The citation or claim text
+        private String citationText; // The citation or claim text (snippet)
 
-        private Integer position; // Character position in document
+        private Integer position; // Character position in document (from)
 
         private Integer length; // Length of the problematic text
 
@@ -63,11 +69,40 @@ public class CitationCheckResponseDto {
 
         private String message; // Human-readable issue description
 
-        private String suggestion; // Suggested fix or improvement
+        private List<String> citedKeys; // NEW - bibliography keys in the span
+
+        private List<SuggestionDto> suggestions; // NEW - suggested citations
 
         private Boolean resolved; // Whether user marked as resolved
 
+        private String createdAt; // NEW - timestamp as string
+
         private List<EvidenceDto> evidence; // Supporting/contradicting evidence
+
+        @Data
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class SuggestionDto {
+
+            private String kind; // 'local' | 'web'
+
+            private Double score;
+
+            private String paperId;
+
+            private String url;
+
+            private String bibTex;
+
+            private String title;
+
+            private List<String> authors;
+
+            private Integer year;
+
+            private String description;
+        }
 
         @Data
         @Builder

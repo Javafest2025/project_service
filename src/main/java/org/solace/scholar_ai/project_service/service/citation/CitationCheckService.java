@@ -1,18 +1,23 @@
 package org.solace.scholar_ai.project_service.service.citation;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.solace.scholar_ai.project_service.dto.citation.CitationCheckRequestDto;
 import org.solace.scholar_ai.project_service.dto.citation.CitationCheckResponseDto;
+import org.solace.scholar_ai.project_service.dto.citation.CitationSummaryDto;
+import org.solace.scholar_ai.project_service.dto.paper.PaperMetadataDto;
 import org.solace.scholar_ai.project_service.model.citation.CitationCheck;
 import org.solace.scholar_ai.project_service.model.citation.CitationEvidence;
 import org.solace.scholar_ai.project_service.model.citation.CitationIssue;
@@ -20,7 +25,6 @@ import org.solace.scholar_ai.project_service.repository.citation.CitationCheckRe
 import org.solace.scholar_ai.project_service.repository.citation.CitationEvidenceRepository;
 import org.solace.scholar_ai.project_service.repository.citation.CitationIssueRepository;
 import org.solace.scholar_ai.project_service.service.paper.PaperPersistenceService;
-import org.solace.scholar_ai.project_service.dto.paper.PaperMetadataDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +34,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class CitationCheckService {
 
     private static final Logger logger = LoggerFactory.getLogger(CitationCheckService.class);
+
+    // Listener interface for SSE streaming
+    public interface CitationJobListener {
+        void onStatus(UUID jobId, String status, String step, int progressPct);
+
+        void onIssue(UUID jobId, CitationCheckResponseDto.CitationIssueDto issue);
+
+        void onSummary(UUID jobId, CitationSummaryDto summary);
+
+        void onError(UUID jobId, String error);
+
+        void onComplete(UUID jobId);
+    }
+
+    // Map to store job listeners for SSE streaming
+    private final Map<UUID, CitationJobListener> jobListeners = new ConcurrentHashMap<>();
 
     @Autowired
     private CitationCheckRepository citationCheckRepository;
@@ -47,6 +67,94 @@ public class CitationCheckService {
     private PaperPersistenceService paperPersistenceService;
 
     /**
+     * Register a job listener for SSE streaming
+     */
+    public void registerJobListener(UUID jobId, CitationJobListener listener) {
+        jobListeners.put(jobId, listener);
+        logger.debug("Registered listener for job {}", jobId);
+    }
+
+    /**
+     * Unregister a job listener
+     */
+    public void unregisterJobListener(UUID jobId) {
+        jobListeners.remove(jobId);
+        logger.debug("Unregistered listener for job {}", jobId);
+    }
+
+    /**
+     * Notify listeners about status updates
+     */
+    private void notifyStatus(UUID jobId, String status, String step, int progressPct) {
+        CitationJobListener listener = jobListeners.get(jobId);
+        if (listener != null) {
+            try {
+                listener.onStatus(jobId, status, step, progressPct);
+            } catch (Exception e) {
+                logger.warn("Error notifying listener for job {}: {}", jobId, e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Notify listeners about new issues
+     */
+    private void notifyIssue(UUID jobId, CitationCheckResponseDto.CitationIssueDto issue) {
+        CitationJobListener listener = jobListeners.get(jobId);
+        if (listener != null) {
+            try {
+                listener.onIssue(jobId, issue);
+            } catch (Exception e) {
+                logger.warn("Error notifying listener for job {}: {}", jobId, e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Notify listeners about summary
+     */
+    private void notifySummary(UUID jobId, CitationSummaryDto summary) {
+        CitationJobListener listener = jobListeners.get(jobId);
+        if (listener != null) {
+            try {
+                listener.onSummary(jobId, summary);
+            } catch (Exception e) {
+                logger.warn("Error notifying listener for job {}: {}", jobId, e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Notify listeners about errors
+     */
+    private void notifyError(UUID jobId, String error) {
+        CitationJobListener listener = jobListeners.get(jobId);
+        if (listener != null) {
+            try {
+                listener.onError(jobId, error);
+            } catch (Exception e) {
+                logger.warn("Error notifying listener for job {}: {}", jobId, e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Notify listeners about completion
+     */
+    private void notifyComplete(UUID jobId) {
+        CitationJobListener listener = jobListeners.get(jobId);
+        if (listener != null) {
+            try {
+                listener.onComplete(jobId);
+            } catch (Exception e) {
+                logger.warn("Error notifying listener for job {}: {}", jobId, e.getMessage());
+            }
+        }
+        // Auto-unregister after completion
+        unregisterJobListener(jobId);
+    }
+
+    /**
      * Start a new citation check job
      */
     public CitationCheckResponseDto startCitationCheck(CitationCheckRequestDto request) {
@@ -55,12 +163,28 @@ public class CitationCheckService {
                 request.getDocumentId(),
                 request.getProjectId());
 
-        // Check if recent check exists and force recheck is not requested
+        // Calculate content hash for reuse detection
+        String contentHash = calculateContentHash(request.getContent());
+        logger.info("Content hash for citation check: {}", contentHash);
+
+        // Check if recent check exists with same content hash (unless force recheck)
         if (!Boolean.TRUE.equals(request.getForceRecheck())) {
-            Optional<CitationCheck> existing =
-                    citationCheckRepository.findLatestCompletedByDocumentId(request.getDocumentId());
+            Optional<CitationCheck> existing = citationCheckRepository.findLatestCompletedByDocumentIdAndContentHash(
+                    request.getDocumentId(), contentHash);
+
             if (existing.isPresent()) {
                 CitationCheck existingCheck = existing.get();
+                logger.info(
+                        "Found existing citation check {} with matching content hash, returning cached result",
+                        existingCheck.getId());
+                return convertToResponseDto(existingCheck);
+            }
+
+            // Also check for recent checks without content hash (legacy)
+            Optional<CitationCheck> recentCheck =
+                    citationCheckRepository.findLatestCompletedByDocumentId(request.getDocumentId());
+            if (recentCheck.isPresent()) {
+                CitationCheck existingCheck = recentCheck.get();
                 // If completed within last hour, return existing result
                 if (existingCheck.isCompleted()
                         && existingCheck
@@ -72,7 +196,7 @@ public class CitationCheckService {
             }
         }
 
-        // If force recheck or no recent check, delete any existing DONE checks for this document
+        // If force recheck or no cached check, delete any existing DONE checks for this document
         // to avoid unique constraint violation
         citationCheckRepository.deleteCompletedByDocumentId(request.getDocumentId());
 
@@ -81,6 +205,7 @@ public class CitationCheckService {
                 .projectId(request.getProjectId())
                 .documentId(request.getDocumentId())
                 .texFileName(request.getFilename() != null ? request.getFilename() : "document.tex")
+                .contentHash(contentHash) // Store content hash
                 .status(CitationCheck.Status.QUEUED)
                 .step(CitationCheck.Step.PARSING)
                 .progressPct(0)
@@ -173,23 +298,42 @@ public class CitationCheckService {
             // Parse LaTeX content and extract citations using real AI analysis
             updateCheckProgress(check, CitationCheck.Status.RUNNING, CitationCheck.Step.LOCAL_RETRIEVAL, 30);
 
-            // Use real citation analysis instead of mock
-            // Get papers marked for LaTeX context from the project
-            List<PaperMetadataDto> latexContextPapers = paperPersistenceService.findLatexContextPapersByProjectId(check.getProjectId());
-            List<String> selectedPaperIds = latexContextPapers.stream()
-                .map(paper -> paper.id().toString())
-                .toList();
-            
-            logger.info("Found {} papers in LaTeX context for project {}", selectedPaperIds.size(), check.getProjectId());
-            
-            boolean enableWebSearch = request.getOptions() != null && Boolean.TRUE.equals(request.getOptions().getCheckWeb());
-            
+            // Use selectedPaperIds from request if provided, otherwise use LaTeX context papers
+            List<String> selectedPaperIds;
+            if (request.getSelectedPaperIds() != null
+                    && !request.getSelectedPaperIds().isEmpty()) {
+                selectedPaperIds = request.getSelectedPaperIds().stream()
+                        .map(UUID::toString)
+                        .toList();
+                logger.info(
+                        "Using {} selectedPaperIds from request for citation check {}",
+                        selectedPaperIds.size(),
+                        citationCheckId);
+            } else {
+                // Fallback to papers marked for LaTeX context from the project
+                List<PaperMetadataDto> latexContextPapers =
+                        paperPersistenceService.findLatexContextPapersByProjectId(check.getProjectId());
+                selectedPaperIds = latexContextPapers.stream()
+                        .map(paper -> paper.id().toString())
+                        .toList();
+                logger.info(
+                        "Using {} LaTeX context papers for project {} in citation check {}",
+                        selectedPaperIds.size(),
+                        check.getProjectId(),
+                        citationCheckId);
+            }
+
+            boolean enableWebSearch = request.getOptions() != null
+                    && Boolean.TRUE.equals(request.getOptions().getCheckWeb());
+
+            // Pass the configurable options to the analysis service
             List<CitationIssue> issues = citationAnalysisService.analyzeDocument(
-                check, 
-                request.getContent(), 
-                selectedPaperIds, 
-                enableWebSearch
-            );
+                    check,
+                    request.getContent(),
+                    selectedPaperIds,
+                    enableWebSearch,
+                    request.getOptions() // Pass options for configurable thresholds
+                    );
 
             updateCheckProgress(check, CitationCheck.Status.RUNNING, CitationCheck.Step.WEB_RETRIEVAL, 60);
 
@@ -215,6 +359,9 @@ public class CitationCheckService {
                 check.setStatus(CitationCheck.Status.ERROR);
                 check.setErrorMessage("Error: " + e.getMessage());
                 citationCheckRepository.save(check);
+
+                // Notify listeners about error
+                notifyError(citationCheckId, e.getMessage());
             }
         }
 
@@ -227,6 +374,9 @@ public class CitationCheckService {
         check.setStep(step);
         check.setProgressPct(progressPercent);
         citationCheckRepository.save(check);
+
+        // Notify listeners about progress
+        notifyStatus(check.getId(), status.toString(), step.toString(), progressPercent);
     }
 
     private void finalizeCheck(CitationCheck check, List<CitationIssue> issues) {
@@ -235,6 +385,12 @@ public class CitationCheckService {
             issue.setCitationCheck(check);
         }
         citationIssueRepository.saveAll(issues);
+
+        // Notify listeners about each issue
+        for (CitationIssue issue : issues) {
+            CitationCheckResponseDto.CitationIssueDto issueDto = convertIssueToDto(issue);
+            notifyIssue(check.getId(), issueDto);
+        }
 
         // Update check status
         check.setStatus(CitationCheck.Status.DONE);
@@ -262,8 +418,12 @@ public class CitationCheckService {
         summaryMap.put("completedAt", LocalDateTime.now().toString());
 
         check.setSummary(summaryMap);
-
         citationCheckRepository.save(check);
+
+        // Notify listeners about summary and completion
+        CitationSummaryDto summaryDto = convertSummaryToDto(summaryMap, check);
+        notifySummary(check.getId(), summaryDto);
+        notifyComplete(check.getId());
     }
 
     private List<String> extractCitations(String content) {
@@ -290,11 +450,12 @@ public class CitationCheckService {
                 .lineStart(45) // Actual CodeMirror line number
                 .lineEnd(45)
                 .snippet("For a European agricultural case study, see")
-                .citedKeys(new String[]{}) // Add empty array for cited keys
+                .citedKeys(new String[] {}) // Add empty array for cited keys
                 .suggestions(new ArrayList<>()) // Add empty list for suggestions
                 .build();
 
-        // Second issue: "Challenges and Opportunities of Large Transnational Datasets" - Line 65 (based on actual CodeMirror position)
+        // Second issue: "Challenges and Opportunities of Large Transnational Datasets" - Line 65 (based on actual
+        // CodeMirror position)
         CitationIssue mockIssue2 = CitationIssue.builder()
                 .citationCheck(check)
                 .projectId(check.getProjectId())
@@ -302,24 +463,25 @@ public class CitationCheckService {
                 .type(CitationIssue.IssueType.MISSING_CITATION)
                 .severity(CitationIssue.Severity.LOW)
                 .fromPos(2494) // Position in document for line 65
-                .toPos(2605) // End position  
+                .toPos(2605) // End position
                 .lineStart(65) // Actual CodeMirror line number
                 .lineEnd(65)
-                .snippet("Challenges and Opportunities of Large Transnational Datasets: A Case Study on European Administrative Crop Data")
-                .citedKeys(new String[]{}) // Add empty array for cited keys
+                .snippet(
+                        "Challenges and Opportunities of Large Transnational Datasets: A Case Study on European Administrative Crop Data")
+                .citedKeys(new String[] {}) // Add empty array for cited keys
                 .suggestions(new ArrayList<>()) // Add empty list for suggestions
                 .build();
 
         issues.add(mockIssue1);
         issues.add(mockIssue2);
-        
+
         // Log the created issues to verify line numbers
         logger.info("Created mock issues:");
         for (CitationIssue issue : issues) {
-            logger.info("Issue ID: {}, Line: {}, Snippet: '{}'", 
-                issue.getId(), issue.getLineStart(), issue.getSnippet());
+            logger.info(
+                    "Issue ID: {}, Line: {}, Snippet: '{}'", issue.getId(), issue.getLineStart(), issue.getSnippet());
         }
-        
+
         return issues;
     }
 
@@ -338,7 +500,8 @@ public class CitationCheckService {
 
         // Parse summary JSON
         if (check.getSummary() != null) {
-            builder.summary(check.getSummary());
+            CitationSummaryDto summaryDto = convertSummaryToDto(check.getSummary(), check);
+            builder.summary(summaryDto);
         }
 
         // Convert issues if available
@@ -352,12 +515,18 @@ public class CitationCheckService {
     }
 
     private CitationCheckResponseDto.CitationIssueDto convertIssueToDto(CitationIssue issue) {
-        logger.info("Converting issue to DTO: ID={}, LineStart={}, LineEnd={}, Snippet='{}'", 
-            issue.getId(), issue.getLineStart(), issue.getLineEnd(), issue.getSnippet());
-            
+        logger.info(
+                "Converting issue to DTO: ID={}, LineStart={}, LineEnd={}, Snippet='{}'",
+                issue.getId(),
+                issue.getLineStart(),
+                issue.getLineEnd(),
+                issue.getSnippet());
+
         CitationCheckResponseDto.CitationIssueDto.CitationIssueDtoBuilder builder =
                 CitationCheckResponseDto.CitationIssueDto.builder()
                         .id(issue.getId())
+                        .projectId(issue.getProjectId())
+                        .documentId(issue.getDocumentId())
                         .issueType(issue.getType().getValue())
                         .severity(issue.getSeverity().toString())
                         .citationText(issue.getSnippet())
@@ -366,16 +535,17 @@ public class CitationCheckService {
                         .lineStart(issue.getLineStart())
                         .lineEnd(issue.getLineEnd())
                         .message("Citation issue detected") // TODO: Add proper message field
-                        .suggestion(
-                                issue.getSuggestions() != null
-                                        ? issue.getSuggestions().toString()
-                                        : null) // Convert List to String for DTO
+                        .citedKeys(issue.getCitedKeys() != null ? List.of(issue.getCitedKeys()) : List.of())
+                        .suggestions(List.of()) // Empty suggestions for now
                         .resolved(issue.getResolved()); // Use the actual resolved field
 
         CitationCheckResponseDto.CitationIssueDto dto = builder.build();
-        
-        logger.info("Created DTO: LineStart={}, LineEnd={}, CitationText='{}'", 
-            dto.getLineStart(), dto.getLineEnd(), dto.getCitationText());
+
+        logger.info(
+                "Created DTO: LineStart={}, LineEnd={}, CitationText='{}'",
+                dto.getLineStart(),
+                dto.getLineEnd(),
+                dto.getCitationText());
 
         // Convert evidence if available
         if (issue.getEvidence() != null && !issue.getEvidence().isEmpty()) {
@@ -399,5 +569,62 @@ public class CitationCheckService {
                                 ? evidence.getExtra().toString()
                                 : null) // Convert Map to String for DTO
                 .build();
+    }
+
+    private CitationSummaryDto convertSummaryToDto(Map<String, Object> summaryMap, CitationCheck check) {
+        if (summaryMap == null) {
+            return null;
+        }
+
+        int totalIssues = summaryMap.get("totalIssues") != null ? (Integer) summaryMap.get("totalIssues") : 0;
+        int errorCount = summaryMap.get("errorCount") != null ? (Integer) summaryMap.get("errorCount") : 0;
+        int warningCount = summaryMap.get("warningCount") != null ? (Integer) summaryMap.get("warningCount") : 0;
+        int infoCount = summaryMap.get("infoCount") != null ? (Integer) summaryMap.get("infoCount") : 0;
+
+        Map<String, Integer> byType = new HashMap<>();
+        byType.put("error", errorCount);
+        byType.put("warning", warningCount);
+        byType.put("info", infoCount);
+
+        return CitationSummaryDto.builder()
+                .total(totalIssues)
+                .byType(byType)
+                .contentHash(check.getContentHash()) // Use actual content hash from check
+                .startedAt(check.getCreatedAt()
+                        .atZone(java.time.ZoneId.systemDefault())
+                        .toInstant())
+                .finishedAt(
+                        check.isCompleted()
+                                ? check.getUpdatedAt()
+                                        .atZone(java.time.ZoneId.systemDefault())
+                                        .toInstant()
+                                : null)
+                .build();
+    }
+
+    /**
+     * Calculate SHA-256 hash of content for caching
+     */
+    private String calculateContentHash(String content) {
+        if (content == null || content.trim().isEmpty()) {
+            return null;
+        }
+
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(content.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            logger.error("SHA-256 algorithm not available", e);
+            return null;
+        }
     }
 }

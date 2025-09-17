@@ -72,4 +72,28 @@ public interface CitationCheckRepository extends JpaRepository<CitationCheck, UU
     @Query(
             "SELECT c FROM CitationCheck c LEFT JOIN FETCH c.issues WHERE c.documentId = :documentId AND c.status = 'DONE' ORDER BY c.createdAt DESC")
     Optional<CitationCheck> findLatestByDocumentIdWithIssues(@Param("documentId") UUID documentId);
+
+    /**
+     * Find completed citation check by document and content hash for reuse
+     */
+    @Query(
+            "SELECT c FROM CitationCheck c LEFT JOIN FETCH c.issues WHERE c.documentId = :documentId AND c.contentHash = :contentHash AND c.status = 'DONE' ORDER BY c.createdAt DESC")
+    Optional<CitationCheck> findByDocumentIdAndContentHashWithIssues(
+            @Param("documentId") UUID documentId, @Param("contentHash") String contentHash);
+
+    /**
+     * Find latest completed citation check by document and content hash (for cache reuse)
+     */
+    @Query(
+            "SELECT c FROM CitationCheck c WHERE c.documentId = :documentId AND c.contentHash = :contentHash AND c.status = 'DONE' ORDER BY c.createdAt DESC")
+    Optional<CitationCheck> findLatestCompletedByDocumentIdAndContentHash(
+            @Param("documentId") UUID documentId, @Param("contentHash") String contentHash);
+
+    /**
+     * Check if a completed check exists for this document and content hash
+     */
+    @Query(
+            "SELECT COUNT(c) > 0 FROM CitationCheck c WHERE c.documentId = :documentId AND c.contentHash = :contentHash AND c.status = 'DONE'")
+    boolean existsByDocumentIdAndContentHashAndCompleted(
+            @Param("documentId") UUID documentId, @Param("contentHash") String contentHash);
 }

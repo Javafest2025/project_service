@@ -37,6 +37,9 @@ public class CitationCheck {
     @Column(name = "tex_file_name", nullable = false)
     private String texFileName;
 
+    @Column(name = "content_hash", length = 64)
+    private String contentHash; // SHA256 hash of LaTeX content
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private Status status;
