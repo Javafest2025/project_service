@@ -92,3 +92,6 @@ hs_err_pid*
 
 # Spring Boot specific
 .springBeans
+
+# Uploaded files
+uploads/

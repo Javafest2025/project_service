@@ -137,6 +137,10 @@ scholarai:
   fastapi:
     papersearch-url: http://localhost:8001
     extractor-url: http://localhost:8002
+  notes:
+    images:
+      upload-path: ${NOTES_IMAGES_PATH:./uploads/note-images}
+      max-size: ${NOTES_IMAGES_MAX_SIZE:10485760} # 10MB
   rabbitmq:
     exchange: scholarai.exchange
     web-search:

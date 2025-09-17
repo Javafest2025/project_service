@@ -39,3 +39,6 @@ build/
 *.log
 *.pid
 
+# Uploaded files
+uploads/
+
