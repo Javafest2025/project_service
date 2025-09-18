@@ -162,8 +162,8 @@ public class ProjectController {
         try {
             log.info("Update project {} endpoint hit for user: {}", projectId, updateProjectDto.userId());
 
-            ProjectDto updatedProject = projectService.updateProject(projectId, updateProjectDto,
-                    updateProjectDto.userId());
+            ProjectDto updatedProject =
+                    projectService.updateProject(projectId, updateProjectDto, updateProjectDto.userId());
 
             return ResponseEntity.ok(
                     APIResponse.success(HttpStatus.OK.value(), "Project updated successfully", updatedProject));
@@ -313,5 +313,4 @@ public class ProjectController {
                             null));
         }
     }
-
 }

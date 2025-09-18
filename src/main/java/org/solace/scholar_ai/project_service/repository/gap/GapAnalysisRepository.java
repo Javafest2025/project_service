@@ -7,6 +7,7 @@ import org.solace.scholar_ai.project_service.model.gap.GapAnalysis;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -90,6 +91,7 @@ public interface GapAnalysisRepository extends JpaRepository<GapAnalysis, UUID> 
     /**
      * Delete gap analyses by paper IDs
      */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM GapAnalysis ga WHERE ga.paper.id IN :paperIds")
     void deleteByPaperIdIn(@Param("paperIds") List<UUID> paperIds);
 }

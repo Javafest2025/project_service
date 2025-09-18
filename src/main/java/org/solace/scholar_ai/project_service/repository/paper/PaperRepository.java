@@ -57,7 +57,8 @@ public interface PaperRepository extends JpaRepository<Paper, UUID> {
     /**
      * Find paper IDs by project ID
      */
-    @Query("SELECT p.id FROM Paper p WHERE p.correlationId IN (SELECT wso.correlationId FROM WebSearchOperation wso WHERE wso.projectId = :projectId)")
+    @Query(
+            "SELECT p.id FROM Paper p WHERE p.correlationId IN (SELECT wso.correlationId FROM WebSearchOperation wso WHERE wso.projectId = :projectId)")
     List<UUID> findIdsByProjectId(@Param("projectId") UUID projectId);
 
     /**

@@ -30,7 +30,8 @@ public interface NoteImageRepository extends JpaRepository<NoteImage, UUID> {
     /**
      * Find images by project ID and note ID
      */
-    @Query("SELECT ni FROM NoteImage ni WHERE ni.projectId = :projectId AND ni.noteId = :noteId ORDER BY ni.uploadedAt DESC")
+    @Query(
+            "SELECT ni FROM NoteImage ni WHERE ni.projectId = :projectId AND ni.noteId = :noteId ORDER BY ni.uploadedAt DESC")
     List<NoteImage> findByProjectIdAndNoteId(@Param("projectId") UUID projectId, @Param("noteId") UUID noteId);
 
     /**

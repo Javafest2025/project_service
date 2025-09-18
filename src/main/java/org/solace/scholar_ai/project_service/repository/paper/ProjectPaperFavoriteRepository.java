@@ -67,4 +67,7 @@ public interface ProjectPaperFavoriteRepository extends JpaRepository<ProjectPap
             "SELECT f FROM ProjectPaperFavorite f JOIN f.paper p WHERE f.project.id = :projectId AND f.userId = :userId AND p.title LIKE %:title%")
     List<ProjectPaperFavorite> findByProjectIdAndUserIdAndPaperTitleContaining(
             @Param("projectId") UUID projectId, @Param("userId") UUID userId, @Param("title") String title);
+
+    // Delete all favorites for a project
+    void deleteByProjectId(UUID projectId);
 }

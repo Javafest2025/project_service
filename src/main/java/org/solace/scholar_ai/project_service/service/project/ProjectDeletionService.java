@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.solace.scholar_ai.project_service.client.UserNotificationClient;
 import org.solace.scholar_ai.project_service.model.project.Project;
 import org.solace.scholar_ai.project_service.repository.chat.ChatMessageRepository;
 import org.solace.scholar_ai.project_service.repository.chat.ChatSessionRepository;
@@ -18,6 +19,7 @@ import org.solace.scholar_ai.project_service.repository.latex.LatexDocumentCheck
 import org.solace.scholar_ai.project_service.repository.note.NoteImageRepository;
 import org.solace.scholar_ai.project_service.repository.note.PaperMentionRepository;
 import org.solace.scholar_ai.project_service.repository.note.ProjectNoteRepository;
+import org.solace.scholar_ai.project_service.repository.paper.PaperAuthorRepository;
 import org.solace.scholar_ai.project_service.repository.paper.PaperRepository;
 import org.solace.scholar_ai.project_service.repository.paper.ProjectPaperFavoriteRepository;
 import org.solace.scholar_ai.project_service.repository.project.ProjectRepository;
@@ -67,6 +69,7 @@ public class ProjectDeletionService {
     private final ChatMessageRepository chatMessageRepository;
 
     // Paper-related repositories
+    private final PaperAuthorRepository paperAuthorRepository;
     private final ProjectPaperFavoriteRepository projectPaperFavoriteRepository;
     private final PaperSummaryRepository paperSummaryRepository;
 
@@ -74,6 +77,7 @@ public class ProjectDeletionService {
     private final GapAnalysisRepository gapAnalysisRepository;
     private final ResearchGapRepository researchGapRepository;
     private final GapValidationPaperRepository gapValidationPaperRepository;
+    private final UserNotificationClient notificationClient;
 
     /**
      * Delete a project and all its related data in a comprehensive manner.
@@ -91,6 +95,15 @@ public class ProjectDeletionService {
         log.info("Project found: {} - {}", project.getName(), project.getDescription());
 
         try {
+            // Collect stats before deletion for notification
+            long readingListCount = readingListItemRepository.countByProjectId(projectId);
+            long mentionCount = paperMentionRepository.countByProjectId(projectId);
+            long noteCount = projectNoteRepository.countByProjectId(projectId);
+            long gapAnalysisCount =
+                    gapAnalysisRepository.countByPaperIdIn(paperRepository.findIdsByProjectId(projectId));
+            long summaryCount = paperSummaryRepository.countByPaperIdIn(paperRepository.findIdsByProjectId(projectId));
+            int paperCount = paperRepository.findIdsByProjectId(projectId).size();
+
             // Step 1: Delete project-specific data (these have direct project_id
             // references)
             deleteProjectSpecificData(projectId);
@@ -102,6 +115,20 @@ public class ProjectDeletionService {
             projectRepository.delete(project);
 
             log.info("Project {} deleted successfully with all related data", projectId);
+
+            // Send notification (best-effort)
+            try {
+                java.util.Map<String, Object> data = new java.util.HashMap<>();
+                data.put("projectName", project.getName());
+                data.put("papersCount", paperCount);
+                data.put("notesCount", noteCount);
+                data.put("readingListCount", readingListCount);
+                data.put("gapAnalysesCount", gapAnalysisCount);
+                data.put("summariesCount", summaryCount);
+                data.put("appUrl", "https://scholarai.me");
+                notificationClient.send(userId, "PROJECT_DELETED", data);
+            } catch (Exception ignore) {
+            }
 
         } catch (Exception e) {
             log.error("Error during project deletion: {}", e.getMessage(), e);
@@ -157,9 +184,8 @@ public class ProjectDeletionService {
             log.info("Deleting {} LaTeX documents and related data", documentIds.size());
 
             // Convert UUID to Long for LaTeX repositories (they use Long IDs)
-            List<Long> documentLongIds = documentIds.stream()
-                    .map(UUID::getMostSignificantBits)
-                    .toList();
+            List<Long> documentLongIds =
+                    documentIds.stream().map(UUID::getMostSignificantBits).toList();
 
             // Delete LaTeX AI chat messages
             latexAiChatMessageRepository.deleteByDocumentIdIn(documentLongIds);
@@ -181,7 +207,7 @@ public class ProjectDeletionService {
         List<UUID> chatSessionIds = chatSessionRepository.findIdsByProjectId(projectId);
         if (!chatSessionIds.isEmpty()) {
             log.info("Deleting {} chat sessions and messages", chatSessionIds.size());
-            chatMessageRepository.deleteByChatSessionIdIn(chatSessionIds);
+            chatMessageRepository.deleteBySessionIdIn(chatSessionIds);
             chatSessionRepository.deleteByProjectId(projectId);
         }
 
@@ -238,6 +264,13 @@ public class ProjectDeletionService {
         if (summaryCount > 0) {
             log.info("Deleting {} paper summaries", summaryCount);
             paperSummaryRepository.deleteByPaperIdIn(paperIds);
+        }
+
+        // Delete paper authors (must be deleted before papers due to foreign key
+        // constraint)
+        log.info("Deleting paper authors for {} papers", paperIds.size());
+        for (UUID paperId : paperIds) {
+            paperAuthorRepository.deleteByPaperId(paperId);
         }
 
         // Delete papers (this will cascade to related entities with proper JPA cascade

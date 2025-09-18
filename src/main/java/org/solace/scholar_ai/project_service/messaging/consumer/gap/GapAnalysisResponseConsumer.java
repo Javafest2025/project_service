@@ -5,11 +5,15 @@ import java.time.Instant;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.solace.scholar_ai.project_service.client.UserNotificationClient;
 import org.solace.scholar_ai.project_service.dto.messaging.gap.GapAnalysisMessageResponse;
 import org.solace.scholar_ai.project_service.model.gap.GapAnalysis;
 import org.solace.scholar_ai.project_service.model.gap.ResearchGap;
+import org.solace.scholar_ai.project_service.model.papersearch.WebSearchOperation;
 import org.solace.scholar_ai.project_service.repository.gap.GapAnalysisRepository;
 import org.solace.scholar_ai.project_service.repository.gap.ResearchGapRepository;
+import org.solace.scholar_ai.project_service.repository.papersearch.WebSearchOperationRepository;
+import org.solace.scholar_ai.project_service.repository.project.ProjectRepository;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +29,9 @@ public class GapAnalysisResponseConsumer {
     private final GapAnalysisRepository gapAnalysisRepository;
     private final ResearchGapRepository researchGapRepository;
     private final ObjectMapper objectMapper;
+    private final WebSearchOperationRepository webSearchOperationRepository;
+    private final ProjectRepository projectRepository;
+    private final UserNotificationClient notificationClient;
 
     /**
      * Process gap analysis response from the gap analyzer service.
@@ -75,6 +82,72 @@ public class GapAnalysisResponseConsumer {
             }
 
             gapAnalysisRepository.save(gapAnalysis);
+
+            // Send notification on success (best-effort)
+            try {
+                if (gapAnalysis.getStatus() == GapAnalysis.GapStatus.COMPLETED) {
+                    // Get user ID through Paper -> correlationId -> WebSearchOperation -> Project
+                    // -> userId
+                    String paperCorrelationId = gapAnalysis.getPaper().getCorrelationId();
+                    java.util.UUID userId = null;
+
+                    log.debug(
+                            "Looking for user ID for gap analysis notification, paperCorrelationId: {}",
+                            paperCorrelationId);
+
+                    if (org.springframework.util.StringUtils.hasText(paperCorrelationId)) {
+                        WebSearchOperation op = webSearchOperationRepository
+                                .findByCorrelationId(paperCorrelationId)
+                                .orElse(null);
+                        if (op != null) {
+                            var project = projectRepository
+                                    .findById(op.getProjectId())
+                                    .orElse(null);
+                            if (project != null) {
+                                userId = project.getUserId();
+                                java.util.Map<String, Object> data = new java.util.HashMap<>();
+                                data.put("paperTitle", gapAnalysis.getPaper().getTitle());
+                                data.put("gapsCount", response.getTotalGaps());
+                                data.put("validGaps", response.getValidGaps());
+                                data.put("projectName", project.getName());
+                                data.put(
+                                        "gapNames",
+                                        response.getGaps() != null
+                                                ? response.getGaps().stream()
+                                                        .map(
+                                                                org.solace.scholar_ai.project_service.dto.messaging.gap
+                                                                                .GapAnalysisMessageResponse.GapData
+                                                                        ::getName)
+                                                        .toList()
+                                                : java.util.List.of());
+                                data.put("appUrl", "https://scholarai.me");
+
+                                log.info(
+                                        "Sending gap analysis notification to user: {}, paper: {}, gaps: {}",
+                                        userId,
+                                        gapAnalysis.getPaper().getTitle(),
+                                        response.getTotalGaps());
+
+                                notificationClient.send(userId, "GAP_ANALYSIS_COMPLETED", data);
+                            } else {
+                                log.warn(
+                                        "Project not found for gap analysis notification, projectId: {}",
+                                        op.getProjectId());
+                            }
+                        } else {
+                            log.warn(
+                                    "WebSearchOperation not found for gap analysis notification, correlationId: {}",
+                                    paperCorrelationId);
+                        }
+                    } else {
+                        log.warn(
+                                "No correlationId found in paper for gap analysis notification, paperId: {}",
+                                gapAnalysis.getPaper().getId());
+                    }
+                }
+            } catch (Exception e) {
+                log.error("Failed to send gap analysis notification for requestId: {}", response.getRequestId(), e);
+            }
 
         } catch (Exception e) {
             log.error("Failed to process gap analysis response for requestId: {}", response.getRequestId(), e);

@@ -39,10 +39,10 @@ public class ReadingListItemService {
         String priority = filters.get("priority");
         String difficulty = filters.get("difficulty");
         String relevance = filters.get("relevance");
-        Boolean isBookmarked = filters.get("isBookmarked") != null ? Boolean.valueOf(filters.get("isBookmarked"))
-                : null;
-        Boolean isRecommended = filters.get("isRecommended") != null ? Boolean.valueOf(filters.get("isRecommended"))
-                : null;
+        Boolean isBookmarked =
+                filters.get("isBookmarked") != null ? Boolean.valueOf(filters.get("isBookmarked")) : null;
+        Boolean isRecommended =
+                filters.get("isRecommended") != null ? Boolean.valueOf(filters.get("isRecommended")) : null;
         String sortBy = filters.get("sortBy");
         String sortOrder = filters.get("sortOrder");
 
@@ -240,23 +240,22 @@ public class ReadingListItemService {
         validateProjectAccess(projectId, userId);
 
         long totalItems = readingListItemRepository.countByProjectId(projectId);
-        long pendingItems = readingListItemRepository.countByProjectIdAndStatus(projectId,
-                ReadingListItem.Status.PENDING);
-        long inProgressItems = readingListItemRepository.countByProjectIdAndStatus(projectId,
-                ReadingListItem.Status.IN_PROGRESS);
-        long completedItems = readingListItemRepository.countByProjectIdAndStatus(projectId,
-                ReadingListItem.Status.COMPLETED);
-        long skippedItems = readingListItemRepository.countByProjectIdAndStatus(projectId,
-                ReadingListItem.Status.SKIPPED);
+        long pendingItems =
+                readingListItemRepository.countByProjectIdAndStatus(projectId, ReadingListItem.Status.PENDING);
+        long inProgressItems =
+                readingListItemRepository.countByProjectIdAndStatus(projectId, ReadingListItem.Status.IN_PROGRESS);
+        long completedItems =
+                readingListItemRepository.countByProjectIdAndStatus(projectId, ReadingListItem.Status.COMPLETED);
+        long skippedItems =
+                readingListItemRepository.countByProjectIdAndStatus(projectId, ReadingListItem.Status.SKIPPED);
 
         Double averageRating = readingListItemRepository.getAverageRatingByProjectId(projectId);
         Long totalEstimatedTime = readingListItemRepository.getTotalEstimatedTimeByProjectId(projectId);
         Long totalActualTime = readingListItemRepository.getTotalActualTimeByProjectId(projectId);
 
         double completionRate = totalItems > 0 ? (double) completedItems / totalItems * 100 : 0;
-        double averageReadingTime = completedItems > 0 && totalActualTime != null
-                ? (double) totalActualTime / completedItems
-                : 0;
+        double averageReadingTime =
+                completedItems > 0 && totalActualTime != null ? (double) totalActualTime / completedItems : 0;
 
         return Map.of(
                 "totalItems", totalItems,
@@ -301,8 +300,7 @@ public class ReadingListItemService {
      * Handle status changes and update timestamps accordingly
      */
     private void handleStatusChange(ReadingListItem item, String newStatus) {
-        if (newStatus == null)
-            return;
+        if (newStatus == null) return;
 
         ReadingListItem.Status status = ReadingListItem.Status.valueOf(newStatus.toUpperCase());
         ReadingListItem.Status oldStatus = item.getStatus();

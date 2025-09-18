@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.solace.scholar_ai.project_service.client.UserNotificationClient;
 import org.solace.scholar_ai.project_service.dto.event.papersearch.WebSearchCompletedEvent;
 import org.solace.scholar_ai.project_service.dto.paper.PaperMetadataDto;
 import org.solace.scholar_ai.project_service.dto.papersearch.request.WebSearchRequestDto;
@@ -15,7 +16,9 @@ import org.solace.scholar_ai.project_service.dto.request.papersearch.WebSearchRe
 import org.solace.scholar_ai.project_service.messaging.publisher.papersearch.WebSearchRequestSender;
 import org.solace.scholar_ai.project_service.model.paper.Paper;
 import org.solace.scholar_ai.project_service.model.papersearch.WebSearchOperation;
+import org.solace.scholar_ai.project_service.model.project.Project;
 import org.solace.scholar_ai.project_service.repository.papersearch.WebSearchOperationRepository;
+import org.solace.scholar_ai.project_service.repository.project.ProjectRepository;
 import org.solace.scholar_ai.project_service.service.paper.PaperPersistenceService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +32,8 @@ public class WebSearchService {
     private final WebSearchOperationRepository webSearchOperationRepository;
     private final PaperPersistenceService paperPersistenceService;
     private final ObjectMapper objectMapper;
+    private final UserNotificationClient notificationClient;
+    private final ProjectRepository projectRepository;
 
     @Transactional
     public WebSearchResponseDto initiateWebSearch(WebSearchRequestDto requestDto) {
@@ -129,6 +134,34 @@ public class WebSearchService {
                     "Updated search results for correlation ID: {} with {} papers",
                     correlationId,
                     event.papers().size());
+
+            // Send notification to user via user-service
+            try {
+                Project project =
+                        projectRepository.findById(operation.getProjectId()).orElse(null);
+                if (project != null) {
+                    java.util.Map<String, Object> data = new java.util.HashMap<>();
+                    data.put("projectName", project.getName());
+                    data.put(
+                            "papersCount",
+                            event.papers() != null ? event.papers().size() : 0);
+                    data.put("domain", operation.getDomain());
+                    data.put("batchSize", operation.getBatchSize());
+                    data.put("correlationId", correlationId);
+                    // queryTerms was saved as JSON; reuse the parsed list used for response
+                    data.put(
+                            "searchTerms",
+                            objectMapper.readValue(
+                                    operation.getQueryTerms(),
+                                    objectMapper
+                                            .getTypeFactory()
+                                            .constructCollectionType(java.util.List.class, String.class)));
+                    data.put("appUrl", "https://scholarai.me");
+                    notificationClient.send(project.getUserId(), "WEB_SEARCH_COMPLETED", data);
+                }
+            } catch (Exception ex) {
+                log.warn("Failed to send web search completed notification: {}", ex.getMessage());
+            }
         } else {
             log.warn("No existing search operation found for correlation ID: {}", correlationId);
         }

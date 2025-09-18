@@ -21,4 +21,10 @@ public interface PaperSummaryRepository extends JpaRepository<PaperSummary, UUID
 
     @Query("SELECT ps FROM PaperSummary ps WHERE ps.reproScore >= :minScore")
     List<PaperSummary> findHighReproducibilitySummaries(Double minScore);
+
+    // Count summaries by paper IDs
+    long countByPaperIdIn(List<UUID> paperIds);
+
+    // Delete summaries by paper IDs
+    void deleteByPaperIdIn(List<UUID> paperIds);
 }

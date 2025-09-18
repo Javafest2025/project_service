@@ -16,53 +16,53 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TodoRepository extends JpaRepository<Todo, String>, JpaSpecificationExecutor<Todo> {
 
-        // Find todos by status
-        List<Todo> findByStatusIn(List<TodoStatus> statuses);
+    // Find todos by status
+    List<Todo> findByStatusIn(List<TodoStatus> statuses);
 
-        // Find todos by priority
-        List<Todo> findByPriorityIn(List<TodoPriority> priorities);
+    // Find todos by priority
+    List<Todo> findByPriorityIn(List<TodoPriority> priorities);
 
-        // Find todos by category
-        List<Todo> findByCategoryIn(List<TodoCategory> categories);
+    // Find todos by category
+    List<Todo> findByCategoryIn(List<TodoCategory> categories);
 
-        // Find todos by due date range
-        List<Todo> findByDueDateBetween(LocalDateTime start, LocalDateTime end);
+    // Find todos by due date range
+    List<Todo> findByDueDateBetween(LocalDateTime start, LocalDateTime end);
 
-        // Find overdue todos
-        @Query("SELECT t FROM Todo t WHERE t.dueDate < :now AND t.status != 'completed'")
-        List<Todo> findOverdueTodos(@Param("now") LocalDateTime now);
+    // Find overdue todos
+    @Query("SELECT t FROM Todo t WHERE t.dueDate < :now AND t.status != 'completed'")
+    List<Todo> findOverdueTodos(@Param("now") LocalDateTime now);
 
-        // Find todos due today
-        @Query("SELECT t FROM Todo t WHERE DATE(t.dueDate) = DATE(:today)")
-        List<Todo> findTodosDueToday(@Param("today") LocalDateTime today);
+    // Find todos due today
+    @Query("SELECT t FROM Todo t WHERE DATE(t.dueDate) = DATE(:today)")
+    List<Todo> findTodosDueToday(@Param("today") LocalDateTime today);
 
-        // Find todos due this week
-        @Query("SELECT t FROM Todo t WHERE t.dueDate BETWEEN :startOfWeek AND :endOfWeek")
-        List<Todo> findTodosDueThisWeek(
-                        @Param("startOfWeek") LocalDateTime startOfWeek, @Param("endOfWeek") LocalDateTime endOfWeek);
+    // Find todos due this week
+    @Query("SELECT t FROM Todo t WHERE t.dueDate BETWEEN :startOfWeek AND :endOfWeek")
+    List<Todo> findTodosDueThisWeek(
+            @Param("startOfWeek") LocalDateTime startOfWeek, @Param("endOfWeek") LocalDateTime endOfWeek);
 
-        // Search todos by title or description
-        @Query("SELECT t FROM Todo t WHERE " + "LOWER(t.title) LIKE LOWER(CONCAT('%', :search, '%')) OR "
-                        + "LOWER(t.description) LIKE LOWER(CONCAT('%', :search, '%'))")
-        List<Todo> searchTodos(@Param("search") String search);
+    // Search todos by title or description
+    @Query("SELECT t FROM Todo t WHERE " + "LOWER(t.title) LIKE LOWER(CONCAT('%', :search, '%')) OR "
+            + "LOWER(t.description) LIKE LOWER(CONCAT('%', :search, '%'))")
+    List<Todo> searchTodos(@Param("search") String search);
 
-        // Find todos by tags
-        @Query("SELECT DISTINCT t FROM Todo t JOIN t.tags tag WHERE tag IN :tags")
-        List<Todo> findByTagsIn(@Param("tags") Set<String> tags);
+    // Find todos by tags
+    @Query("SELECT DISTINCT t FROM Todo t JOIN t.tags tag WHERE tag IN :tags")
+    List<Todo> findByTagsIn(@Param("tags") Set<String> tags);
 
-        // Find todos by related project
-        List<Todo> findByRelatedProjectId(String projectId);
+    // Find todos by related project
+    List<Todo> findByRelatedProjectId(String projectId);
 
-        // Count todos by status
-        long countByStatus(TodoStatus status);
+    // Count todos by status
+    long countByStatus(TodoStatus status);
 
-        // Count todos by priority
-        long countByPriority(TodoPriority priority);
+    // Count todos by priority
+    long countByPriority(TodoPriority priority);
 
-        // Find todo IDs by project ID
-        @Query("SELECT t.id FROM Todo t WHERE t.relatedProjectId = :projectId")
-        List<String> findIdsByProjectId(@Param("projectId") String projectId);
+    // Find todo IDs by project ID
+    @Query("SELECT t.id FROM Todo t WHERE t.relatedProjectId = :projectId")
+    List<String> findIdsByProjectId(@Param("projectId") String projectId);
 
-        // Delete todos by project ID
-        void deleteByRelatedProjectId(String projectId);
+    // Delete todos by project ID
+    void deleteByRelatedProjectId(String projectId);
 }
