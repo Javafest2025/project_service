@@ -58,4 +58,11 @@ public interface TodoRepository extends JpaRepository<Todo, String>, JpaSpecific
 
     // Count todos by priority
     long countByPriority(TodoPriority priority);
+
+    // Find todo IDs by project ID
+    @Query("SELECT t.id FROM Todo t WHERE t.relatedProjectId = :projectId")
+    List<String> findIdsByProjectId(@Param("projectId") String projectId);
+
+    // Delete todos by project ID
+    void deleteByRelatedProjectId(String projectId);
 }

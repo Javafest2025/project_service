@@ -134,6 +134,8 @@ resilience4j:
         timeoutDuration: 2s                     # Faster timeout (2s vs 5s)
 
 scholarai:
+  spring:
+    user-service-url: http://localhost:8081
   fastapi:
     papersearch-url: http://localhost:8001
     extractor-url: http://localhost:8002

@@ -28,4 +28,14 @@ public interface ProjectNoteRepository extends JpaRepository<ProjectNote, UUID> 
             nativeQuery = true)
     List<ProjectNote> findByProjectIdAndSearchTerm(
             @Param("projectId") UUID projectId, @Param("searchTerm") String searchTerm);
+
+    /**
+     * Count notes by project ID
+     */
+    long countByProjectId(UUID projectId);
+
+    /**
+     * Delete notes by project ID
+     */
+    void deleteByProjectId(UUID projectId);
 }

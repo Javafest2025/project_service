@@ -14,14 +14,19 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.solace.scholar_ai.project_service.client.UserNotificationClient;
 import org.solace.scholar_ai.project_service.dto.summary.ExtractionContext;
 import org.solace.scholar_ai.project_service.dto.summary.PaperSummaryDto;
 import org.solace.scholar_ai.project_service.exception.PaperNotExtractedException;
 import org.solace.scholar_ai.project_service.model.extraction.*;
 import org.solace.scholar_ai.project_service.model.paper.Paper;
+import org.solace.scholar_ai.project_service.model.papersearch.WebSearchOperation;
+import org.solace.scholar_ai.project_service.model.project.Project;
 import org.solace.scholar_ai.project_service.model.summary.PaperSummary;
 import org.solace.scholar_ai.project_service.repository.extraction.PaperExtractionRepository;
 import org.solace.scholar_ai.project_service.repository.paper.PaperRepository;
+import org.solace.scholar_ai.project_service.repository.papersearch.WebSearchOperationRepository;
+import org.solace.scholar_ai.project_service.repository.project.ProjectRepository;
 import org.solace.scholar_ai.project_service.repository.summary.PaperSummaryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +45,9 @@ public class PaperSummaryGenerationService {
     private final PaperSummaryRepository summaryRepository;
     private final GeminiService geminiService;
     private final ObjectMapper objectMapper;
+    private final UserNotificationClient notificationClient;
+    private final WebSearchOperationRepository webSearchOperationRepository;
+    private final ProjectRepository projectRepository;
 
     private final ExecutorService executorService = Executors.newFixedThreadPool(4);
 
@@ -638,6 +646,37 @@ public class PaperSummaryGenerationService {
             paper.setSummarizationCompletedAt(Instant.now());
             paper.setIsSummarized(true);
             paperRepository.save(paper);
+
+            // Notify user
+            try {
+                java.util.Map<String, Object> data = new java.util.HashMap<>();
+                data.put("paperTitle", paper.getTitle());
+                data.put("doi", paper.getDoi());
+                data.put("confidence", summary.getConfidence());
+                data.put("appUrl", "https://scholarai.me");
+
+                java.util.UUID userId = null;
+                String correlationId = paper.getCorrelationId();
+                if (correlationId != null) {
+                    WebSearchOperation op =
+                            webSearchOperationRepository.findById(correlationId).orElse(null);
+                    if (op != null) {
+                        Project project =
+                                projectRepository.findById(op.getProjectId()).orElse(null);
+                        if (project != null) {
+                            userId = project.getUserId();
+                            data.put("projectName", project.getName());
+                        }
+                    }
+                }
+                if (userId != null) {
+                    notificationClient.send(userId, "SUMMARIZATION_COMPLETED", data);
+                } else {
+                    log.warn("Could not resolve userId for summarization notification of paper {}", paper.getId());
+                }
+            } catch (Exception e) {
+                log.warn("Failed to send summarization completed notification: {}", e.getMessage());
+            }
 
             return summary;
 

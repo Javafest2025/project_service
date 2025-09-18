@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 import org.solace.scholar_ai.project_service.model.gap.GapValidationPaper;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -68,4 +69,17 @@ public interface GapValidationPaperRepository extends JpaRepository<GapValidatio
      * Count validation papers that conflict with gaps.
      */
     long countByConflictsWithGapTrue();
+
+    /**
+     * Count gap validation papers by paper IDs
+     */
+    @Query("SELECT COUNT(gvp) FROM GapValidationPaper gvp WHERE gvp.researchGap.gapAnalysis.paper.id IN :paperIds")
+    long countByPaperIdIn(@Param("paperIds") List<UUID> paperIds);
+
+    /**
+     * Delete gap validation papers by paper IDs
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("DELETE FROM GapValidationPaper gvp WHERE gvp.researchGap.gapAnalysis.paper.id IN :paperIds")
+    void deleteByPaperIdIn(@Param("paperIds") List<UUID> paperIds);
 }

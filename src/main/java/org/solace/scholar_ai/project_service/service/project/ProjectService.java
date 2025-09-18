@@ -2,7 +2,6 @@ package org.solace.scholar_ai.project_service.service.project;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solace.scholar_ai.project_service.dto.project.CreateProjectDto;
@@ -22,6 +21,7 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final ProjectMapper projectMapper;
+    private final ProjectDeletionService projectDeletionService;
 
     /**
      * Create a new project
@@ -59,7 +59,7 @@ public class ProjectService {
         log.info("Fetching all projects for user: {}", userId);
 
         List<Project> projects = projectRepository.findByUserId(userId);
-        return projects.stream().map(projectMapper::toDto).collect(Collectors.toList());
+        return projects.stream().map(projectMapper::toDto).toList();
     }
 
     /**
@@ -70,7 +70,7 @@ public class ProjectService {
         log.info("Fetching projects with status: {} for user: {}", status, userId);
 
         List<Project> projects = projectRepository.findByUserIdAndStatus(userId, status);
-        return projects.stream().map(projectMapper::toDto).collect(Collectors.toList());
+        return projects.stream().map(projectMapper::toDto).toList();
     }
 
     /**
@@ -81,7 +81,7 @@ public class ProjectService {
         log.info("Fetching starred projects for user: {}", userId);
 
         List<Project> projects = projectRepository.findStarredProjectsByUserId(userId);
-        return projects.stream().map(projectMapper::toDto).collect(Collectors.toList());
+        return projects.stream().map(projectMapper::toDto).toList();
     }
 
     /**
@@ -135,19 +135,15 @@ public class ProjectService {
     }
 
     /**
-     * Delete a project
+     * Delete a project and all its related data
      */
     public void deleteProject(UUID projectId, UUID userId) {
         log.info("Deleting project with ID: {} for user: {}", projectId, userId);
 
-        // Only project owners can delete projects
-        Project project = projectRepository
-                .findByIdAndUserId(projectId, userId)
-                .orElseThrow(() -> new RuntimeException("Project not found or access denied"));
+        // Use the comprehensive deletion service to delete project and all related data
+        projectDeletionService.deleteProjectCompletely(projectId, userId);
 
-        projectRepository.delete(project);
-
-        log.info("Project deleted successfully with ID: {}", projectId);
+        log.info("Project and all related data deleted successfully with ID: {}", projectId);
     }
 
     /**

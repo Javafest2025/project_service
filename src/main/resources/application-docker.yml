@@ -34,6 +34,8 @@ spring:
     password: ${RABBITMQ_PASSWORD}
 
 scholarai:
+  spring:
+    user-service-url: ${USER_SERVICE_URL:http://scholar-user-service:8081}
   fastapi:
     papersearch-url: ${FASTAPI_PAPERSEARCH_URL:http://scholar-paper-search:8001}
     extractor-url: ${FASTAPI_EXTRACTOR_URL:http://scholar-extractor:8002}

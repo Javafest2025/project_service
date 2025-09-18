@@ -50,4 +50,9 @@ public interface LatexAiChatSessionRepository extends JpaRepository<LatexAiChatS
      */
     @Query("SELECT COUNT(s) FROM LatexAiChatSession s WHERE s.projectId = :projectId AND s.isActive = true")
     long countActiveSessionsByProject(@Param("projectId") Long projectId);
+
+    /**
+     * Delete chat sessions by document IDs
+     */
+    void deleteByDocumentIdIn(List<Long> documentIds);
 }

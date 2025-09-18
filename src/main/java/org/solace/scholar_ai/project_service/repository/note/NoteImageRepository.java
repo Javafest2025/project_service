@@ -43,4 +43,9 @@ public interface NoteImageRepository extends JpaRepository<NoteImage, UUID> {
      * Delete images by note ID
      */
     void deleteByNoteId(UUID noteId);
+
+    /**
+     * Count images by project ID
+     */
+    long countByProjectId(UUID projectId);
 }

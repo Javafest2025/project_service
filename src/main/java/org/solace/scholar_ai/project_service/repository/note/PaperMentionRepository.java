@@ -51,4 +51,9 @@ public interface PaperMentionRepository extends JpaRepository<PaperMention, UUID
      */
     @Query("SELECT COUNT(pm) > 0 FROM PaperMention pm WHERE pm.projectId = :projectId AND pm.paperId = :paperId")
     boolean existsByProjectIdAndPaperId(@Param("projectId") UUID projectId, @Param("paperId") UUID paperId);
+
+    /**
+     * Count paper mentions by project ID
+     */
+    long countByProjectId(UUID projectId);
 }

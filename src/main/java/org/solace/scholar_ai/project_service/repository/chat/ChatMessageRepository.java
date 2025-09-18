@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 import org.solace.scholar_ai.project_service.model.chat.ChatMessage;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -56,6 +57,7 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, UUID> 
     /**
      * Delete old messages (for cleanup)
      */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM ChatMessage cm WHERE cm.timestamp < :cutoffTime")
     void deleteOldMessages(@Param("cutoffTime") Instant cutoffTime);
 
@@ -65,4 +67,9 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, UUID> 
     @Query(
             "SELECT cm FROM ChatMessage cm WHERE cm.sessionId = :sessionId AND cm.tokenCount IS NOT NULL ORDER BY cm.timestamp DESC")
     List<ChatMessage> findMessagesWithTokenCount(@Param("sessionId") UUID sessionId);
+
+    /**
+     * Delete chat messages by chat session IDs
+     */
+    void deleteBySessionIdIn(List<UUID> sessionIds);
 }

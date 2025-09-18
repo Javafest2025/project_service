@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.solace.scholar_ai.project_service.model.latex.LatexAiChatMessage;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -55,4 +56,11 @@ public interface LatexAiChatMessageRepository extends JpaRepository<LatexAiChatM
             + "AND m.messageType = 'AI' AND m.latexSuggestion IS NOT NULL "
             + "AND m.isApplied = true ORDER BY m.createdAt DESC")
     List<LatexAiChatMessage> findAppliedAiSuggestions(@Param("sessionId") Long sessionId);
+
+    /**
+     * Delete chat messages by document IDs
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("DELETE FROM LatexAiChatMessage m WHERE m.session.documentId IN :documentIds")
+    void deleteByDocumentIdIn(@Param("documentIds") List<Long> documentIds);
 }

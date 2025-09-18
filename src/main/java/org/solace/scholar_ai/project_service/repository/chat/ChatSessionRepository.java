@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.solace.scholar_ai.project_service.model.chat.ChatSession;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -46,4 +47,19 @@ public interface ChatSessionRepository extends JpaRepository<ChatSession, UUID> 
     @Query(
             "UPDATE ChatSession cs SET cs.lastMessageAt = :timestamp, cs.updatedAt = :timestamp WHERE cs.id = :sessionId")
     void updateLastMessageAt(@Param("sessionId") UUID sessionId, @Param("timestamp") Instant timestamp);
+
+    /**
+     * Find chat session IDs by project ID
+     */
+    @Query(
+            "SELECT cs.id FROM ChatSession cs JOIN Paper p ON cs.paperId = p.id JOIN WebSearchOperation wso ON p.correlationId = wso.correlationId WHERE wso.projectId = :projectId")
+    List<UUID> findIdsByProjectId(@Param("projectId") UUID projectId);
+
+    /**
+     * Delete chat sessions by project ID
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(
+            "DELETE FROM ChatSession cs WHERE cs.paperId IN (SELECT p.id FROM Paper p JOIN WebSearchOperation wso ON p.correlationId = wso.correlationId WHERE wso.projectId = :projectId)")
+    void deleteByProjectId(@Param("projectId") UUID projectId);
 }

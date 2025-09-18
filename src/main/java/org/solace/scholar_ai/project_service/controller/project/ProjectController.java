@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.solace.scholar_ai.project_service.dto.project.CreateProjectDto;
 import org.solace.scholar_ai.project_service.dto.project.ProjectDto;
-import org.solace.scholar_ai.project_service.dto.project.ReadingListStatsDto;
 import org.solace.scholar_ai.project_service.dto.project.UpdateProjectDto;
 import org.solace.scholar_ai.project_service.dto.response.APIResponse;
 import org.solace.scholar_ai.project_service.model.project.Project;
@@ -311,41 +310,6 @@ public class ProjectController {
                     .body(APIResponse.error(
                             HttpStatus.INTERNAL_SERVER_ERROR.value(),
                             "Failed to update project active tasks count",
-                            null));
-        }
-    }
-
-    /**
-     * Get reading list statistics for a project
-     */
-    @GetMapping("/{projectId}/reading-list/stats")
-    public ResponseEntity<APIResponse<ReadingListStatsDto>> getReadingListStats(
-            @PathVariable UUID projectId,
-            @RequestParam UUID userId,
-            @RequestParam(defaultValue = "all") String timeRange) {
-        try {
-            log.info(
-                    "Get reading list stats endpoint hit for project: {} and user: {} with timeRange: {}",
-                    projectId,
-                    userId,
-                    timeRange);
-
-            // For now, return empty stats until reading list functionality is implemented
-            ReadingListStatsDto stats = ReadingListStatsDto.builder()
-                    .totalPapers(0)
-                    .readPapers(0)
-                    .unreadPapers(0)
-                    .timeRange(timeRange)
-                    .build();
-
-            return ResponseEntity.ok(APIResponse.success(
-                    HttpStatus.OK.value(), "Reading list statistics retrieved successfully", stats));
-        } catch (Exception e) {
-            log.error("Unexpected error retrieving reading list stats for project {}: {}", projectId, e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(APIResponse.error(
-                            HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                            "Failed to retrieve reading list statistics",
                             null));
         }
     }

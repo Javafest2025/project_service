@@ -7,6 +7,7 @@ import org.solace.scholar_ai.project_service.model.gap.ResearchGap;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -109,4 +110,11 @@ public interface ResearchGapRepository extends JpaRepository<ResearchGap, UUID> 
      */
     @Query("SELECT rg FROM ResearchGap rg WHERE rg.category IN :categories ORDER BY rg.createdAt DESC")
     List<ResearchGap> findByCategories(@Param("categories") List<String> categories);
+
+    /**
+     * Delete research gaps by gap analysis IDs
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("DELETE FROM ResearchGap rg WHERE rg.gapAnalysis.id IN :gapAnalysisIds")
+    void deleteByGapAnalysisIdIn(@Param("gapAnalysisIds") List<UUID> gapAnalysisIds);
 }

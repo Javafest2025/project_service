@@ -67,4 +67,9 @@ public interface LatexDocumentCheckpointRepository extends JpaRepository<LatexDo
             + "AND c.id NOT IN (SELECT c2.id FROM LatexDocumentCheckpoint c2 "
             + "WHERE c2.documentId = :documentId ORDER BY c2.createdAt DESC LIMIT :keepCount)")
     void deleteOldCheckpoints(@Param("documentId") Long documentId, @Param("keepCount") int keepCount);
+
+    /**
+     * Delete checkpoints by document IDs
+     */
+    void deleteByDocumentIdIn(List<Long> documentIds);
 }

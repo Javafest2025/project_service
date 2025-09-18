@@ -7,6 +7,7 @@ import org.solace.scholar_ai.project_service.model.gap.GapAnalysis;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -74,4 +75,23 @@ public interface GapAnalysisRepository extends JpaRepository<GapAnalysis, UUID> 
      */
     @Query("SELECT ga FROM GapAnalysis ga WHERE ga.status = 'PROCESSING' AND ga.startedAt < :cutoffTime")
     List<GapAnalysis> findStuckAnalyses(@Param("cutoffTime") java.time.Instant cutoffTime);
+
+    /**
+     * Find gap analysis IDs by paper IDs
+     */
+    @Query("SELECT ga.id FROM GapAnalysis ga WHERE ga.paper.id IN :paperIds")
+    List<UUID> findIdsByPaperIdIn(@Param("paperIds") List<UUID> paperIds);
+
+    /**
+     * Count gap analyses by paper IDs
+     */
+    @Query("SELECT COUNT(ga) FROM GapAnalysis ga WHERE ga.paper.id IN :paperIds")
+    long countByPaperIdIn(@Param("paperIds") List<UUID> paperIds);
+
+    /**
+     * Delete gap analyses by paper IDs
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("DELETE FROM GapAnalysis ga WHERE ga.paper.id IN :paperIds")
+    void deleteByPaperIdIn(@Param("paperIds") List<UUID> paperIds);
 }
