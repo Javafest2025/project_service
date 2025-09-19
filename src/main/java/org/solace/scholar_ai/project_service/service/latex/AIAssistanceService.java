@@ -209,6 +209,77 @@ public class AIAssistanceService {
         }
     }
 
+    public String generateComprehensiveFinalReview(String content) {
+        try {
+            String prompt = String.format(
+                    """
+                You are an expert academic writing and LaTeX reviewer. Provide a comprehensive final review of this LaTeX document.
+
+                Document content:
+                %s
+
+                Please provide a thorough, detailed, and comprehensive review covering ALL aspects of the document. This should be a ROBUST and EXTENSIVE review that addresses:
+
+                ## **ACADEMIC CONTENT ANALYSIS**
+                1. **Research Quality & Contribution**: Evaluate the novelty, significance, and academic rigor of the work
+                2. **Argument Structure**: Assess logical flow, coherence, and persuasiveness of arguments
+                3. **Literature Review**: Check comprehensiveness and relevance of cited works
+                4. **Methodology**: Analyze research methods and their appropriateness
+                5. **Results & Analysis**: Evaluate data presentation and interpretation
+                6. **Conclusions**: Assess whether conclusions are supported by evidence
+
+                ## **WRITING QUALITY & STYLE**
+                1. **Clarity & Readability**: Assess how clear and accessible the writing is
+                2. **Academic Tone**: Evaluate appropriateness of language and style
+                3. **Grammar & Syntax**: Check for language errors and awkward phrasing
+                4. **Transitions**: Analyze flow between paragraphs and sections
+                5. **Precision**: Check for ambiguous or imprecise language
+
+                ## **STRUCTURE & ORGANIZATION**
+                1. **Document Structure**: Evaluate overall organization and section flow
+                2. **Introduction**: Assess problem setup, motivation, and contributions
+                3. **Body Organization**: Check logical progression of ideas
+                4. **Conclusion**: Evaluate summary and future work discussion
+
+                ## **TECHNICAL & LaTeX ASPECTS**
+                1. **LaTeX Formatting**: Check proper use of commands, environments, and packages
+                2. **Mathematical Notation**: Verify correctness and consistency of equations
+                3. **Figures & Tables**: Assess quality, relevance, and proper referencing
+                4. **Citations & Bibliography**: Check format consistency and completeness
+                5. **Cross-references**: Verify proper referencing of sections, figures, tables
+
+                ## **COMPLIANCE & STANDARDS**
+                1. **Academic Standards**: Check adherence to academic writing conventions
+                2. **Conference/Journal Standards**: Assess compliance with typical requirements
+                3. **Ethical Considerations**: Note any potential ethical issues
+
+                ## **OVERALL ASSESSMENT**
+                Provide a comprehensive overall assessment including:
+                - **Strengths**: What the document does well
+                - **Areas for Improvement**: Specific suggestions for enhancement
+                - **Priority Fixes**: Most critical issues to address
+                - **Publication Readiness**: Assessment of readiness for submission
+
+                **IMPORTANT**: 
+                - Be thorough and detailed in your analysis
+                - Provide specific examples and suggestions
+                - Even if the document is excellent, provide detailed feedback on why it's good and how it aligns with academic standards
+                - If there are issues, be specific about what needs improvement and how to fix it
+                - Make this review comprehensive enough to guide the author in improving their work
+                - Use markdown formatting for better readability
+                - Be encouraging but honest in your assessment
+
+                This should be a COMPREHENSIVE, DETAILED, and PROFESSIONAL academic review.
+                """,
+                    content.length() > 3000 ? content.substring(0, 3000) + "\n\n[Content truncated for analysis...]" : content);
+
+            return callGeminiAPI(prompt);
+        } catch (Exception e) {
+            log.error("Error generating comprehensive final review", e);
+            return "I'm sorry, I encountered an error generating the final review. Please try again.";
+        }
+    }
+
     private String callGeminiAPI(String prompt) {
         try {
             Map<String, Object> requestBody = new HashMap<>();

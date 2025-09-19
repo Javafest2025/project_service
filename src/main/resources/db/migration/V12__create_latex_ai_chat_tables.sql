@@ -2,7 +2,7 @@
 -- V6__create_latex_ai_chat_tables.sql
 
 -- Table to store LaTeX AI chat sessions (one per document)
-CREATE TABLE latex_ai_chat_sessions (
+CREATE TABLE IF NOT EXISTS latex_ai_chat_sessions (
     id BIGSERIAL PRIMARY KEY,
     document_id BIGINT NOT NULL,
     project_id BIGINT NOT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE latex_ai_chat_sessions (
 );
 
 -- Table to store individual chat messages
-CREATE TABLE latex_ai_chat_messages (
+CREATE TABLE IF NOT EXISTS latex_ai_chat_messages (
     id BIGSERIAL PRIMARY KEY,
     session_id BIGINT NOT NULL,
     message_type VARCHAR(10) NOT NULL CHECK (message_type IN ('USER', 'AI')),
@@ -36,7 +36,7 @@ CREATE TABLE latex_ai_chat_messages (
 );
 
 -- Table to store document checkpoints (for restore functionality)
-CREATE TABLE latex_document_checkpoints (
+CREATE TABLE IF NOT EXISTS latex_document_checkpoints (
     id BIGSERIAL PRIMARY KEY,
     document_id BIGINT NOT NULL,
     session_id BIGINT NOT NULL,
@@ -52,11 +52,52 @@ CREATE TABLE latex_document_checkpoints (
     CONSTRAINT fk_latex_checkpoint_message FOREIGN KEY (message_id) REFERENCES latex_ai_chat_messages(id) ON DELETE SET NULL
 );
 
--- Indexes for better performance
-CREATE INDEX idx_latex_chat_sessions_document_id ON latex_ai_chat_sessions(document_id);
-CREATE INDEX idx_latex_chat_sessions_project_id ON latex_ai_chat_sessions(project_id);
-CREATE INDEX idx_latex_chat_messages_session_id ON latex_ai_chat_messages(session_id);
-CREATE INDEX idx_latex_chat_messages_created_at ON latex_ai_chat_messages(created_at);
-CREATE INDEX idx_latex_checkpoints_document_id ON latex_document_checkpoints(document_id);
-CREATE INDEX idx_latex_checkpoints_session_id ON latex_document_checkpoints(session_id);
-CREATE INDEX idx_latex_checkpoints_current ON latex_document_checkpoints(document_id, is_current);
+-- Indexes for better performance (conditional creation)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_latex_chat_sessions_document_id') THEN
+        CREATE INDEX idx_latex_chat_sessions_document_id ON latex_ai_chat_sessions(document_id);
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_latex_chat_sessions_project_id') THEN
+        CREATE INDEX idx_latex_chat_sessions_project_id ON latex_ai_chat_sessions(project_id);
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_latex_chat_messages_session_id') THEN
+        CREATE INDEX idx_latex_chat_messages_session_id ON latex_ai_chat_messages(session_id);
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_latex_chat_messages_created_at') THEN
+        CREATE INDEX idx_latex_chat_messages_created_at ON latex_ai_chat_messages(created_at);
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_latex_checkpoints_document_id') THEN
+        CREATE INDEX idx_latex_checkpoints_document_id ON latex_document_checkpoints(document_id);
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_latex_checkpoints_session_id') THEN
+        CREATE INDEX idx_latex_checkpoints_session_id ON latex_document_checkpoints(session_id);
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_latex_checkpoints_current') THEN
+        CREATE INDEX idx_latex_checkpoints_current ON latex_document_checkpoints(document_id, is_current);
+    END IF;
+END $$;

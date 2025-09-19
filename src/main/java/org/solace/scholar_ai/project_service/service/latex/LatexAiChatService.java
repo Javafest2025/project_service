@@ -2,6 +2,7 @@ package org.solace.scholar_ai.project_service.service.latex;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Data;
@@ -27,7 +28,7 @@ public class LatexAiChatService {
     /**
      * Get or create a chat session for a document
      */
-    public LatexAiChatSessionDto getOrCreateChatSession(Long documentId, Long projectId) {
+    public LatexAiChatSessionDto getOrCreateChatSession(UUID documentId, UUID projectId) {
         log.info("Getting or creating chat session for document: {}, project: {}", documentId, projectId);
 
         Optional<LatexAiChatSession> existingSession =
@@ -58,7 +59,7 @@ public class LatexAiChatService {
     /**
      * Send a message to the chat (user message + AI response)
      */
-    public LatexAiChatMessageDto sendMessage(Long documentId, CreateLatexChatMessageRequest request) {
+    public LatexAiChatMessageDto sendMessage(UUID documentId, CreateLatexChatMessageRequest request) {
         log.info("Sending message to chat for document: {}", documentId);
 
         LatexAiChatSession session = sessionRepository
@@ -159,7 +160,7 @@ public class LatexAiChatService {
      * Get chat history for a document
      */
     @Transactional(readOnly = true)
-    public List<LatexAiChatMessageDto> getChatHistory(Long documentId) {
+    public List<LatexAiChatMessageDto> getChatHistory(UUID documentId) {
         log.info("Getting chat history for document: {}", documentId);
 
         LatexAiChatSession session =
@@ -177,8 +178,8 @@ public class LatexAiChatService {
      * Create a document checkpoint
      */
     public LatexDocumentCheckpointDto createCheckpoint(
-            Long documentId,
-            Long sessionId,
+            UUID documentId,
+            UUID sessionId,
             Long messageId,
             String checkpointName,
             String contentBefore,
@@ -223,7 +224,7 @@ public class LatexAiChatService {
      * Get checkpoints for a document
      */
     @Transactional(readOnly = true)
-    public List<LatexDocumentCheckpointDto> getCheckpoints(Long documentId) {
+    public List<LatexDocumentCheckpointDto> getCheckpoints(UUID documentId) {
         log.info("Getting checkpoints for document: {}", documentId);
 
         List<LatexDocumentCheckpoint> checkpoints =

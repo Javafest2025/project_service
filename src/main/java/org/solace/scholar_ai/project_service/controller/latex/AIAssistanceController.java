@@ -169,4 +169,29 @@ public class AIAssistanceController {
                 .data(aiResponse)
                 .build());
     }
+
+    /**
+     * Generate comprehensive final review of LaTeX document
+     */
+    @PostMapping("/final-review")
+    public ResponseEntity<APIResponse<String>> generateFinalReview(@RequestBody Map<String, String> request) {
+
+        String content = request.get("content");
+
+        if (content == null || content.trim().isEmpty()) {
+            return ResponseEntity.badRequest()
+                    .body(APIResponse.<String>builder()
+                            .status(400)
+                            .message("Content is required")
+                            .build());
+        }
+
+        String finalReview = aiAssistanceService.generateComprehensiveFinalReview(content);
+
+        return ResponseEntity.ok(APIResponse.<String>builder()
+                .status(200)
+                .message("Comprehensive final review generated successfully")
+                .data(finalReview)
+                .build());
+    }
 }

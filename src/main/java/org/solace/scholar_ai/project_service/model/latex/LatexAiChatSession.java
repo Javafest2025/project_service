@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -21,14 +22,14 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class LatexAiChatSession {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
 
     @Column(name = "document_id", nullable = false)
-    private Long documentId;
+    private UUID documentId;
 
     @Column(name = "project_id", nullable = false)
-    private Long projectId;
+    private UUID projectId;
 
     @Column(name = "session_title", nullable = false)
     @Builder.Default
@@ -47,12 +48,14 @@ public class LatexAiChatSession {
     private Boolean isActive = true;
 
     // Relationships
-    @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "session_id")
     @OrderBy("createdAt ASC")
     @Builder.Default
     private List<LatexAiChatMessage> messages = new ArrayList<>();
 
-    @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "document_id")
     @OrderBy("createdAt DESC")
     @Builder.Default
     private List<LatexDocumentCheckpoint> checkpoints = new ArrayList<>();
