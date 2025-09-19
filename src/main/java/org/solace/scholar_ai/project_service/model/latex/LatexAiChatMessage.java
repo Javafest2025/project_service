@@ -3,7 +3,6 @@ package org.solace.scholar_ai.project_service.model.latex;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
@@ -52,7 +51,6 @@ public class LatexAiChatMessage {
     @Builder.Default
     private Boolean isApplied = false;
 
-    @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
