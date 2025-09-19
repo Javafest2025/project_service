@@ -1,6 +1,7 @@
 package org.solace.scholar_ai.project_service.dto.latex;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.*;
 import org.solace.scholar_ai.project_service.model.latex.LatexAiChatMessage;
 
@@ -10,7 +11,7 @@ import org.solace.scholar_ai.project_service.model.latex.LatexAiChatMessage;
 @Builder
 public class LatexAiChatMessageDto {
     private Long id;
-    private Long sessionId;
+    private UUID sessionId;
     private LatexAiChatMessage.MessageType messageType;
     private String content;
     private String latexSuggestion;

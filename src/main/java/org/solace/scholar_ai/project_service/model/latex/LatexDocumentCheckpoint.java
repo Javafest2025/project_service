@@ -2,6 +2,7 @@ package org.solace.scholar_ai.project_service.model.latex;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -22,7 +23,7 @@ public class LatexDocumentCheckpoint {
     private Long id;
 
     @Column(name = "document_id", nullable = false)
-    private Long documentId;
+    private UUID documentId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "session_id", nullable = false)

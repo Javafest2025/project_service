@@ -36,7 +36,9 @@ LABEL service="project-service" \
 
 # Install curl for health checks (minimal installation)
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl && \
+    apt-get install -y --no-install-recommends \
+        curl \
+        texlive-full && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 

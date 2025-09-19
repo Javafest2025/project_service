@@ -5,6 +5,11 @@ spring:
     discovery:
       enabled: true
 
+  # Async timeout configuration for long-running SSE connections
+  mvc:
+    async:
+      request-timeout: -1  # No timeout for async requests
+
   datasource:
     url: jdbc:postgresql://localhost:${PROJECT_DB_PORT}/projectDB
     username: ${PROJECT_DB_USER}
@@ -40,6 +45,8 @@ server:
     include-binding-errors: always
     include-stacktrace: never
     include-exception: false
+  tomcat:
+    connection-timeout: 600000  # 10 minutes timeout for connections
 
 eureka:
   client:
