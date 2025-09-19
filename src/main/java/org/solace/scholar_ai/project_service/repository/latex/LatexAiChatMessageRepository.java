@@ -68,6 +68,6 @@ public interface LatexAiChatMessageRepository extends JpaRepository<LatexAiChatM
      * Delete messages by document IDs
      */
     @Modifying
-    @Query("DELETE FROM LatexAiChatMessage m WHERE m.session.documentId IN :documentIds")
+    @Query("DELETE FROM LatexAiChatMessage m WHERE m.session.document.id IN :documentIds")
     void deleteByDocumentIdIn(@Param("documentIds") List<UUID> documentIds);
 }
