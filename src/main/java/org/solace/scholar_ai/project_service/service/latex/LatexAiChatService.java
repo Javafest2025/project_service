@@ -329,12 +329,11 @@ public class LatexAiChatService {
                 .isActive(session.getIsActive())
                 .messageCount(session.getMessageCount())
                 .lastMessageTime(session.getLastMessageTime())
-                .messages(session.getMessages().stream().map(this::convertToDto).collect(Collectors.toList()))
-                .checkpoints(session.getCheckpoints().stream()
-                        .map(this::convertToDto)
-                        .collect(Collectors.toList()))
-                .currentCheckpoint(
-                        session.getCurrentCheckpoint() != null ? convertToDto(session.getCurrentCheckpoint()) : null)
+                .messages(session.getMessages() != null && !session.getMessages().isEmpty() 
+                    ? session.getMessages().stream().map(this::convertToDto).collect(Collectors.toList())
+                    : List.of())
+                .checkpoints(List.of()) // Don't fetch checkpoints here to avoid lazy loading issues
+                .currentCheckpoint(null) // Don't fetch current checkpoint here to avoid lazy loading issues
                 .build();
     }
 

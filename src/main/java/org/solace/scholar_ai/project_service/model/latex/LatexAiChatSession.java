@@ -55,7 +55,7 @@ public class LatexAiChatSession {
     private List<LatexAiChatMessage> messages = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "document_id")
+    @JoinColumn(name = "session_id")
     @OrderBy("createdAt DESC")
     @Builder.Default
     private List<LatexDocumentCheckpoint> checkpoints = new ArrayList<>();
