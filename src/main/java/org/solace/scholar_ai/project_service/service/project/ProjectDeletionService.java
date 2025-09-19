@@ -183,18 +183,14 @@ public class ProjectDeletionService {
         if (!documentIds.isEmpty()) {
             log.info("Deleting {} LaTeX documents and related data", documentIds.size());
 
-            // Convert UUID to Long for LaTeX repositories (they use Long IDs)
-            List<Long> documentLongIds =
-                    documentIds.stream().map(UUID::getMostSignificantBits).toList();
-
             // Delete LaTeX AI chat messages
-            latexAiChatMessageRepository.deleteByDocumentIdIn(documentLongIds);
+            latexAiChatMessageRepository.deleteByDocumentIdIn(documentIds);
 
             // Delete LaTeX AI chat sessions
-            latexAiChatSessionRepository.deleteByDocumentIdIn(documentLongIds);
+            latexAiChatSessionRepository.deleteByDocumentIdIn(documentIds);
 
             // Delete LaTeX document checkpoints
-            latexDocumentCheckpointRepository.deleteByDocumentIdIn(documentLongIds);
+            latexDocumentCheckpointRepository.deleteByDocumentIdIn(documentIds);
 
             // Delete document versions
             documentVersionRepository.deleteByDocumentIdIn(documentIds);

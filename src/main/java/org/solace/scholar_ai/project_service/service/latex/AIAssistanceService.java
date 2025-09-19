@@ -260,7 +260,7 @@ public class AIAssistanceService {
                 - **Priority Fixes**: Most critical issues to address
                 - **Publication Readiness**: Assessment of readiness for submission
 
-                **IMPORTANT**: 
+                **IMPORTANT**:
                 - Be thorough and detailed in your analysis
                 - Provide specific examples and suggestions
                 - Even if the document is excellent, provide detailed feedback on why it's good and how it aligns with academic standards
@@ -271,7 +271,9 @@ public class AIAssistanceService {
 
                 This should be a COMPREHENSIVE, DETAILED, and PROFESSIONAL academic review.
                 """,
-                    content.length() > 3000 ? content.substring(0, 3000) + "\n\n[Content truncated for analysis...]" : content);
+                    content.length() > 3000
+                            ? content.substring(0, 3000) + "\n\n[Content truncated for analysis...]"
+                            : content);
 
             return callGeminiAPI(prompt);
         } catch (Exception e) {

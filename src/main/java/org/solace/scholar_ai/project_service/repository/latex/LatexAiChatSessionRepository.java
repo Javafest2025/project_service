@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.solace.scholar_ai.project_service.model.latex.LatexAiChatSession;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -50,4 +51,11 @@ public interface LatexAiChatSessionRepository extends JpaRepository<LatexAiChatS
      */
     @Query("SELECT COUNT(s) FROM LatexAiChatSession s WHERE s.projectId = :projectId AND s.isActive = true")
     long countActiveSessionsByProject(@Param("projectId") UUID projectId);
+
+    /**
+     * Delete sessions by document IDs
+     */
+    @Modifying
+    @Query("DELETE FROM LatexAiChatSession s WHERE s.documentId IN :documentIds")
+    void deleteByDocumentIdIn(@Param("documentIds") List<UUID> documentIds);
 }

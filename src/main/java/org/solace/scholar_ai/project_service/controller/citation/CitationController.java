@@ -79,7 +79,7 @@ public class CitationController {
             Optional<CitationCheckResponseDto> existingJob = citationCheckService.getCitationCheck(jobId);
             if (existingJob.isPresent() && "DONE".equals(existingJob.get().getStatus())) {
                 logger.info("Job {} is already completed, sending final status immediately", jobId);
-                
+
                 // Send initial status
                 send(
                         emitter,
@@ -102,7 +102,7 @@ public class CitationController {
                                 "status", "DONE",
                                 "step", "Citation check completed",
                                 "progressPct", 100));
-                
+
                 emitter.complete();
                 return emitter;
             }
