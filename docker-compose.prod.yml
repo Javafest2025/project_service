@@ -33,6 +33,8 @@ services:
       - SERVER_TOMCAT_ACCEPT_COUNT=50
       - SPRING_THREADS_VIRTUAL_ENABLED=true
 
+    volumes:
+      - /opt/scholarai/uploads:/app/uploads
     networks:
       - scholarai-network
     restart: unless-stopped
