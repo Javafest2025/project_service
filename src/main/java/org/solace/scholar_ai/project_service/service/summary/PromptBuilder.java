@@ -8,6 +8,10 @@ import org.solace.scholar_ai.project_service.dto.summary.ExtractionContext;
  */
 public class PromptBuilder {
 
+    private PromptBuilder() {
+        // Utility class - prevent instantiation
+    }
+
     private static final String SYSTEM_CONTEXT =
             """
             You are an expert academic paper analyzer specializing in extracting structured information
@@ -32,28 +36,44 @@ public class PromptBuilder {
         prompt.append("\nGenerate a JSON object with the following structure:\n");
         prompt.append(
                 """
-                {
-                    "one_liner": "A single sentence (≤200 chars) describing the central claim/contribution",
-                    "key_contributions": ["contribution 1", "contribution 2", "contribution 3"], // 3-5 bullets
-                    "method_overview": "2-3 sentences describing the approach",
-                    "main_findings": [
                         {
-                            "task": "task name or null",
-                            "metric": "metric name",
-                            "value": "achieved value",
-                            "comparator": "baseline or comparison",
-                            "delta": "improvement percentage or absolute",
-                            "significance": "p-value or confidence"
+                            "one_liner": "A single sentence (≤200 chars) describing the central claim/contribution",
+                            "key_contributions": ["contribution 1", "contribution 2", "contribution 3"], // 3-5 bullets
+                            "method_overview": "2-3 sentences describing the approach",
+                            "main_findings": [
+                                {
+                                    "task": "task name or null",
+                                    "metric": "metric name",
+                                    "value": "achieved value",
+                                    "comparator": "baseline or comparison",
+                                    "delta": "improvement percentage or absolute",
+                                    "significance": "p-value or confidence"
+                                }
+                            ],
+                            "limitations": ["limitation 1", "limitation 2"], // 1-3 bullets
+                            "applicability": ["application area 1", "application area 2"] // where this is useful
                         }
-                    ],
-                    "limitations": ["limitation 1", "limitation 2"], // 1-3 bullets
-                    "applicability": ["application area 1", "application area 2"] // where this is useful
-                }
 
-                Extract this information accurately from the paper content provided.
-                Focus on concrete, measurable contributions and findings.
-                Be specific about improvements and comparisons.
-                """);
+                        IMPORTANT: For limitations, analyze the paper content to identify:
+                        - Explicitly mentioned limitations in dedicated sections
+                        - Methodological constraints and assumptions
+                        - Dataset limitations and scope restrictions
+                        - Computational or resource constraints
+                        - Generalization limitations
+                        - Evaluation methodology weaknesses
+                        - Domain-specific constraints
+
+                        Even if not explicitly stated, infer reasonable limitations based on:
+                        - The methodology used
+                        - Dataset characteristics
+                        - Experimental setup
+                        - Scope of evaluation
+                        - Domain knowledge
+
+                        Extract this information accurately from the paper content provided.
+                        Focus on concrete, measurable contributions and findings.
+                        Be specific about improvements and comparisons.
+                        """);
 
         return prompt.toString();
     }
@@ -219,12 +239,39 @@ public class PromptBuilder {
                                               // documentation quality (0.2), environment details (0.2)
                         }
 
-                        Calculate repro_score based on availability of artifacts and clarity of instructions.
-                        1.0 = fully reproducible with all artifacts
+                        IMPORTANT: For artifacts, look for:
+                        - Explicit URLs in text, references, or footnotes
+                        - Mentions of GitHub, GitLab, or other repositories
+                        - Dataset availability statements
+                        - Model sharing commitments
+                        - Supplementary material references
+                        - Code availability promises
+                        - Docker or containerization mentions
+                        - Configuration file references
+
+                        For reproducibility_notes, analyze:
+                        - Environment setup instructions
+                        - Dependency lists and versions
+                        - Random seed specifications
+                        - Hardware requirements
+                        - Step-by-step reproduction guides
+                        - Parameter settings and hyperparameters
+                        - Data preprocessing steps
+                        - Evaluation procedures
+
+                        Calculate repro_score based on availability of artifacts and clarity of instructions:
+                        1.0 = fully reproducible with all artifacts and clear instructions
                         0.8 = code and data available with good documentation
-                        0.6 = partial artifacts available
-                        0.4 = limited information
+                        0.6 = partial artifacts available with some documentation
+                        0.4 = limited information but some artifacts mentioned
                         0.2 = minimal reproducibility information
+                        0.0 = no reproducibility information available
+
+                        If no explicit reproducibility information is found, provide reasonable assessment based on:
+                        - Code complexity and implementation details provided
+                        - Dataset accessibility and licensing
+                        - Methodological clarity
+                        - Experimental setup completeness
                         """);
 
         return prompt.toString();
@@ -246,39 +293,77 @@ public class PromptBuilder {
         // Look for limitations and broader impact sections
         addLimitationsSections(prompt, context);
 
+        // Add methodology sections to infer potential biases
+        addMethodsSections(prompt, context);
+
+        // Add experiment sections to identify potential risks
+        addExperimentSections(prompt, context);
+
+        // Add discussion sections for broader impact
+        addDiscussionSections(prompt, context);
+
+        // Add comprehensive analysis sections
+        addComprehensiveAnalysisSections(prompt, context);
+
         prompt.append("\nGenerate a JSON object with the following structure:\n");
         prompt.append(
                 """
-                {
-                    "ethics": {
-                        "irb": true/false/null, // IRB approval mentioned
-                        "consent": true/false/null, // informed consent mentioned
-                        "sensitive_data": true/false/null, // handling sensitive data
-                        "privacy_measures": "privacy protection methods used",
-                        "data_anonymization": "anonymization techniques mentioned"
-                    },
-                    "bias_and_fairness": [
-                        "Known bias 1",
-                        "Fairness consideration 2",
-                        "Subgroup performance differences"
-                    ],
-                    "risks_and_misuse": [
-                        "Potential misuse scenario 1",
-                        "Risk to specific groups",
-                        "Unintended consequences"
-                    ],
-                    "data_rights": "License terms, usage restrictions, and data rights information"
-                }
+                        {
+                            "ethics": {
+                                "irb": true/false/null, // IRB approval mentioned
+                                "consent": true/false/null, // informed consent mentioned
+                                "sensitive_data": true/false/null, // handling sensitive data
+                                "privacy_measures": "privacy protection methods used",
+                                "data_anonymization": "anonymization techniques mentioned"
+                            },
+                            "bias_and_fairness": [
+                                "Known bias 1",
+                                "Fairness consideration 2",
+                                "Subgroup performance differences"
+                            ],
+                            "risks_and_misuse": [
+                                "Potential misuse scenario 1",
+                                "Risk to specific groups",
+                                "Unintended consequences"
+                            ],
+                            "data_rights": "License terms, usage restrictions, and data rights information"
+                        }
 
-                Extract ethical considerations, biases, and potential risks.
-                Look for mentions of:
-                - IRB/ethics approval
-                - Data privacy and protection
-                - Potential biases in data or models
-                - Fairness across different groups
-                - Possible misuse scenarios
-                - Environmental impact (if mentioned)
-                """);
+                        IMPORTANT: Even if not explicitly mentioned, analyze the paper content to infer:
+
+                        For bias_and_fairness:
+                        - Dataset composition and potential sampling biases
+                        - Evaluation methodology limitations
+                        - Demographic representation in data
+                        - Algorithmic bias potential
+                        - Fairness across different groups or domains
+                        - Generalization limitations
+
+                        For risks_and_misuse:
+                        - Potential malicious applications of the method
+                        - Privacy risks from data usage
+                        - Security vulnerabilities
+                        - Environmental impact of computational requirements
+                        - Social implications and unintended consequences
+                        - Misinformation or manipulation potential
+
+                        For ethics:
+                        - Look for any human subjects research indicators
+                        - Data collection and usage ethics
+                        - Consent and approval processes
+                        - Data protection measures
+
+                        Extract ethical considerations, biases, and potential risks.
+                        Look for mentions of:
+                        - IRB/ethics approval
+                        - Data privacy and protection
+                        - Potential biases in data or models
+                        - Fairness across different groups
+                        - Possible misuse scenarios
+                        - Environmental impact (if mentioned)
+
+                        If no explicit information is found, provide reasonable inferences based on the methodology and domain.
+                        """);
 
         return prompt.toString();
     }
@@ -302,17 +387,18 @@ public class PromptBuilder {
         // Add discussion/future work sections
         addDiscussionSections(prompt, context);
 
+        // Add comprehensive analysis sections
+        addComprehensiveAnalysisSections(prompt, context);
+
         // Include references for context
         prompt.append("\n## Key References:\n");
-        context.getReferences().stream().limit(10).forEach(ref -> {
-            prompt.append("- ")
-                    .append(ref.getAuthors())
-                    .append(" (")
-                    .append(ref.getYear())
-                    .append("): ")
-                    .append(ref.getTitle())
-                    .append("\n");
-        });
+        context.getReferences().stream().limit(10).forEach(ref -> prompt.append("- ")
+                .append(ref.getAuthors())
+                .append(" (")
+                .append(ref.getYear())
+                .append("): ")
+                .append(ref.getTitle())
+                .append("\n"));
 
         prompt.append("\nGenerate a JSON object with the following structure:\n");
         prompt.append(
@@ -353,6 +439,27 @@ public class PromptBuilder {
                                 "Construct validity concern"
                             ]
                         }
+
+                        IMPORTANT: For threats_to_validity, analyze the paper to identify:
+                        - Internal validity: confounding variables, selection bias, measurement errors
+                        - External validity: generalizability limitations, population differences
+                        - Construct validity: measurement validity, theoretical construct issues
+                        - Statistical validity: sample size, power analysis, multiple comparisons
+                        - Ecological validity: real-world applicability concerns
+
+                        For future_work, look for:
+                        - Explicitly mentioned future directions
+                        - Limitations that suggest future improvements
+                        - Open problems identified in discussion
+                        - Potential extensions mentioned
+                        - Unresolved challenges
+
+                        For interdisciplinary_connections, identify:
+                        - Applications in other domains
+                        - Cross-disciplinary methodologies
+                        - Real-world impact areas
+                        - Industry applications
+                        - Social implications
 
                         Analyze the paper's contribution in context of existing work.
                         Identify the type of novelty and positioning relative to prior art.
@@ -482,6 +589,27 @@ public class PromptBuilder {
                     prompt.append("\n## ").append(section.getTitle()).append(":\n");
                     section.getParagraphs().stream().limit(3).forEach(p -> prompt.append(
                                     p.substring(0, Math.min(400, p.length())))
+                            .append("...\n"));
+                });
+    }
+
+    /**
+     * Add comprehensive analysis sections for better field extraction
+     */
+    private static void addComprehensiveAnalysisSections(StringBuilder prompt, ExtractionContext context) {
+        // Add any section that might contain relevant information
+        prompt.append("\n## Additional Analysis Sections:\n");
+        context.getSections().stream()
+                .filter(s -> s.getType() != null
+                        && (s.getType().toLowerCase().contains("analysis")
+                                || s.getType().toLowerCase().contains("evaluation")
+                                || s.getType().toLowerCase().contains("comparison")
+                                || s.getType().toLowerCase().contains("validation")
+                                || s.getType().toLowerCase().contains("assessment")))
+                .forEach(section -> {
+                    prompt.append("### ").append(section.getTitle()).append(":\n");
+                    section.getParagraphs().stream().limit(2).forEach(p -> prompt.append(
+                                    p.substring(0, Math.min(300, p.length())))
                             .append("...\n"));
                 });
     }

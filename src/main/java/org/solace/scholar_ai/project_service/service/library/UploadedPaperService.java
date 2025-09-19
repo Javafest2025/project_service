@@ -16,6 +16,7 @@ import org.solace.scholar_ai.project_service.model.project.Project;
 import org.solace.scholar_ai.project_service.repository.paper.PaperRepository;
 import org.solace.scholar_ai.project_service.repository.papersearch.WebSearchOperationRepository;
 import org.solace.scholar_ai.project_service.repository.project.ProjectRepository;
+import org.solace.scholar_ai.project_service.service.author.AuthorService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ public class UploadedPaperService {
     private final PaperMapper paperMapper;
     private final ProjectRepository projectRepository;
     private final WebSearchOperationRepository webSearchOperationRepository;
+    private final AuthorService authorService;
 
     /**
      * Process and save an uploaded paper to a project's library
@@ -50,15 +52,37 @@ public class UploadedPaperService {
             // Convert UploadedPaperRequest to PaperMetadataDto
             PaperMetadataDto paperDto = convertToPaperMetadataDto(request, correlationId);
 
-            // Convert to Paper entity
-            Paper paper = paperMapper.fromMetadataDto(paperDto);
+            // Convert to Paper entity WITHOUT authors (to avoid transient entity issues)
+            PaperMetadataDto paperDtoWithoutAuthors = new PaperMetadataDto(
+                    paperDto.id(),
+                    paperDto.title(),
+                    paperDto.abstractText(),
+                    new ArrayList<>(), // Empty authors list
+                    paperDto.publicationDate(),
+                    paperDto.doi(),
+                    paperDto.semanticScholarId(),
+                    paperDto.externalIds(),
+                    paperDto.source(),
+                    paperDto.pdfContentUrl(),
+                    paperDto.pdfUrl(),
+                    paperDto.isOpenAccess(),
+                    paperDto.paperUrl(),
+                    paperDto.venueName(),
+                    paperDto.publisher(),
+                    paperDto.publicationTypes(),
+                    paperDto.volume(),
+                    paperDto.issue(),
+                    paperDto.pages(),
+                    paperDto.citationCount(),
+                    paperDto.referenceCount(),
+                    paperDto.influentialCitationCount(),
+                    paperDto.fieldsOfStudy(),
+                    paperDto.isLatexContext());
+
+            Paper paper = paperMapper.fromMetadataDto(paperDtoWithoutAuthors);
             paper.setCorrelationId(correlationId);
 
             // Set bidirectional relationships
-            if (paper.getPaperAuthors() != null) {
-                paper.getPaperAuthors().forEach(paperAuthor -> paperAuthor.setPaper(paper));
-            }
-
             if (paper.getExternalIds() != null) {
                 paper.getExternalIds().forEach(externalId -> externalId.setPaper(paper));
             }
@@ -71,8 +95,28 @@ public class UploadedPaperService {
                 paper.getMetrics().setPaper(paper);
             }
 
-            // Save the paper
+            // Save the paper first (without authors)
             Paper savedPaper = paperRepository.save(paper);
+
+            // Now handle authors properly - create/find them and link to the paper
+            if (request.authors() != null && !request.authors().isEmpty()) {
+                for (int i = 0; i < request.authors().size(); i++) {
+                    String authorName = request.authors().get(i).name(); // Extract name from AuthorDto
+                    if (authorName != null && !authorName.trim().isEmpty()) {
+                        // Use AuthorService to properly create/find author and link to paper
+                        authorService.getOrCreateAuthorForPaper(
+                                authorName.trim(),
+                                savedPaper,
+                                i + 1, // authorOrder (1-based)
+                                false // isCorrespondingAuthor
+                                );
+                    }
+                }
+                log.info(
+                        "Created {} author relationships for paper: {}",
+                        request.authors().size(),
+                        savedPaper.getId());
+            }
 
             log.info(
                     "Successfully saved uploaded paper: {} (ID: {}) with correlation ID: {}",
