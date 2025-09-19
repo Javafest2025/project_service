@@ -16,7 +16,7 @@ public interface LatexAiChatSessionRepository extends JpaRepository<LatexAiChatS
     /**
      * Find chat session by document ID
      */
-    Optional<LatexAiChatSession> findByDocumentId(UUID documentId);
+    Optional<LatexAiChatSession> findByDocument_Id(UUID documentId);
 
     /**
      * Find all chat sessions for a project
@@ -26,24 +26,24 @@ public interface LatexAiChatSessionRepository extends JpaRepository<LatexAiChatS
     /**
      * Find chat session by document ID and project ID
      */
-    Optional<LatexAiChatSession> findByDocumentIdAndProjectId(UUID documentId, UUID projectId);
+    Optional<LatexAiChatSession> findByDocument_IdAndProjectId(UUID documentId, UUID projectId);
 
     /**
      * Check if a chat session exists for a document
      */
-    boolean existsByDocumentId(UUID documentId);
+    boolean existsByDocument_Id(UUID documentId);
 
     /**
      * Get chat session with messages loaded
      */
-    @Query("SELECT s FROM LatexAiChatSession s LEFT JOIN FETCH s.messages WHERE s.documentId = :documentId")
+    @Query("SELECT s FROM LatexAiChatSession s LEFT JOIN FETCH s.messages WHERE s.document.id = :documentId")
     Optional<LatexAiChatSession> findByDocumentIdWithMessages(@Param("documentId") UUID documentId);
 
     /**
      * Get chat session with messages and checkpoints loaded
      * Note: Using separate queries to avoid MultipleBagFetchException
      */
-    @Query("SELECT s FROM LatexAiChatSession s LEFT JOIN FETCH s.messages WHERE s.documentId = :documentId")
+    @Query("SELECT s FROM LatexAiChatSession s LEFT JOIN FETCH s.messages WHERE s.document.id = :documentId")
     Optional<LatexAiChatSession> findByDocumentIdWithMessagesAndCheckpoints(@Param("documentId") UUID documentId);
 
     /**
@@ -56,6 +56,6 @@ public interface LatexAiChatSessionRepository extends JpaRepository<LatexAiChatS
      * Delete sessions by document IDs
      */
     @Modifying
-    @Query("DELETE FROM LatexAiChatSession s WHERE s.documentId IN :documentIds")
+    @Query("DELETE FROM LatexAiChatSession s WHERE s.document.id IN :documentIds")
     void deleteByDocumentIdIn(@Param("documentIds") List<UUID> documentIds);
 }

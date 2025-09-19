@@ -2,7 +2,6 @@ package org.solace.scholar_ai.project_service.model.latex;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.UUID;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -15,7 +14,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = { "document", "session", "message" })
+@ToString(exclude = {"document", "session", "message"})
 public class LatexDocumentCheckpoint {
 
     @Id
@@ -61,8 +60,7 @@ public class LatexDocumentCheckpoint {
     }
 
     public long getContentSizeDifference() {
-        if (contentAfter == null)
-            return 0;
+        if (contentAfter == null) return 0;
         return (long) contentAfter.length() - contentBefore.length();
     }
 }

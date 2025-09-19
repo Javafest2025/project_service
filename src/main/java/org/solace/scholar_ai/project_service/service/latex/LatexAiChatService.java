@@ -23,6 +23,7 @@ public class LatexAiChatService {
     private final LatexAiChatSessionRepository sessionRepository;
     private final LatexAiChatMessageRepository messageRepository;
     private final LatexDocumentCheckpointRepository checkpointRepository;
+    private final DocumentRepository documentRepository;
     private final AIAssistanceService aiAssistanceService;
 
     /**
@@ -40,8 +41,12 @@ public class LatexAiChatService {
         }
 
         // Create new session
+        Document document = documentRepository
+                .findById(documentId)
+                .orElseThrow(() -> new RuntimeException("Document not found: " + documentId));
+
         LatexAiChatSession newSession = LatexAiChatSession.builder()
-                .documentId(documentId)
+                .document(document)
                 .projectId(projectId)
                 .sessionTitle("LaTeX AI Chat")
                 .isActive(true)
@@ -63,7 +68,7 @@ public class LatexAiChatService {
         log.info("Sending message to chat for document: {}", documentId);
 
         LatexAiChatSession session = sessionRepository
-                .findByDocumentId(documentId)
+                .findByDocument_Id(documentId)
                 .orElseThrow(() -> new RuntimeException("Chat session not found for document: " + documentId));
 
         // Create user message
@@ -149,7 +154,8 @@ public class LatexAiChatService {
 
         // Update checkpoint with the content after application
         checkpointRepository
-                .findByDocumentIdAndIsCurrentTrue(message.getSession().getDocumentId())
+                .findByDocument_IdAndIsCurrentTrue(
+                        message.getSession().getDocument().getId())
                 .ifPresent(checkpoint -> {
                     checkpoint.setContentAfter(contentAfter);
                     checkpointRepository.save(checkpoint);
@@ -164,7 +170,7 @@ public class LatexAiChatService {
         log.info("Getting chat history for document: {}", documentId);
 
         LatexAiChatSession session =
-                sessionRepository.findByDocumentId(documentId).orElse(null);
+                sessionRepository.findByDocument_Id(documentId).orElse(null);
 
         if (session == null) {
             return List.of();
@@ -189,8 +195,12 @@ public class LatexAiChatService {
         // Clear current checkpoint flag
         checkpointRepository.clearCurrentCheckpointForDocument(documentId);
 
+        Document document = documentRepository
+                .findById(documentId)
+                .orElseThrow(() -> new RuntimeException("Document not found: " + documentId));
+
         LatexDocumentCheckpoint checkpoint = LatexDocumentCheckpoint.builder()
-                .documentId(documentId)
+                .document(document)
                 .session(sessionRepository.getReferenceById(sessionId))
                 .message(messageId != null ? messageRepository.getReferenceById(messageId) : null)
                 .checkpointName(checkpointName)
@@ -214,7 +224,8 @@ public class LatexAiChatService {
                 .orElseThrow(() -> new RuntimeException("Checkpoint not found: " + checkpointId));
 
         // Clear current checkpoint flag and set this one as current
-        checkpointRepository.clearCurrentCheckpointForDocument(checkpoint.getDocumentId());
+        checkpointRepository.clearCurrentCheckpointForDocument(
+                checkpoint.getDocument().getId());
         checkpointRepository.setCheckpointAsCurrent(checkpointId);
 
         return checkpoint.getContentBefore();
@@ -228,7 +239,7 @@ public class LatexAiChatService {
         log.info("Getting checkpoints for document: {}", documentId);
 
         List<LatexDocumentCheckpoint> checkpoints =
-                checkpointRepository.findByDocumentIdOrderByCreatedAtDesc(documentId);
+                checkpointRepository.findByDocument_IdOrderByCreatedAtDesc(documentId);
         return checkpoints.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
@@ -321,7 +332,7 @@ public class LatexAiChatService {
     private LatexAiChatSessionDto convertToDto(LatexAiChatSession session) {
         return LatexAiChatSessionDto.builder()
                 .id(session.getId())
-                .documentId(session.getDocumentId())
+                .documentId(session.getDocument().getId())
                 .projectId(session.getProjectId())
                 .sessionTitle(session.getSessionTitle())
                 .createdAt(session.getCreatedAt())
@@ -329,9 +340,12 @@ public class LatexAiChatService {
                 .isActive(session.getIsActive())
                 .messageCount(session.getMessageCount())
                 .lastMessageTime(session.getLastMessageTime())
-                .messages(session.getMessages() != null && !session.getMessages().isEmpty() 
-                    ? session.getMessages().stream().map(this::convertToDto).collect(Collectors.toList())
-                    : List.of())
+                .messages(
+                        session.getMessages() != null && !session.getMessages().isEmpty()
+                                ? session.getMessages().stream()
+                                        .map(this::convertToDto)
+                                        .collect(Collectors.toList())
+                                : List.of())
                 .checkpoints(List.of()) // Don't fetch checkpoints here to avoid lazy loading issues
                 .currentCheckpoint(null) // Don't fetch current checkpoint here to avoid lazy loading issues
                 .build();
@@ -356,7 +370,7 @@ public class LatexAiChatService {
     private LatexDocumentCheckpointDto convertToDto(LatexDocumentCheckpoint checkpoint) {
         return LatexDocumentCheckpointDto.builder()
                 .id(checkpoint.getId())
-                .documentId(checkpoint.getDocumentId())
+                .documentId(checkpoint.getDocument().getId())
                 .sessionId(checkpoint.getSession().getId())
                 .messageId(
                         checkpoint.getMessage() != null

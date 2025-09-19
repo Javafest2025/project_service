@@ -18,7 +18,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = { "document", "messages", "checkpoints" })
+@ToString(exclude = {"document", "messages", "checkpoints"})
 public class LatexAiChatSession {
 
     @Id
