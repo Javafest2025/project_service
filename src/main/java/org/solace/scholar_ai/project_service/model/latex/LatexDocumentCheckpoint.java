@@ -15,15 +15,16 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"session", "message"})
+@ToString(exclude = { "document", "session", "message" })
 public class LatexDocumentCheckpoint {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "document_id", nullable = false)
-    private UUID documentId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "document_id", nullable = false)
+    private Document document;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "session_id", nullable = false)
@@ -60,7 +61,8 @@ public class LatexDocumentCheckpoint {
     }
 
     public long getContentSizeDifference() {
-        if (contentAfter == null) return 0;
-        return contentAfter.length() - contentBefore.length();
+        if (contentAfter == null)
+            return 0;
+        return (long) contentAfter.length() - contentBefore.length();
     }
 }
