@@ -109,7 +109,7 @@ public class UploadedPaperService {
                                 savedPaper,
                                 i + 1, // authorOrder (1-based)
                                 false // isCorrespondingAuthor
-                        );
+                                );
                     }
                 }
                 log.info(
@@ -172,8 +172,8 @@ public class UploadedPaperService {
         // Set defaults for optional fields
         LocalDate publicationDate = request.publicationDate() != null ? request.publicationDate() : LocalDate.now();
         Boolean isOpenAccess = request.isOpenAccess() != null ? request.isOpenAccess() : true;
-        List<String> publicationTypes = request.publicationTypes() != null ? request.publicationTypes()
-                : List.of("Uploaded Document");
+        List<String> publicationTypes =
+                request.publicationTypes() != null ? request.publicationTypes() : List.of("Uploaded Document");
         List<String> fieldsOfStudy = request.fieldsOfStudy() != null ? request.fieldsOfStudy() : new ArrayList<>();
 
         // Ensure pdfUrl is set to pdfContentUrl if not provided
