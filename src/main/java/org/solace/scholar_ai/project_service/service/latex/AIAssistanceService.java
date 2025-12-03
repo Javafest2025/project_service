@@ -20,8 +20,8 @@ public class AIAssistanceService {
     @Value("${gemini.api.key:AIzaSyD1f5phqFOLvgC4zRnpPCd6EBQOegKHNuw}")
     private String geminiApiKey;
 
-    private static final String GEMINI_API_URL =
-            "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent";
+    @Value("${gemini.api.url:https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent}")
+    private String geminiApiUrl;
 
     public Map<String, Object> reviewDocument(String content) {
         try {
@@ -284,6 +284,9 @@ public class AIAssistanceService {
 
     private String callGeminiAPI(String prompt) {
         try {
+            log.info("🤖 Calling Gemini API...");
+            log.debug("Prompt length: {} characters", prompt.length());
+            
             Map<String, Object> requestBody = new HashMap<>();
             Map<String, Object> contents = new HashMap<>();
             Map<String, String> parts = new HashMap<>();
@@ -291,30 +294,51 @@ public class AIAssistanceService {
             contents.put("parts", new Map[] {parts});
             requestBody.put("contents", new Map[] {contents});
 
-            String url = GEMINI_API_URL + "?key=" + geminiApiKey;
+            String url = geminiApiUrl + "?key=" + geminiApiKey;
+            log.debug("Gemini API URL: {}", geminiApiUrl);
+            log.debug("API Key present: {}", geminiApiKey != null && !geminiApiKey.isEmpty());
 
             Map<String, Object> response = restTemplate.postForObject(url, requestBody, Map.class);
+            
+            log.info("✅ Received response from Gemini API");
+            log.debug("Response structure: {}", response != null ? response.keySet() : "null");
 
             if (response != null && response.containsKey("candidates")) {
                 @SuppressWarnings("unchecked")
                 java.util.List<Map<String, Object>> candidates =
                         (java.util.List<Map<String, Object>>) response.get("candidates");
+                log.debug("Number of candidates: {}", candidates != null ? candidates.size() : 0);
+                
                 if (!candidates.isEmpty()) {
                     Map<String, Object> content =
                             (Map<String, Object>) candidates.get(0).get("content");
                     @SuppressWarnings("unchecked")
                     java.util.List<Map<String, String>> contentParts =
                             (java.util.List<Map<String, String>>) content.get("parts");
+                    
                     if (!contentParts.isEmpty()) {
-                        return contentParts.get(0).get("text");
+                        String aiResponse = contentParts.get(0).get("text");
+                        log.info("✨ AI Response length: {} characters", aiResponse != null ? aiResponse.length() : 0);
+                        log.debug("AI Response preview: {}", 
+                            aiResponse != null && aiResponse.length() > 200 
+                                ? aiResponse.substring(0, 200) + "..." 
+                                : aiResponse);
+                        return aiResponse;
                     }
                 }
             }
 
+            log.warn("⚠️ No valid response structure from Gemini API");
             return "No response from AI service";
+        } catch (org.springframework.web.client.HttpClientErrorException e) {
+            log.error("❌ HTTP Client Error calling Gemini API: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
+            throw new RuntimeException("AI service error: " + e.getStatusCode() + " - " + e.getMessage(), e);
+        } catch (org.springframework.web.client.HttpServerErrorException e) {
+            log.error("❌ HTTP Server Error calling Gemini API: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
+            throw new RuntimeException("AI service unavailable: " + e.getStatusCode() + " - " + e.getMessage(), e);
         } catch (Exception e) {
-            log.error("Error calling Gemini API", e);
-            throw new RuntimeException("AI service unavailable", e);
+            log.error("❌ Unexpected error calling Gemini API", e);
+            throw new RuntimeException("AI service unavailable: " + e.getMessage(), e);
         }
     }
 

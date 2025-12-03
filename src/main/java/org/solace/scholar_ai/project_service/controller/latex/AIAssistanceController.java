@@ -2,6 +2,7 @@ package org.solace.scholar_ai.project_service.controller.latex;
 
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.solace.scholar_ai.project_service.dto.response.APIResponse;
 import org.solace.scholar_ai.project_service.service.latex.AIAssistanceService;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/ai-assistance")
 @RequiredArgsConstructor
+@Slf4j
 public class AIAssistanceController {
 
     private final AIAssistanceService aiAssistanceService;
@@ -148,11 +150,13 @@ public class AIAssistanceController {
     @PostMapping("/chat")
     public ResponseEntity<APIResponse<String>> processChatRequest(@RequestBody Map<String, String> request) {
 
+        log.info("💬 Received chat request");
         String selectedText = request.get("selectedText");
         String userRequest = request.get("userRequest");
         String fullDocument = request.get("fullDocument");
 
         if (userRequest == null || userRequest.trim().isEmpty()) {
+            log.warn("⚠️ Chat request rejected: userRequest is empty");
             return ResponseEntity.badRequest()
                     .body(APIResponse.<String>builder()
                             .status(400)
@@ -160,14 +164,26 @@ public class AIAssistanceController {
                             .build());
         }
 
-        String aiResponse = aiAssistanceService.processChatRequest(
-                selectedText != null ? selectedText : "", userRequest, fullDocument != null ? fullDocument : "");
+        log.info("📝 Processing chat request: {}", userRequest.substring(0, Math.min(100, userRequest.length())));
+        try {
+            String aiResponse = aiAssistanceService.processChatRequest(
+                    selectedText != null ? selectedText : "", userRequest, fullDocument != null ? fullDocument : "");
+            log.info("✅ Chat response generated successfully, length: {} characters", aiResponse != null ? aiResponse.length() : 0);
 
-        return ResponseEntity.ok(APIResponse.<String>builder()
-                .status(200)
-                .message("AI response generated")
-                .data(aiResponse)
-                .build());
+            return ResponseEntity.ok(APIResponse.<String>builder()
+                    .status(200)
+                    .message("AI response generated")
+                    .data(aiResponse)
+                    .build());
+        } catch (Exception e) {
+            log.error("❌ Error processing chat request", e);
+            return ResponseEntity.internalServerError()
+                    .body(APIResponse.<String>builder()
+                            .status(500)
+                            .message("Failed to process chat request: " + e.getMessage())
+                            .data("I'm sorry, I encountered an error processing your request. Please try again.")
+                            .build());
+        }
     }
 
     /**
@@ -176,9 +192,11 @@ public class AIAssistanceController {
     @PostMapping("/final-review")
     public ResponseEntity<APIResponse<String>> generateFinalReview(@RequestBody Map<String, String> request) {
 
+        log.info("📝 Received final review request");
         String content = request.get("content");
 
         if (content == null || content.trim().isEmpty()) {
+            log.warn("⚠️ Final review request rejected: content is empty");
             return ResponseEntity.badRequest()
                     .body(APIResponse.<String>builder()
                             .status(400)
@@ -186,12 +204,24 @@ public class AIAssistanceController {
                             .build());
         }
 
-        String finalReview = aiAssistanceService.generateComprehensiveFinalReview(content);
+        log.info("📄 Processing final review for content length: {} characters", content.length());
+        try {
+            String finalReview = aiAssistanceService.generateComprehensiveFinalReview(content);
+            log.info("✅ Final review generated successfully, length: {} characters", finalReview != null ? finalReview.length() : 0);
 
-        return ResponseEntity.ok(APIResponse.<String>builder()
-                .status(200)
-                .message("Comprehensive final review generated successfully")
-                .data(finalReview)
-                .build());
+            return ResponseEntity.ok(APIResponse.<String>builder()
+                    .status(200)
+                    .message("Comprehensive final review generated successfully")
+                    .data(finalReview)
+                    .build());
+        } catch (Exception e) {
+            log.error("❌ Error generating final review", e);
+            return ResponseEntity.internalServerError()
+                    .body(APIResponse.<String>builder()
+                            .status(500)
+                            .message("Failed to generate final review: " + e.getMessage())
+                            .data("I'm sorry, I encountered an error generating the final review. Please try again.")
+                            .build());
+        }
     }
 }
